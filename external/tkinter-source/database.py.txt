@@ -1,0 +1,2566 @@
+import json
+from contextlib import contextmanager
+import sqlite3
+import os
+from datetime import datetime
+
+
+DB_PATH = "data/app.db"
+
+
+@contextmanager
+def get_connection():
+    """Контекстный менеджер для безопасного получения и закрытия соединения"""
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    try:
+        yield conn
+    finally:
+        conn.close()
+
+
+def init_court_schedule_table():
+    """Создает или обновляет таблицу для графика судебных заседаний"""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        # Проверяем, существует ли таблица
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='court_schedule'")
+        table_exists = cursor.fetchone() is not None
+        cursor.execute("PRAGMA table_info(court_schedule)")
+        existing_columns = [col[1] for col in cursor.fetchall()]
+
+        if "hearing_date" not in existing_columns:
+            cursor.execute("ALTER TABLE court_schedule ADD COLUMN hearing_date TEXT")
+
+        if table_exists:
+            # Проверяем, есть ли колонка session_date
+            cursor.execute("PRAGMA table_info(court_schedule)")
+            columns = [col[1] for col in cursor.fetchall()]
+
+            if 'session_date' not in columns:
+                # Таблица существует со старой структурой - нужно пересоздать
+                print("⚠️ Обнаружена старая версия таблицы court_schedule. Обновление структуры...")
+
+                # Копируем данные если они есть
+                cursor.execute("SELECT * FROM court_schedule")
+                old_data = cursor.fetchall()
+
+                # Получаем имена колонок
+                cursor.execute("PRAGMA table_info(court_schedule)")
+                old_columns = [col[1] for col in cursor.fetchall()]
+
+                # Удаляем старую таблицу
+                cursor.execute("DROP TABLE court_schedule")
+
+                # Создаем новую таблицу
+                cursor.execute('''
+                    CREATE TABLE court_schedule (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        session_date TEXT NOT NULL,
+                        court TEXT,
+                        time TEXT,
+                        representative TEXT,
+                        plaintiff TEXT,
+                        defendant TEXT,
+                        category TEXT,
+                        result TEXT,
+                        is_date_row INTEGER DEFAULT 0,
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+                    )
+                ''')
+
+                print("✅ Таблица court_schedule обновлена")
+            else:
+                print("ℹ️ Таблица court_schedule уже существует с правильной структурой")
+        else:
+            # Таблица не существует - создаем новую
+            cursor.execute('''
+                CREATE TABLE court_schedule (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    session_date TEXT NOT NULL,
+                    court TEXT,
+                    time TEXT,
+                    representative TEXT,
+                    plaintiff TEXT,
+                    defendant TEXT,
+                    category TEXT,
+                    result TEXT,
+                    is_date_row INTEGER DEFAULT 0,
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            print("✅ Таблица court_schedule создана")
+
+        # Создаем индексы
+        cursor.execute('CREATE INDEX IF NOT EXISTS idx_session_date ON court_schedule(session_date)')
+        cursor.execute('CREATE INDEX IF NOT EXISTS idx_is_date_row ON court_schedule(is_date_row)')
+
+        conn.commit()
+        return True
+
+
+# ================= CRUD ФУНКЦИИ =================
+
+def schedule_add_date(session_date):
+    """Добавляет строку с датой"""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO court_schedule (session_date, is_date_row)
+            VALUES (?, 1)
+        ''', (session_date,))
+        conn.commit()
+        return True
+
+
+
+
+def schedule_add_case(session_date, data):
+    try:
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                INSERT INTO court_schedule (
+                    session_date,
+                    is_date_row,
+                    court,
+                    time,
+                    representative,
+                    plaintiff,
+                    defendant,
+                    category,
+                    result,
+                    hearing_date
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    session_date,
+                    0,
+                    data.get("court", ""),
+                    data.get("time", ""),
+                    data.get("representative", ""),
+                    data.get("plaintiff", ""),
+                    data.get("defendant", ""),
+                    data.get("category", ""),
+                    data.get("result", ""),
+                    data.get("hearing_date", "")
+                )
+            )
+            conn.commit()
+            return True
+    except Exception as e:
+        print(f"Ошибка schedule_add_case: {e}")
+        return False
+
+
+def schedule_delete_cases_only(record_id):
+    """Удаляет только дело (не дату)"""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM court_schedule WHERE id = ?', (record_id,))
+        conn.commit()
+        return True
+
+
+# ================= ФУНКЦИИ ДЛЯ APP_OPTIONS =================
+
+def get_options_from_db(category):
+    """Получает опции из таблицы app_options по категории"""
+    try:
+        with get_connection() as conn:
+            cursor = conn.cursor()
+
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='app_options';")
+            if not cursor.fetchone():
+                print("⚠️ Таблица 'app_options' не найдена!")
+                return []
+
+            cursor.execute("""
+                SELECT value FROM app_options
+                WHERE category = ?
+                ORDER BY id
+            """, (category,))
+
+            options = [row['value'] for row in cursor.fetchall()]
+            return options
+
+    except Exception as e:
+        print(f"❌ Ошибка загрузки {category}: {e}")
+        return []
+
+
+def init_database():
+    """Инициализация БД и создание всех таблиц"""
+    # Исправление: проверяем, есть ли директория в пути
+    db_dir = os.path.dirname(DB_PATH)
+    if db_dir:  # Создаем директорию только если она есть в пути
+        os.makedirs(db_dir, exist_ok=True)
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        try:
+            # 1. USERS
+            cursor.execute("""CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                full_name TEXT NOT NULL,
+                password TEXT NOT NULL UNIQUE
+            )""")
+            cursor.execute("SELECT COUNT(*) FROM users WHERE password='admin'")
+            if cursor.fetchone()[0] == 0:
+                cursor.execute("INSERT INTO users (full_name, password) VALUES (?, ?)", ("Администратор", "admin"))
+
+            # 2. OPTIONS (СПРАВОЧНИКИ)
+            cursor.execute("""CREATE TABLE IF NOT EXISTS app_options (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                category TEXT NOT NULL,
+                value TEXT NOT NULL,
+                UNIQUE(category, value)
+            )""")
+
+            # ✅ ДОБАВЛЕНО: Категория 'kvartal' с годом 2026
+            default_options = {
+                'court': ["Железнодорожный районный суд г.Барнаула", "Октябрьский районный суд г.Барнаула",
+                         "Индустриальный районный суд г.Барнаула", "Арбитражный суд Алтайского края",
+                         "Центральный районный суд г.Барнаула"],
+                'stage': ["решение-удовлетворено", "решение-отказано", "экспертиза", "на рассмотрении",
+                         "на рассмотрении (после экспертизы)", "без рассмотрения", "заявление возвращено",
+                         "прекращение производства по делу", "не назначено"],
+                'requirements': ["предоставление ЖП", "выкуп ЖП", "выкуп нежилого помещения", "выкуп ОКН"],
+                'execution': ["исполнено", "не исполнено", "не подлежит исполнению"],
+                'property_type': ["жилой дом", "жилой дом и земельный участок", "жилое помещение"],
+                'kvartal': ["I квартал 2026 года", "II квартал 2026 года",
+                            "III квартал 2026 года", "IV квартал 2026 года"],  # <-- Новые значения
+                'prosecutor':["Прокурор ЖР", "Прокурор ЦР"],
+                'district':["ЖР", "ЦР"],
+                'dispute_category':["освещение", "водоснабжение", "предоставление", "дороги"],
+            }
+
+            cursor.execute("""CREATE TABLE IF NOT EXISTS registry (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                kvartal TEXT,
+                pk_number TEXT,
+                address TEXT,
+                fio TEXT,
+                property_type TEXT,
+                notes TEXT,
+                court TEXT,
+                stage TEXT,
+                court_act TEXT,
+                appeal TEXT,
+                requirements TEXT,
+                execution TEXT,
+                collected TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP
+            )""")
+            # Мягкая миграция registry: добавляем недостающие поля, если таблица уже была создана раньше
+            cursor.execute("PRAGMA table_info(registry)")
+            registry_columns = [col[1] for col in cursor.fetchall()]
+
+            registry_required_columns = {
+                "kvartal":"TEXT",
+                "pk_number":"TEXT",
+                "address":"TEXT",
+                "fio":"TEXT",
+                "property_type":"TEXT",
+                "notes":"TEXT",
+                "court":"TEXT",
+                "stage":"TEXT",
+                "court_act":"TEXT",
+                "requirements":"TEXT",
+                "appeal":"TEXT",
+                "execution":"TEXT",
+                "collected":"TEXT",
+                "updated_at":"TIMESTAMP"
+            }
+
+            for col_name, col_type in registry_required_columns.items():
+                if col_name not in registry_columns:
+                    try:
+                        cursor.execute(f"ALTER TABLE registry ADD COLUMN {col_name} {col_type}")
+                    except Exception:
+                        pass
+
+            # Мягкая миграция: добавляем недостающие колонки в уже существующую таблицу registry
+            cursor.execute("PRAGMA table_info(registry)")
+            registry_columns = [col[1] for col in cursor.fetchall()]
+
+            registry_required_columns = {
+                "kvartal":"TEXT",
+                "pk_number":"TEXT",
+                "address":"TEXT",
+                "fio":"TEXT",
+                "property_type":"TEXT",
+                "notes":"TEXT",
+                "court":"TEXT",
+                "stage":"TEXT",
+                "court_act":"TEXT",
+                "appeal":"TEXT",
+                "requirements":"TEXT",
+                "execution":"TEXT",
+                "collected":"TEXT",
+                "created_at":"TIMESTAMP",
+                "updated_at":"TIMESTAMP"
+            }
+
+            for col_name, col_type in registry_required_columns.items():
+                if col_name not in registry_columns:
+                    try:
+                        cursor.execute(f"ALTER TABLE registry ADD COLUMN {col_name} {col_type}")
+                    except sqlite3.OperationalError:
+                        pass
+
+            for cat, vals in default_options.items():
+                for v in vals:
+                    try:
+                        cursor.execute("INSERT INTO app_options (category, value) VALUES (?, ?)", (cat, v))
+                    except sqlite3.IntegrityError:
+                        pass
+
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS map_state (
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                data TEXT NOT NULL DEFAULT '{}',
+                updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )
+            """)
+
+            cursor.execute("""
+            INSERT OR IGNORE INTO map_state (id, data)
+            VALUES (1, '{}')
+            """)
+            # 3. ОСНОВНЫЕ ТАБЛИЦЫ
+            cursor.execute("""CREATE TABLE IF NOT EXISTS court_schedule (
+                id INTEGER PRIMARY KEY AUTOINCREMENT, court TEXT, time_val TEXT, representative TEXT,
+                plaintiff TEXT, defendant TEXT, category TEXT, result TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP
+            )""")
+
+            cursor.execute("""CREATE TABLE IF NOT EXISTS calendar_tasks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT, date_str TEXT NOT NULL, user_name TEXT NOT NULL,
+                task_type TEXT, description TEXT, time_val TEXT, court TEXT, subject TEXT, assignment TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )""")
+
+            cursor.execute("""CREATE TABLE IF NOT EXISTS enforcement_proceedings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT, case_number TEXT NOT NULL, date_start TEXT NOT NULL,
+                basis TEXT NOT NULL, amount_claimed TEXT, appeal_info TEXT, payment_info TEXT,
+                decision_date TEXT, amount_non_mat TEXT, note TEXT, debt TEXT,
+                nature TEXT DEFAULT 'material', mode TEXT NOT NULL, is_archived INTEGER DEFAULT 0,
+                archived_date TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )""")
+
+            cursor.execute("""CREATE TABLE IF NOT EXISTS controlled_cases (
+                id INTEGER PRIMARY KEY AUTOINCREMENT, case_number TEXT NOT NULL, plaintiff TEXT,
+                defendant TEXT, subject TEXT, representative TEXT, result TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )""")
+
+            # 3.0. СПИСОК ОБЪЕКТОВ
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS object_list (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                pk_number TEXT,
+                district TEXT,
+                dispute_category TEXT,
+                address TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP
+            )
+            """)
+
+            # 3.1. АВАРИЙНЫЙ ФОНД
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS emergency_fund (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                kvartal TEXT,
+                pk_number TEXT,
+                fio TEXT,
+                prosecutor TEXT,
+                address TEXT,
+                district TEXT,
+                requirements TEXT,
+                stage TEXT,
+                case_number TEXT,
+                judicial_act_date TEXT,
+                appeal TEXT,
+                claim_amount TEXT,
+                collected TEXT,
+                area TEXT,
+                address_exec TEXT,
+                sum_property_claim TEXT,
+                sum_property TEXT,
+                execution TEXT,
+                executors TEXT,
+                notes TEXT,
+                court TEXT,
+                latitude REAL,
+                longitude REAL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP
+            )
+            """)
+
+            # Мягкая миграция: если emergency_fund уже существовала, добавляем недостающие колонки.
+            cursor.execute("PRAGMA table_info(emergency_fund)")
+            emergency_columns = [col[1] for col in cursor.fetchall()]
+
+            emergency_required_columns = {
+                "kvartal":"TEXT",
+                "pk_number":"TEXT",
+                "fio":"TEXT",
+                "prosecutor":"TEXT",
+                "address":"TEXT",
+                "district":"TEXT",
+                "requirements":"TEXT",
+                "stage":"TEXT",
+                "case_number":"TEXT",
+                "judicial_act_date":"TEXT",
+                "appeal":"TEXT",
+                "claim_amount":"TEXT",
+                "collected":"TEXT",
+                "area":"TEXT",
+                "address_exec":"TEXT",
+                "sum_property_claim":"TEXT",
+                "sum_property":"TEXT",
+                "execution":"TEXT",
+                "executors":"TEXT",
+                "notes":"TEXT",
+                "court":"TEXT",
+                "latitude":"REAL",
+                "longitude":"REAL",
+                "created_at":"TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+                "updated_at":"TIMESTAMP"
+            }
+
+            for col_name, col_type in emergency_required_columns.items():
+                if col_name not in emergency_columns:
+                    try:
+                        cursor.execute(f"ALTER TABLE emergency_fund ADD COLUMN {col_name} {col_type}")
+                    except sqlite3.OperationalError:
+                        pass
+
+            # 4. MEETINGS
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='meetings'")
+            if cursor.fetchone():
+                try:
+                    cursor.execute("ALTER TABLE meetings ADD COLUMN has_participants_list INTEGER DEFAULT 0")
+                except sqlite3.OperationalError:
+                    pass
+                try:
+                    cursor.execute("ALTER TABLE meetings ADD COLUMN has_telegram INTEGER DEFAULT 0")
+                except sqlite3.OperationalError:
+                    pass
+            else:
+                cursor.execute("""CREATE TABLE meetings (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    title TEXT NOT NULL,
+                    date_val TEXT NOT NULL,
+                    time_val TEXT NOT NULL,
+                    agenda TEXT,
+                    protocol TEXT,
+                    participants TEXT,
+                    attachment_path TEXT,
+                    has_participants_list INTEGER DEFAULT 0,
+                    has_telegram INTEGER DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )""")
+
+            # 5. EMPLOYEES
+            cursor.execute("""CREATE TABLE IF NOT EXISTS employees (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                full_name TEXT NOT NULL,
+                position TEXT NOT NULL,
+                department TEXT,
+                supervisor_id INTEGER,
+                level TEXT NOT NULL,
+                display_order INTEGER DEFAULT 0,
+                FOREIGN KEY (supervisor_id) REFERENCES employees(id),
+                UNIQUE(full_name, position)
+            )""")
+
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS invited_people (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                full_name TEXT NOT NULL,
+                position TEXT NOT NULL,
+                organization TEXT DEFAULT '',
+                sort_order INTEGER DEFAULT 999
+            )
+            """)
+
+            # Значения по умолчанию для списка приглашенных
+            default_invited_people = [
+                ("Иванов Андрей Максимович", 'Директор "ООО Ромашка"', "", 1),
+                ("Иванов Михаил Максимович", "Депутат АКЗС", "", 2),
+            ]
+
+            for full_name, position, organization, sort_order in default_invited_people:
+                cursor.execute(
+                    """
+                    SELECT id
+                    FROM invited_people
+                    WHERE LOWER(TRIM(full_name)) = LOWER(TRIM(?))
+                      AND LOWER(TRIM(position)) = LOWER(TRIM(?))
+                    """,
+                    (full_name, position)
+                )
+
+                if not cursor.fetchone():
+                    cursor.execute(
+                        """
+                        INSERT INTO invited_people (
+                            full_name,
+                            position,
+                            organization,
+                            sort_order
+                        )
+                        VALUES (?, ?, ?, ?)
+                        """,
+                        (full_name, position, organization, sort_order)
+                    )
+
+            cursor.execute("SELECT COUNT(*) FROM employees")
+            if cursor.fetchone()[0] == 0:
+                employees_data = [
+                    ("Федоров Андрей Алексеевич", "Первый заместитель главы администрации города", None, None, 'deputy',
+                     1),
+                    ("Финк Оксана Анатольевна", "Заместитель главы администрации города, руководитель аппарата", None,
+                     None, 'deputy', 2),
+                ]
+                cursor.executemany("""
+                    INSERT INTO employees (full_name, position, department, supervisor_id, level, display_order)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                """, employees_data)
+
+            # 6. АРХИВ
+            cursor.execute("""CREATE TABLE IF NOT EXISTS archive (
+                id INTEGER PRIMARY KEY AUTOINCREMENT, table_name TEXT NOT NULL, record_id INTEGER,
+                data TEXT NOT NULL, archived_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )""")
+
+            conn.commit()
+            print("✅ База данных успешно инициализирована!")
+
+        except Exception as e:
+            print(f"❌ Ошибка инициализации БД: {e}")
+            conn.rollback()
+            raise
+    ensure_emergency_fund_extra_columns()
+
+# ==================== АВТОРИЗАЦИЯ И СПРАВОЧНИКИ ====================
+
+def authenticate(password):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT full_name FROM users WHERE password = ?", (password,))
+        result = cursor.fetchone()
+        return result[0] if result else None
+
+
+def get_user_by_password(password):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, full_name, password FROM users WHERE password = ?", (password,))
+        result = cursor.fetchone()
+        return dict(result) if result else None
+
+def ensure_emergency_fund_extra_columns():
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("PRAGMA table_info(emergency_fund)")
+        existing_columns = [row[1] for row in cursor.fetchall()]
+
+        columns_to_add = {
+            "prosecutor": "TEXT",
+            "district": "TEXT",
+            "judicial_act_date": "TEXT",
+            "execution_quarter": "TEXT"
+        }
+
+        for column_name, column_type in columns_to_add.items():
+            if column_name not in existing_columns:
+                cursor.execute(
+                    f"ALTER TABLE emergency_fund ADD COLUMN {column_name} {column_type}"
+                )
+
+        conn.commit()
+def is_admin(password):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT full_name, password FROM users WHERE password = ?", (password,))
+        result = cursor.fetchone()
+        if result:
+            return result['password'] in ('adm', 'admin') or result['full_name'] == 'Администратор'
+        return False
+
+
+def get_options(category):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT value FROM app_options WHERE category=? ORDER BY id", (category,))
+        return [row['value'] for row in cursor.fetchall()]
+
+
+def add_option(category, value):
+    try:
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO app_options (category, value) VALUES (?, ?)", (category, value))
+            conn.commit()
+            return True
+    except sqlite3.IntegrityError:
+        return False
+
+
+def delete_option(option_id):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM app_options WHERE id=?", (option_id,))
+        conn.commit()
+
+
+def get_options_with_ids(category):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, value FROM app_options WHERE category=? ORDER BY id", (category,))
+        return [{'id': row['id'], 'value': row['value']} for row in cursor.fetchall()]
+
+
+# ==================== EMERGENCY FUND ====================
+
+def emergency_add(data: dict):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+        INSERT INTO emergency_fund (
+            kvartal, pk_number, fio, address, requirements, stage, case_number, appeal,
+            claim_amount, collected, area, address_exec, sum_property_claim, sum_property,
+            execution, executors, notes, court, latitude, longitude, updated_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            data.get('kvartal'),
+            data.get('pk_number'),
+            data.get('fio'),
+            data.get('address'),
+            data.get('requirements'),
+            data.get('stage'),
+            data.get('case_number'),
+            data.get('appeal'),
+            data.get('claim_amount'),
+            data.get('collected'),
+            data.get('area'),
+            data.get('address_exec'),
+            data.get('sum_property_claim'),
+            data.get('sum_property'),
+            data.get('execution'),
+            data.get('executors'),
+            data.get('notes'),
+            data.get('court'),
+            data.get('latitude'),
+            data.get('longitude'),
+            datetime.now()
+        ))
+        conn.commit()
+        return cursor.lastrowid
+
+
+def emergency_get_all():
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM emergency_fund ORDER BY id DESC")
+        return [dict(row) for row in cursor.fetchall()]
+
+
+def emergency_update(record_id: int, data: dict):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+        UPDATE emergency_fund SET
+            kvartal=?,
+            pk_number=?,
+            fio=?,
+            address=?,
+            requirements=?,
+            stage=?,
+            case_number=?,
+            appeal=?,
+            claim_amount=?,
+            collected=?,
+            area=?,
+            address_exec=?,
+            sum_property_claim=?,
+            sum_property=?,
+            execution=?,
+            executors=?,
+            notes=?,
+            court=?,
+            latitude=?,
+            longitude=?,
+            updated_at=?
+        WHERE id=?
+        """, (
+            data.get('kvartal'),
+            data.get('pk_number'),
+            data.get('fio'),
+            data.get('address'),
+            data.get('requirements'),
+            data.get('stage'),
+            data.get('case_number'),
+            data.get('appeal'),
+            data.get('claim_amount'),
+            data.get('collected'),
+            data.get('area'),
+            data.get('address_exec'),
+            data.get('sum_property_claim'),
+            data.get('sum_property'),
+            data.get('execution'),
+            data.get('executors'),
+            data.get('notes'),
+            data.get('court'),
+            data.get('latitude'),
+            data.get('longitude'),
+            datetime.now(),
+            record_id
+        ))
+        conn.commit()
+
+
+def emergency_delete(record_id: int):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM emergency_fund WHERE id=?", (record_id,))
+        conn.commit()
+
+
+def emergency_to_archive(record_id: int):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM emergency_fund WHERE id=?", (record_id,))
+        row = cursor.fetchone()
+
+        if row:
+            cursor.execute(
+                "INSERT INTO archive (table_name, record_id, data) VALUES (?, ?, ?)",
+                ('emergency', record_id, json.dumps(dict(row), ensure_ascii=False))
+            )
+            cursor.execute("DELETE FROM emergency_fund WHERE id=?", (record_id,))
+            conn.commit()
+            return True
+
+        return False
+
+
+# ==================== REGISTRY ====================
+
+def registry_add(data: dict):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+        INSERT INTO registry (
+            kvartal,
+            pk_number,
+            address,
+            fio,
+            property_type,
+            notes,
+            court,
+            stage,
+            court_act,
+            requirements,
+            appeal,
+            execution,
+            collected,
+            updated_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            data.get('kvartal', ''),
+            data.get('pk_number', ''),
+            data.get('address', ''),
+            data.get('fio', ''),
+            data.get('property_type', ''),
+            data.get('notes', ''),
+            data.get('court', ''),
+            data.get('stage', ''),
+            data.get('court_act', ''),
+            data.get('requirements', ''),
+            data.get('appeal', ''),
+            data.get('execution', ''),
+            data.get('collected', ''),
+            datetime.now()
+        ))
+
+        conn.commit()
+        return cursor.lastrowid
+
+def registry_get_all():
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM registry ORDER BY id DESC")
+        return [dict(row) for row in cursor.fetchall()]
+
+
+def registry_update(record_id: int, data: dict):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+        UPDATE registry SET
+            kvartal=?,
+            pk_number=?,
+            address=?,
+            fio=?,
+            property_type=?,
+            notes=?,
+            court=?,
+            stage=?,
+            court_act=?,
+            requirements=?,
+            appeal=?,
+            execution=?,
+            collected=?,
+            updated_at=?
+        WHERE id=?
+        """, (
+            data.get('kvartal', ''),
+            data.get('pk_number', ''),
+            data.get('address', ''),
+            data.get('fio', ''),
+            data.get('property_type', ''),
+            data.get('notes', ''),
+            data.get('court', ''),
+            data.get('stage', ''),
+            data.get('court_act', ''),
+            data.get('requirements', ''),
+            data.get('appeal', ''),
+            data.get('execution', ''),
+            data.get('collected', ''),
+            datetime.now(),
+            record_id
+        ))
+
+        conn.commit()
+
+
+def registry_delete(record_id: int):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM registry WHERE id=?", (record_id,))
+        conn.commit()
+
+
+def registry_to_archive(record_id: int):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM registry WHERE id=?", (record_id,))
+        row = cursor.fetchone()
+        if row:
+            cursor.execute("INSERT INTO archive (table_name, record_id, data) VALUES (?, ?, ?)",
+                           ('registry', record_id, json.dumps(dict(row), ensure_ascii=False)))
+            cursor.execute("DELETE FROM registry WHERE id=?", (record_id,))
+            conn.commit()
+            return True
+        return False
+
+
+def schedule_add(data: dict):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+        INSERT INTO court_schedule (court, time_val, representative, plaintiff, defendant, category, result, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            data.get('Суд'),
+            data.get('Время'),  # ✅ Исправлено: было 'Время заседания'
+            data.get('Представитель от администрации города'),
+            data.get('Истец'),
+            data.get('Ответчик'),
+            data.get('Категория дела'),
+            data.get('Результат'),
+            datetime.now()
+        ))
+        conn.commit()
+        return cursor.lastrowid
+
+
+def schedule_get_all():
+    """Получает все записи графика судебных заседаний"""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM court_schedule ORDER BY id DESC")
+        return [dict(row) for row in cursor.fetchall()]
+
+
+def schedule_update(record_id, data):
+    try:
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                UPDATE court_schedule
+                SET court=?,
+                    time=?,
+                    representative=?,
+                    plaintiff=?,
+                    defendant=?,
+                    category=?,
+                    result=?,
+                    hearing_date=?
+                WHERE id=?
+                """,
+                (
+                    data.get("court", ""),
+                    data.get("time", ""),
+                    data.get("representative", ""),
+                    data.get("plaintiff", ""),
+                    data.get("defendant", ""),
+                    data.get("category", ""),
+                    data.get("result", ""),
+                    data.get("hearing_date", ""),
+                    record_id
+                )
+            )
+            conn.commit()
+            return True
+    except Exception as e:
+        print(f"Ошибка schedule_update: {e}")
+        return False
+
+
+def schedule_delete(record_id: int):
+    """Удаляет запись графика судебных заседаний"""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM court_schedule WHERE id = ?", (record_id,))
+        conn.commit()
+        return True
+
+
+# ==================== CALENDAR TASKS ====================
+
+def calendar_add_task(data: dict):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+        INSERT INTO calendar_tasks (date_str, user_name, task_type, description, time_val, court, subject, assignment)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (data.get('date'), data.get('user'), data.get('type'), data.get('desc'),
+              data.get('time'), data.get('court'), data.get('subject'), data.get('assignment')))
+        conn.commit()
+        return cursor.lastrowid
+
+
+def calendar_get_tasks(date_str: str, user_name: str = None):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        if user_name:
+            cursor.execute("SELECT * FROM calendar_tasks WHERE date_str = ? AND user_name = ? ORDER BY id DESC",
+                           (date_str, user_name))
+        else:
+            cursor.execute("SELECT * FROM calendar_tasks WHERE date_str = ? ORDER BY id DESC", (date_str,))
+        return [dict(row) for row in cursor.fetchall()]
+
+
+def calendar_delete_task(task_id: int):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM calendar_tasks WHERE id=?", (task_id,))
+        conn.commit()
+
+
+# ==================== ENFORCEMENT PROCEEDINGS ====================
+
+def enforcement_add(data):
+    ensure_enforcement_columns()
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            INSERT INTO enforcement_proceedings (
+                mode,
+                archived,
+                case_number,
+                date_start,
+                basis,
+                appeal_info,
+                deadline,
+                nature,
+                amount_claimed,
+                payment_info,
+                total_paid,
+                debt,
+                decision_date,
+                amount_non_mat,
+                note
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                data.get("mode", ""),
+                0,
+                data.get("case_number", "") or data.get("Номер ИП", ""),
+                data.get("date_start", "") or data.get("Дата возбуждения", ""),
+                data.get("basis", "") or data.get("Основание возбуждения ИП", ""),
+                data.get("appeal_info", "") or data.get("Сведения об обжаловании", ""),
+                data.get("deadline", "") or data.get("execution_deadline", "") or data.get("Срок исполнения", ""),
+                data.get("nature", "material"),
+                data.get("amount_claimed", "") or data.get("claim_sum", "") or data.get("Сумма требований(руб.)", ""),
+                data.get("payment_info", "") or data.get("Сведения об оплате", ""),
+                data.get("total_paid", "") or data.get("Итого оплачено", ""),
+                data.get("debt", "") or data.get("Долг", ""),
+                data.get("decision_date", "") or data.get("Дата вынесения постановления", ""),
+                data.get("amount_non_mat", "") or data.get("Сумма", ""),
+                data.get("note", "") or data.get("Примечание", "")
+            )
+        )
+
+        conn.commit()
+        return cursor.lastrowid
+
+def ensure_enforcement_columns():
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS enforcement_proceedings (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                mode TEXT DEFAULT '',
+                archived INTEGER DEFAULT 0,
+                case_number TEXT DEFAULT '',
+                date_start TEXT DEFAULT '',
+                basis TEXT DEFAULT '',
+                appeal_info TEXT DEFAULT '',
+                deadline TEXT DEFAULT '',
+                nature TEXT DEFAULT 'material',
+                amount_claimed TEXT DEFAULT '',
+                payment_info TEXT DEFAULT '',
+                total_paid TEXT DEFAULT '',
+                debt TEXT DEFAULT '',
+                decision_date TEXT DEFAULT '',
+                amount_non_mat TEXT DEFAULT '',
+                note TEXT DEFAULT ''
+            )
+            """
+        )
+
+        cursor.execute("PRAGMA table_info(enforcement_proceedings)")
+        existing_columns = [row[1] for row in cursor.fetchall()]
+
+        columns_to_add = {
+            "mode": "TEXT DEFAULT ''",
+            "archived": "INTEGER DEFAULT 0",
+            "case_number": "TEXT DEFAULT ''",
+            "date_start": "TEXT DEFAULT ''",
+            "basis": "TEXT DEFAULT ''",
+            "appeal_info": "TEXT DEFAULT ''",
+            "deadline": "TEXT DEFAULT ''",
+            "nature": "TEXT DEFAULT 'material'",
+            "amount_claimed": "TEXT DEFAULT ''",
+            "payment_info": "TEXT DEFAULT ''",
+            "total_paid": "TEXT DEFAULT ''",
+            "debt": "TEXT DEFAULT ''",
+            "decision_date": "TEXT DEFAULT ''",
+            "amount_non_mat": "TEXT DEFAULT ''",
+            "note": "TEXT DEFAULT ''"
+        }
+
+        for column_name, column_type in columns_to_add.items():
+            if column_name not in existing_columns:
+                cursor.execute(
+                    f"ALTER TABLE enforcement_proceedings ADD COLUMN {column_name} {column_type}"
+                )
+
+        conn.commit()
+
+def enforcement_get_all(mode=None, archived=False):
+    ensure_enforcement_columns()
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        query = """
+            SELECT *
+            FROM enforcement_proceedings
+            WHERE archived = ?
+        """
+        params = [1 if archived else 0]
+
+        if mode:
+            query += " AND mode = ?"
+            params.append(mode)
+
+        query += " ORDER BY id DESC"
+
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+
+        result = []
+
+        for row in rows:
+            try:
+                result.append(dict(row))
+            except Exception:
+                columns = [desc[0] for desc in cursor.description]
+                result.append(dict(zip(columns, row)))
+
+        return result
+
+
+def enforcement_update(record_id, data):
+    ensure_enforcement_columns()
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            UPDATE enforcement_proceedings
+            SET
+                mode = ?,
+                case_number = ?,
+                date_start = ?,
+                basis = ?,
+                appeal_info = ?,
+                deadline = ?,
+                nature = ?,
+                amount_claimed = ?,
+                payment_info = ?,
+                total_paid = ?,
+                debt = ?,
+                decision_date = ?,
+                amount_non_mat = ?,
+                note = ?
+            WHERE id = ?
+            """,
+            (
+                data.get("mode", ""),
+                data.get("case_number", "") or data.get("Номер ИП", ""),
+                data.get("date_start", "") or data.get("Дата возбуждения", ""),
+                data.get("basis", "") or data.get("Основание возбуждения ИП", ""),
+                data.get("appeal_info", "") or data.get("Сведения об обжаловании", ""),
+                data.get("deadline", "") or data.get("execution_deadline", "") or data.get("Срок исполнения", ""),
+                data.get("nature", "material"),
+                data.get("amount_claimed", "") or data.get("claim_sum", "") or data.get("Сумма требований(руб.)", ""),
+                data.get("payment_info", "") or data.get("Сведения об оплате", ""),
+                data.get("total_paid", "") or data.get("Итого оплачено", ""),
+                data.get("debt", "") or data.get("Долг", ""),
+                data.get("decision_date", "") or data.get("Дата вынесения постановления", ""),
+                data.get("amount_non_mat", "") or data.get("Сумма", ""),
+                data.get("note", "") or data.get("Примечание", ""),
+                record_id
+            )
+        )
+
+        conn.commit()
+
+
+def enforcement_delete(record_id: int):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM enforcement_proceedings WHERE id=?", (record_id,))
+        conn.commit()
+
+
+def enforcement_to_archive(record_id: int):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM enforcement_proceedings WHERE id=?", (record_id,))
+        row = cursor.fetchone()
+        if row:
+            cursor.execute("INSERT INTO archive (table_name, record_id, data) VALUES (?, ?, ?)",
+                           ('enforcement_proceedings', record_id, json.dumps(dict(row), ensure_ascii=False)))
+            cursor.execute("DELETE FROM enforcement_proceedings WHERE id=?", (record_id,))
+            conn.commit()
+            return True
+        return False
+
+
+def enforcement_restore_from_archive(archive_id: int):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM archive WHERE id=?", (archive_id,))
+        archive_row = cursor.fetchone()
+        if archive_row and archive_row['table_name'] == 'enforcement_proceedings':
+            data = json.loads(archive_row['data'])
+            cursor.execute("""
+            INSERT INTO enforcement_proceedings (case_num, date_start, basis, amount_claimed, appeal_info, payment_info,
+                                                 decision_date, amount_non_mat, note, debt, nature, mode, is_archived, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)
+            """, (data.get('case_num'), data.get('date_start'), data.get('basis'), data.get('amount_claimed'),
+                  data.get('appeal_info'), data.get('payment_info'), data.get('decision_date'),
+                  data.get('amount_non_mat'),
+                  data.get('note'), data.get('debt'), data.get('nature', 'material'), data.get('mode', 'debtor'),
+                  datetime.now()))
+            cursor.execute("DELETE FROM archive WHERE id=?", (archive_id,))
+            conn.commit()
+            return True
+        return False
+
+
+# ==================== CONTROLLED CASES ====================
+# ЗАМЕНИ В database.py ВЕСЬ БЛОК от строки:
+# # ==================== CONTROLLED CASES ====================
+# до строки:
+# # ==================== ARCHIVE ====================
+# на код ниже.
+
+
+def ensure_controlled_cases_columns():
+    """Обновляет таблицу controlled_cases, чтобы сохранялись все поля из общего перечня."""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS controlled_cases (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                case_number TEXT DEFAULT '',
+                plaintiff TEXT DEFAULT '',
+                defendant TEXT DEFAULT '',
+                subject TEXT DEFAULT '',
+                representative TEXT DEFAULT '',
+                result TEXT DEFAULT '',
+                court_case_number TEXT DEFAULT '',
+                court TEXT DEFAULT '',
+                general_case_id INTEGER,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+        cursor.execute("PRAGMA table_info(controlled_cases)")
+        existing = [row[1] for row in cursor.fetchall()]
+
+        columns_to_add = {
+            "case_number": "TEXT DEFAULT ''",
+            "plaintiff": "TEXT DEFAULT ''",
+            "defendant": "TEXT DEFAULT ''",
+            "subject": "TEXT DEFAULT ''",
+            "representative": "TEXT DEFAULT ''",
+            "result": "TEXT DEFAULT ''",
+            "court_case_number": "TEXT DEFAULT ''",
+            "court": "TEXT DEFAULT ''",
+            "general_case_id": "INTEGER",
+            "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+            "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+        }
+
+        for column_name, column_sql in columns_to_add.items():
+            if column_name not in existing:
+                cursor.execute(f"ALTER TABLE controlled_cases ADD COLUMN {column_name} {column_sql}")
+
+        conn.commit()
+
+
+def _controlled_value(data, *keys, default=""):
+    """Берет первое непустое значение из разных вариантов названия поля."""
+    for key in keys:
+        value = data.get(key)
+        if value not in (None, ""):
+            return value
+    return default
+
+
+def controlled_cases_add(data: dict):
+    ensure_controlled_cases_columns()
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            INSERT INTO controlled_cases (
+                case_number,
+                plaintiff,
+                defendant,
+                subject,
+                representative,
+                result,
+                court_case_number,
+                court,
+                general_case_id,
+                updated_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            _controlled_value(data, "case_number", "case_num", "case_no"),
+            _controlled_value(data, "plaintiff"),
+            _controlled_value(data, "defendant"),
+            _controlled_value(data, "subject", "claim_subject"),
+            _controlled_value(data, "representative", "executor"),
+            _controlled_value(data, "result", "history_results"),
+            _controlled_value(data, "court_case_number", "court_case_num", "court_no"),
+            _controlled_value(data, "court", "court_name"),
+            _controlled_value(data, "general_case_id", default=None),
+            datetime.now()
+        ))
+
+        conn.commit()
+        return cursor.lastrowid
+
+
+def controlled_cases_get_all():
+    ensure_controlled_cases_columns()
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM controlled_cases ORDER BY id DESC")
+        return [dict(row) for row in cursor.fetchall()]
+
+
+def controlled_cases_update(record_id: int, data: dict):
+    ensure_controlled_cases_columns()
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            UPDATE controlled_cases
+            SET case_number=?,
+                plaintiff=?,
+                defendant=?,
+                subject=?,
+                representative=?,
+                result=?,
+                court_case_number=?,
+                court=?,
+                general_case_id=COALESCE(?, general_case_id),
+                updated_at=?
+            WHERE id=?
+        """, (
+            _controlled_value(data, "case_number", "case_num", "case_no"),
+            _controlled_value(data, "plaintiff"),
+            _controlled_value(data, "defendant"),
+            _controlled_value(data, "subject", "claim_subject"),
+            _controlled_value(data, "representative", "executor"),
+            _controlled_value(data, "result", "history_results"),
+            _controlled_value(data, "court_case_number", "court_case_num", "court_no"),
+            _controlled_value(data, "court", "court_name"),
+            _controlled_value(data, "general_case_id", default=None),
+            datetime.now(),
+            record_id
+        ))
+
+        conn.commit()
+
+
+def controlled_cases_delete(record_id: int):
+    ensure_controlled_cases_columns()
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM controlled_cases WHERE id=?", (record_id,))
+        conn.commit()
+
+
+def controlled_cases_to_archive(record_id: int):
+    ensure_controlled_cases_columns()
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM controlled_cases WHERE id=?", (record_id,))
+        row = cursor.fetchone()
+
+        if row:
+            cursor.execute(
+                "INSERT INTO archive (table_name, record_id, data) VALUES (?, ?, ?)",
+                ("controlled_cases", record_id, json.dumps(dict(row), ensure_ascii=False))
+            )
+            cursor.execute("DELETE FROM controlled_cases WHERE id=?", (record_id,))
+            conn.commit()
+            return True
+
+        return False
+
+
+def controlled_cases_restore_from_archive(archive_id: int):
+    ensure_controlled_cases_columns()
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM archive WHERE id=?", (archive_id,))
+        archive_row = cursor.fetchone()
+
+        if archive_row and archive_row["table_name"] == "controlled_cases":
+            data = json.loads(archive_row["data"])
+
+            cursor.execute("""
+                INSERT INTO controlled_cases (
+                    case_number,
+                    plaintiff,
+                    defendant,
+                    subject,
+                    representative,
+                    result,
+                    court_case_number,
+                    court,
+                    general_case_id,
+                    updated_at
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                _controlled_value(data, "case_number", "case_num", "case_no"),
+                _controlled_value(data, "plaintiff"),
+                _controlled_value(data, "defendant"),
+                _controlled_value(data, "subject", "claim_subject"),
+                _controlled_value(data, "representative", "executor"),
+                _controlled_value(data, "result", "history_results"),
+                _controlled_value(data, "court_case_number", "court_case_num", "court_no"),
+                _controlled_value(data, "court", "court_name"),
+                _controlled_value(data, "general_case_id", default=None),
+                datetime.now()
+            ))
+
+            cursor.execute("DELETE FROM archive WHERE id=?", (archive_id,))
+            conn.commit()
+            return True
+
+        return False
+
+
+
+# ==================== ARCHIVE ====================
+
+def archive_get_all(table_name: str):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM archive WHERE table_name=? ORDER BY archived_at DESC", (table_name,))
+        result = []
+        for row in cursor.fetchall():
+            row_dict = dict(row)
+            row_dict['data'] = json.loads(row_dict['data'])
+            result.append(row_dict)
+        return result
+
+
+def archive_delete(archive_id: int):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM archive WHERE id=?", (archive_id,))
+        conn.commit()
+
+
+# ==================== MEETINGS (СОВЕЩАНИЯ) ====================
+
+def meetings_add(data: dict):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+        INSERT INTO meetings (title, date_val, time_val, agenda, protocol, participants, attachment_path, has_participants_list, has_telegram)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (data.get('title'), data.get('date_val'), data.get('time_val'),
+              data.get('agenda'), data.get('protocol'), data.get('participants'),
+              data.get('attachment_path'),
+              data.get('has_participants_list', 0),
+              data.get('has_telegram', 0)))
+        conn.commit()
+        return cursor.lastrowid
+
+
+def meetings_get_all():
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM meetings ORDER BY date_val DESC, time_val DESC")
+        return [dict(row) for row in cursor.fetchall()]
+
+
+def meetings_update(record_id: int, data: dict):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+        UPDATE meetings SET title=?, date_val=?, time_val=?, agenda=?, protocol=?, participants=?, attachment_path=?, has_participants_list=?, has_telegram=?
+        WHERE id=?
+        """, (data.get('title'), data.get('date_val'), data.get('time_val'),
+              data.get('agenda'), data.get('protocol'), data.get('participants'),
+              data.get('attachment_path'),
+              data.get('has_participants_list', 0),
+              data.get('has_telegram', 0),
+              record_id))
+        conn.commit()
+
+
+def meetings_delete(record_id: int):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM meetings WHERE id=?", (record_id,))
+        conn.commit()
+
+
+# ==================== EMPLOYEES (СОТРУДНИКИ АДМИНИСТРАЦИИ) ====================
+
+def get_all_employees():
+    """Получает всех сотрудников с информацией о руководителе"""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT e.*, s.full_name as supervisor_name
+            FROM employees e
+            LEFT JOIN employees s ON e.supervisor_id = s.id
+            ORDER BY e.display_order
+        """)
+        return [dict(row) for row in cursor.fetchall()]
+
+
+def get_deputies():
+    """Получает только заместителей главы администрации"""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT * FROM employees 
+            WHERE level = 'deputy'
+            ORDER BY display_order
+        """)
+        return [dict(row) for row in cursor.fetchall()]
+
+
+def get_subordinates(supervisor_id):
+    """Получает всех сотрудников в подчинении у руководителя"""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT * FROM employees 
+            WHERE supervisor_id = ?
+            ORDER BY department, display_order
+        """, (supervisor_id,))
+        return [dict(row) for row in cursor.fetchall()]
+
+
+def get_employee_by_name(full_name):
+    """Находит сотрудника по ФИО"""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM employees WHERE full_name = ?", (full_name,))
+        row = cursor.fetchone()
+        return dict(row) if row else None
+
+
+def add_employee(data: dict):
+    """Добавляет нового сотрудника"""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO employees (full_name, position, department, supervisor_id, level, display_order)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (
+            data.get('full_name'),
+            data.get('position'),
+            data.get('department'),
+            data.get('supervisor_id'),
+            data.get('level', 'head'),
+            data.get('display_order', 0)
+        ))
+        conn.commit()
+        return cursor.lastrowid
+
+
+def update_employee(employee_id: int, data: dict):
+    """Обновляет данные сотрудника"""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE employees SET 
+                full_name=?, position=?, department=?, supervisor_id=?, 
+                level=?, display_order=?
+            WHERE id=?
+        """, (
+            data.get('full_name'),
+            data.get('position'),
+            data.get('department'),
+            data.get('supervisor_id'),
+            data.get('level'),
+            data.get('display_order'),
+            employee_id
+        ))
+        conn.commit()
+
+
+def delete_employee(employee_id: int):
+    """Удаляет сотрудника"""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE employees SET supervisor_id=NULL WHERE supervisor_id=?", (employee_id,))
+        cursor.execute("DELETE FROM employees WHERE id=?", (employee_id,))
+        conn.commit()
+
+
+# ==================== USERS / PARTICIPANTS ====================
+
+def get_all_users():
+    """Получает список всех сотрудников администрации для выбора в участники"""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT full_name FROM employees ORDER BY full_name")
+        employees = [row['full_name'] for row in cursor.fetchall()]
+
+        if not employees:
+            cursor.execute("SELECT full_name FROM users ORDER BY full_name")
+            employees = [row['full_name'] for row in cursor.fetchall()]
+
+        return employees
+
+
+def get_executors_from_db():
+    """Получает список исполнителей (ФИО) из таблицы сотрудников"""
+    try:
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT full_name FROM employees ORDER BY full_name")
+            executors = [row['full_name'] for row in cursor.fetchall() if row['full_name']]
+            return executors
+    except Exception as e:
+        print(f"Ошибка при загрузке исполнителей: {e}")
+        return []
+
+
+def get_executors_with_ids():
+    """Получает список исполнителей с их ID"""
+    try:
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT id, full_name FROM employees ORDER BY full_name")
+            executors = []
+            for row in cursor.fetchall():
+                if row['full_name']:
+                    executors.append({'id': row['id'], 'full_name': row['full_name']})
+            return executors
+    except Exception as e:
+        print(f"Ошибка при загрузке исполнителей с ID: {e}")
+        return []
+
+
+def add_executor(full_name):
+    """Добавляет нового исполнителя в таблицу сотрудников"""
+    try:
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT id FROM employees WHERE full_name = ?", (full_name,))
+            if cursor.fetchone():
+                return False
+            cursor.execute("""
+                INSERT INTO employees (full_name, position, department, supervisor_id, level)
+                VALUES (?, ?, ?, ?, ?)
+            """, (full_name, 'Сотрудник', None, None, 'head'))
+            conn.commit()
+            return True
+    except Exception as e:
+        print(f"Ошибка при добавлении исполнителя: {e}")
+        return False
+
+
+def delete_executor(executor_id):
+    """Удаляет исполнителя по ID"""
+    try:
+        with get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM employees WHERE id = ?", (executor_id,))
+            if cursor.rowcount > 0:
+                conn.commit()
+                return True
+            return False
+    except Exception as e:
+        print(f"Ошибка при удалении исполнителя: {e}")
+        return False
+
+
+# ==================== АЛИАСЫ ДЛЯ СОВМЕСТИМОСТИ ====================
+
+def emergency_add_task(data):
+    ensure_emergency_fund_extra_columns()
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            INSERT INTO emergency_fund (
+                kvartal,
+                pk_number,
+                fio,
+                prosecutor,
+                address,
+                district,
+                requirements,
+                stage,
+                case_number,
+                judicial_act_date,
+                appeal,
+                claim_amount,
+                sum_property_claim,
+                collected,
+                executors,
+                notes,
+                execution_quarter,
+                court,
+                area,
+                latitude,
+                longitude
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            data.get("kvartal", ""),
+            data.get("pk_number", ""),
+            data.get("fio", ""),
+            data.get("prosecutor", ""),
+            data.get("address", ""),
+            data.get("district", ""),
+            data.get("requirements", ""),
+            data.get("stage", ""),
+            data.get("case_number", ""),
+            data.get("judicial_act_date", ""),
+            data.get("appeal", ""),
+            data.get("claim_amount", ""),
+            data.get("sum_property_claim", ""),
+            data.get("collected", ""),
+            data.get("executors", ""),
+            data.get("notes", ""),
+            data.get("execution_quarter", ""),
+            data.get("court", ""),
+            data.get("area", ""),
+            data.get("latitude", ""),
+            data.get("longitude", "")
+        ))
+
+        conn.commit()
+        return cursor.lastrowid
+
+def emergency_update_task(record_id, data):
+    ensure_emergency_fund_extra_columns()
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            UPDATE emergency_fund
+            SET
+                kvartal = ?,
+                pk_number = ?,
+                fio = ?,
+                prosecutor = ?,
+                address = ?,
+                district = ?,
+                requirements = ?,
+                stage = ?,
+                case_number = ?,
+                judicial_act_date = ?,
+                appeal = ?,
+                claim_amount = ?,
+                sum_property_claim = ?,
+                collected = ?,
+                executors = ?,
+                notes = ?,
+                execution_quarter = ?,
+                court = ?,
+                area = ?,
+                latitude = ?,
+                longitude = ?
+            WHERE id = ?
+        """, (
+            data.get("kvartal", ""),
+            data.get("pk_number", ""),
+            data.get("fio", ""),
+            data.get("prosecutor", ""),
+            data.get("address", ""),
+            data.get("district", ""),
+            data.get("requirements", ""),
+            data.get("stage", ""),
+            data.get("case_number", ""),
+            data.get("judicial_act_date", ""),
+            data.get("appeal", ""),
+            data.get("claim_amount", ""),
+            data.get("sum_property_claim", ""),
+            data.get("collected", ""),
+            data.get("executors", ""),
+            data.get("notes", ""),
+            data.get("execution_quarter", ""),
+            data.get("court", ""),
+            data.get("area", ""),
+            data.get("latitude", ""),
+            data.get("longitude", ""),
+            record_id
+        ))
+
+        conn.commit()
+        return cursor.rowcount
+
+def emergency_delete_task(record_id: int):
+    """Алиас для emergency_delete - для совместимости с формой"""
+    return emergency_delete(record_id)
+
+
+# ==================== ФУНКЦИИ ДЛЯ СИНХРОНИЗАЦИИ ПРЕДСТАВИТЕЛЕЙ ====================
+
+def get_representatives_list():
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT full_name
+            FROM users
+            WHERE full_name IS NOT NULL
+              AND TRIM(full_name) != ''
+            ORDER BY id
+        """)
+        return [row[0] for row in cur.fetchall()]
+
+
+def add_new_representative(full_name):
+    """
+    Проверяет, есть ли сотрудник с таким именем в базе.
+    Если нет — добавляет его как нового сотрудника уровня 'head' (сотрудник).
+    Возвращает True, если сотрудник был добавлен, False, если уже существовал.
+    """
+    if not full_name or not full_name.strip():
+        return False
+
+    clean_name = full_name.strip()
+
+    try:
+        with get_connection() as conn:
+            cursor = conn.cursor()
+
+            # 1. Проверяем, существует ли уже такой сотрудник
+            cursor.execute("SELECT id FROM employees WHERE full_name = ?", (clean_name,))
+            if cursor.fetchone():
+                return False  # Уже есть в базе
+
+            # 2. Если нет, добавляем нового
+            # По умолчанию ставим позицию "Сотрудник" и уровень "head", чтобы он отображался в общих списках
+            cursor.execute("""
+                INSERT INTO employees (full_name, position, department, supervisor_id, level, display_order)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (
+                clean_name,
+                'Сотрудник',  # Позиция по умолчанию
+                None,  # Отдел пока не указан
+                None,  # Без руководителя
+                'head',  # Уровень доступа/отображения
+                999  # Порядок отображения (в конце списка)
+            ))
+            conn.commit()
+            print(f"✅ В базу данных добавлен новый представитель: {clean_name}")
+            return True
+
+    except Exception as e:
+        print(f"❌ Ошибка при добавлении нового представителя '{clean_name}': {e}")
+        return False
+
+def invited_add(full_name, position, organization="", sort_order=999):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO invited_people (full_name, position, organization, sort_order)
+            VALUES (?, ?, ?, ?)
+        """, (full_name, position, organization, sort_order))
+        conn.commit()
+
+def dict_factory(cursor, row):
+    return {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
+
+def invited_get_all():
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS invited_people (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                full_name TEXT NOT NULL,
+                position TEXT NOT NULL,
+                organization TEXT DEFAULT '',
+                sort_order INTEGER DEFAULT 999
+            )
+        """)
+
+        cursor.execute("""
+            SELECT id, full_name, position, organization, sort_order
+            FROM invited_people
+            ORDER BY sort_order, full_name
+        """)
+
+        rows = cursor.fetchall()
+
+        return [
+            {
+                "id": row[0],
+                "full_name": row[1],
+                "position": row[2],
+                "organization": row[3] or "",
+                "sort_order": row[4] if row[4] is not None else 999
+            }
+            for row in rows
+        ]
+
+
+def invited_add(data):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            INSERT INTO invited_people (
+                full_name,
+                position,
+                organization,
+                sort_order
+            )
+            VALUES (?, ?, ?, ?)
+        """, (
+            data.get("full_name", "").strip(),
+            data.get("position", "").strip(),
+            data.get("organization", "").strip(),
+            data.get("sort_order", 999)
+        ))
+
+        conn.commit()
+        return cursor.lastrowid
+
+
+def invited_update(invited_id, data):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            UPDATE invited_people
+            SET full_name = ?,
+                position = ?,
+                organization = ?,
+                sort_order = ?
+            WHERE id = ?
+        """, (
+            data.get("full_name", "").strip(),
+            data.get("position", "").strip(),
+            data.get("organization", "").strip(),
+            data.get("sort_order", 999),
+            invited_id
+        ))
+
+        conn.commit()
+
+
+def invited_delete(invited_id):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            DELETE FROM invited_people
+            WHERE id = ?
+        """, (invited_id,))
+
+        conn.commit()
+
+# ==================== СПИСОК ОБЪЕКТОВ ====================
+
+def object_list_add(data: dict):
+    """Добавляет объект в список объектов"""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS object_list (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                pk_number TEXT,
+                district TEXT,
+                dispute_category TEXT,
+                address TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP
+            )
+        """)
+
+        cursor.execute("""
+            INSERT INTO object_list (
+                pk_number,
+                district,
+                dispute_category,
+                address,
+                updated_at
+            )
+            VALUES (?, ?, ?, ?, ?)
+        """, (
+            data.get("pk_number", "").strip(),
+            data.get("district", "").strip(),
+            data.get("dispute_category", "").strip(),
+            data.get("address", "").strip(),
+            datetime.now()
+        ))
+
+        conn.commit()
+        return cursor.lastrowid
+
+
+def object_list_get_all():
+    """Получает все объекты"""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS object_list (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                pk_number TEXT,
+                district TEXT,
+                dispute_category TEXT,
+                address TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP
+            )
+        """)
+
+        cursor.execute("""
+            SELECT *
+            FROM object_list
+            ORDER BY id DESC
+        """)
+
+        return [dict(row) for row in cursor.fetchall()]
+
+
+def object_list_delete(record_id: int):
+    """Удаляет объект из списка объектов"""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            DELETE FROM object_list
+            WHERE id = ?
+        """, (record_id,))
+
+        conn.commit()
+        return True
+
+# ==================== УЧАСТНИКИ СОВЕЩАНИЙ ====================
+
+def ensure_meeting_participants_table():
+    """Создает таблицу участников совещаний с категориями"""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS meeting_participants (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                category TEXT NOT NULL,
+                full_name TEXT NOT NULL,
+                position TEXT NOT NULL,
+                sort_order INTEGER DEFAULT 999,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP,
+                UNIQUE(category, full_name, position)
+            )
+        """)
+
+        conn.commit()
+
+
+def decline_fio_genitive(full_name):
+    """Примерное склонение ФИО в родительный падеж"""
+    parts = str(full_name or "").strip().split()
+
+    if len(parts) < 3:
+        return full_name
+
+    surname, name, patronymic = parts[0], parts[1], parts[2]
+
+    def decline_surname_rp(s):
+        if s.endswith("ов") or s.endswith("ев") or s.endswith("ин") or s.endswith("ын"):
+            return s + "а"
+        if s.endswith("ский"):
+            return s[:-2] + "ого"
+        if s.endswith("цкий"):
+            return s[:-2] + "ого"
+        if s.endswith("ая"):
+            return s[:-2] + "ой"
+        if s.endswith("ова") or s.endswith("ева") or s.endswith("ина") or s.endswith("ына"):
+            return s[:-1] + "ой"
+        return s
+
+    def decline_name_rp(s):
+        if s.endswith("й"):
+            return s[:-1] + "я"
+        if s.endswith("ь"):
+            return s[:-1] + "я"
+        if s.endswith("а"):
+            return s[:-1] + "ы"
+        if s.endswith("я"):
+            return s[:-1] + "и"
+        return s + "а"
+
+    def decline_patronymic_rp(s):
+        if s.endswith("ич"):
+            return s + "а"
+        if s.endswith("на"):
+            return s[:-1] + "ы"
+        return s
+
+    return f"{decline_surname_rp(surname)} {decline_name_rp(name)} {decline_patronymic_rp(patronymic)}"
+
+
+def decline_fio_dative(full_name):
+    """Примерное склонение ФИО в дательный падеж"""
+    parts = str(full_name or "").strip().split()
+
+    if len(parts) < 3:
+        return full_name
+
+    surname, name, patronymic = parts[0], parts[1], parts[2]
+
+    def decline_surname_dp(s):
+        if s.endswith("ов") or s.endswith("ев") or s.endswith("ин") or s.endswith("ын"):
+            return s + "у"
+        if s.endswith("ский"):
+            return s[:-2] + "ому"
+        if s.endswith("цкий"):
+            return s[:-2] + "ому"
+        if s.endswith("ая"):
+            return s[:-2] + "ой"
+        if s.endswith("ова") or s.endswith("ева") or s.endswith("ина") or s.endswith("ына"):
+            return s[:-1] + "ой"
+        return s
+
+    def decline_name_dp(s):
+        if s.endswith("й"):
+            return s[:-1] + "ю"
+        if s.endswith("ь"):
+            return s[:-1] + "ю"
+        if s.endswith("а"):
+            return s[:-1] + "е"
+        if s.endswith("я"):
+            return s[:-1] + "е"
+        return s + "у"
+
+    def decline_patronymic_dp(s):
+        if s.endswith("ич"):
+            return s + "у"
+        if s.endswith("на"):
+            return s[:-1] + "е"
+        return s
+
+    return f"{decline_surname_dp(surname)} {decline_name_dp(name)} {decline_patronymic_dp(patronymic)}"
+
+
+def decline_position_genitive(position):
+    """Примерное склонение должности в родительный падеж"""
+    text = str(position or "").strip()
+
+    replacements = {
+        "Первый заместитель главы администрации города": "Первого заместителя главы администрации города",
+        "Заместитель главы администрации города, руководитель аппарата": "Заместителя главы администрации города, руководителя аппарата",
+        "Заместитель главы администрации города по экономической политике": "Заместителя главы администрации города по экономической политике",
+        "Заместитель главы администрации города по защите населения и информации": "Заместителя главы администрации города по защите населения и информации",
+        "Заместитель главы администрации города по городскому хозяйству": "Заместителя главы администрации города по городскому хозяйству",
+        "Заместитель главы администрации города по социальной политике": "Заместителя главы администрации города по социальной политике",
+        "Заместитель главы администрации города по дорожному хозяйству и транспорту": "Заместителя главы администрации города по дорожному хозяйству и транспорту",
+        "Председатель комитета": "Председателя комитета",
+        "Начальник управления": "Начальника управления",
+        "Начальник отдела": "Начальника отдела",
+        "Управляющий делами администрации, председатель комитета": "Управляющего делами администрации, председателя комитета",
+    }
+
+    return replacements.get(text, text)
+
+
+def decline_position_dative(position):
+    """Примерное склонение должности в дательный падеж"""
+    text = str(position or "").strip()
+
+    replacements = {
+        "Первый заместитель главы администрации города": "Первому заместителю главы администрации города",
+        "Заместитель главы администрации города, руководитель аппарата": "Заместителю главы администрации города, руководителю аппарата",
+        "Заместитель главы администрации города по экономической политике": "Заместителю главы администрации города по экономической политике",
+        "Заместитель главы администрации города по защите населения и информации": "Заместителю главы администрации города по защите населения и информации",
+        "Заместитель главы администрации города по городскому хозяйству": "Заместителю главы администрации города по городскому хозяйству",
+        "Заместитель главы администрации города по социальной политике": "Заместителю главы администрации города по социальной политике",
+        "Заместитель главы администрации города по дорожному хозяйству и транспорту": "Заместителю главы администрации города по дорожному хозяйству и транспорту",
+        "Председатель комитета": "Председателю комитета",
+        "Начальник управления": "Начальнику управления",
+        "Начальник отдела": "Начальнику отдела",
+        "Управляющий делами администрации, председатель комитета": "Управляющему делами администрации, председателю комитета",
+    }
+
+    return replacements.get(text, text)
+
+
+def seed_meeting_participants_defaults():
+    """
+    Заполняет таблицу участников совещаний.
+    Исправляет:
+    1. Органы МСУ (ИП) — из employees.
+    2. Органы МСУ (РП) — родительный падеж.
+    3. Органы МСУ (ДП) — дательный падеж.
+    4. Приглашенные ИП/РП/ДП — отдельные категории.
+    """
+    ensure_meeting_participants_table()
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        # ===== Приглашенные =====
+        invited_ip = [
+            ("Иванов Андрей Максимович", 'Директор "ООО Ромашка"', 1),
+            ("Иванов Михаил Максимович", "Депутат АКЗС", 2),
+        ]
+
+        invited_rp = [
+            ("Иванова Андрея Максимовича", 'Директора "ООО Ромашка"', 1),
+            ("Иванова Михаила Максимовича", "Депутата АКЗС", 2),
+        ]
+
+        invited_dp = [
+            ("Иванову Андрею Максимовичу", 'Директору "ООО Ромашка"', 1),
+            ("Иванову Михаилу Максимовичу", "Депутату АКЗС", 2),
+        ]
+
+        def insert_default_rows(category, rows):
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM meeting_participants
+                WHERE category = ?
+            """, (category,))
+
+            if cursor.fetchone()[0] == 0:
+                for full_name, position, sort_order in rows:
+                    cursor.execute("""
+                        INSERT OR IGNORE INTO meeting_participants (
+                            category,
+                            full_name,
+                            position,
+                            sort_order
+                        )
+                        VALUES (?, ?, ?, ?)
+                    """, (
+                        category,
+                        full_name,
+                        position,
+                        sort_order
+                    ))
+
+        insert_default_rows("invited_ip", invited_ip)
+        insert_default_rows("invited_rp", invited_rp)
+        insert_default_rows("invited_dp", invited_dp)
+
+        # ===== Органы МСУ =====
+        cursor.execute("""
+            SELECT id, full_name, position
+            FROM employees
+            WHERE full_name IS NOT NULL
+              AND TRIM(full_name) != ''
+            ORDER BY id
+        """)
+
+        employees = cursor.fetchall()
+
+        # Органы МСУ (ИП)
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM meeting_participants
+            WHERE category = 'msu_ip'
+        """)
+
+        if cursor.fetchone()[0] == 0:
+            for index, emp in enumerate(employees, start=1):
+                full_name = emp["full_name"] if hasattr(emp, "keys") else emp[1]
+                position = emp["position"] if hasattr(emp, "keys") else emp[2]
+
+                cursor.execute("""
+                    INSERT OR IGNORE INTO meeting_participants (
+                        category,
+                        full_name,
+                        position,
+                        sort_order
+                    )
+                    VALUES (?, ?, ?, ?)
+                """, (
+                    "msu_ip",
+                    full_name or "",
+                    position or "",
+                    index
+                ))
+
+        # ВАЖНО:
+        # Если РП/ДП были раньше созданы как копия ИП, удаляем их и создаем заново.
+        cursor.execute("DELETE FROM meeting_participants WHERE category IN ('msu_rp', 'msu_dp')")
+
+        for index, emp in enumerate(employees, start=1):
+            full_name = emp["full_name"] if hasattr(emp, "keys") else emp[1]
+            position = emp["position"] if hasattr(emp, "keys") else emp[2]
+
+            cursor.execute("""
+                INSERT OR IGNORE INTO meeting_participants (
+                    category,
+                    full_name,
+                    position,
+                    sort_order
+                )
+                VALUES (?, ?, ?, ?)
+            """, (
+                "msu_rp",
+                decline_fio_genitive(full_name),
+                decline_position_genitive(position),
+                index
+            ))
+
+            cursor.execute("""
+                INSERT OR IGNORE INTO meeting_participants (
+                    category,
+                    full_name,
+                    position,
+                    sort_order
+                )
+                VALUES (?, ?, ?, ?)
+            """, (
+                "msu_dp",
+                decline_fio_dative(full_name),
+                decline_position_dative(position),
+                index
+            ))
+
+        conn.commit()
+
+
+def meeting_participants_get_all(category):
+    """Получает участников совещаний по категории"""
+    ensure_meeting_participants_table()
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT id, category, full_name, position, sort_order
+            FROM meeting_participants
+            WHERE category = ?
+            ORDER BY sort_order, full_name
+        """, (category,))
+
+        return [dict(row) for row in cursor.fetchall()]
+
+
+def meeting_participants_add(category, full_name, position):
+    """Добавляет участника совещаний"""
+    seed_meeting_participants_defaults()
+
+    full_name = str(full_name or "").strip()
+    position = str(position or "").strip()
+
+    if not full_name:
+        return False
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT COALESCE(MAX(sort_order), 0) + 1
+            FROM meeting_participants
+            WHERE category = ?
+        """, (category,))
+
+        sort_order = cursor.fetchone()[0] or 999
+
+        try:
+            cursor.execute("""
+                INSERT INTO meeting_participants (
+                    category,
+                    full_name,
+                    position,
+                    sort_order,
+                    updated_at
+                )
+                VALUES (?, ?, ?, ?, ?)
+            """, (
+                category,
+                full_name,
+                position,
+                sort_order,
+                datetime.now()
+            ))
+
+            conn.commit()
+            return True
+
+        except sqlite3.IntegrityError:
+            return False
+
+
+def meeting_participants_update(record_id, full_name, position):
+    """Изменяет участника совещаний"""
+    full_name = str(full_name or "").strip()
+    position = str(position or "").strip()
+
+    if not full_name:
+        return False
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            UPDATE meeting_participants
+            SET full_name = ?,
+                position = ?,
+                updated_at = ?
+            WHERE id = ?
+        """, (
+            full_name,
+            position,
+            datetime.now(),
+            record_id
+        ))
+
+        conn.commit()
+        return cursor.rowcount > 0
+
+
+def meeting_participants_delete(record_id):
+    """Удаляет участника совещаний"""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            DELETE FROM meeting_participants
+            WHERE id = ?
+        """, (record_id,))
+
+        conn.commit()
+        return cursor.rowcount > 0
+
+
+# ===== Совместимость со старым meetings.py =====
+
+def invited_get_all():
+    """
+    Для кнопки 'Приглашенные' в meetings.py.
+    По умолчанию возвращает Приглашенные (ИП).
+    """
+    return meeting_participants_get_all("invited_ip")
+
+
+def get_all_meeting_msu_ip():
+    """Органы МСУ (ИП)"""
+    return meeting_participants_get_all("msu_ip")
+
+
+def get_all_meeting_msu_rp():
+    """Органы МСУ (РП)"""
+    return meeting_participants_get_all("msu_rp")
+
+
+def get_all_meeting_msu_dp():
+    """Органы МСУ (ДП)"""
+    return meeting_participants_get_all("msu_dp")
+
+
+def get_all_meeting_invited_ip():
+    """Приглашенные (ИП)"""
+    return meeting_participants_get_all("invited_ip")
+
+
+def get_all_meeting_invited_rp():
+    """Приглашенные (РП)"""
+    return meeting_participants_get_all("invited_rp")
+
+
+def get_all_meeting_invited_dp():
+    """Приглашенные (ДП)"""
+    return meeting_participants_get_all("invited_dp")
+
+def object_map_get_all():
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT *
+            FROM object_map_items
+            ORDER BY id DESC
+        """)
+
+        rows = cursor.fetchall()
+
+        result = []
+        for row in rows:
+            try:
+                result.append(dict(row))
+            except Exception:
+                result.append({
+                    "id": row[0],
+                    "pk_number": row[1],
+                    "district": row[2],
+                    "dispute_category": row[3],
+                    "address": row[4],
+                    "latitude": row[5],
+                    "longitude": row[6],
+                    "created_at": row[7],
+                    "updated_at": row[8],
+                })
+
+        return result
+
+
+def object_map_add(data):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            INSERT INTO object_map_items (
+                pk_number,
+                district,
+                dispute_category,
+                address,
+                latitude,
+                longitude
+            )
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (
+            data.get("pk_number", ""),
+            data.get("district", ""),
+            data.get("dispute_category", ""),
+            data.get("address", ""),
+            data.get("latitude"),
+            data.get("longitude"),
+        ))
+
+        conn.commit()
+        return cursor.lastrowid
+
+
+def object_map_update(object_id, data):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            UPDATE object_map_items
+            SET pk_number = ?,
+                district = ?,
+                dispute_category = ?,
+                address = ?,
+                latitude = ?,
+                longitude = ?,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        """, (
+            data.get("pk_number", ""),
+            data.get("district", ""),
+            data.get("dispute_category", ""),
+            data.get("address", ""),
+            data.get("latitude"),
+            data.get("longitude"),
+            object_id
+        ))
+
+        conn.commit()
+        return cursor.rowcount > 0
+
+
+def object_map_delete(object_id):
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            DELETE FROM object_map_items
+            WHERE id = ?
+        """, (object_id,))
+
+        conn.commit()
+        return cursor.rowcount > 0

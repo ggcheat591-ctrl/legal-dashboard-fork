@@ -1,0 +1,355 @@
+/* Prototype-inspired color layer. Keep this file last in main.css. */
+body {
+  color: var(--text) !important;
+  background:
+    radial-gradient(circle at 20% -8%, rgba(37, 87, 214, .12), transparent 330px),
+    linear-gradient(180deg, #f8f9fc, var(--bg)) !important;
+}
+
+::selection {
+  background: #dbe5ff !important;
+}
+
+.sidebar {
+  color: #eef2ff !important;
+  background: linear-gradient(180deg, #17223d 0%, #111a31 100%) !important;
+  border-color: rgba(255, 255, 255, .06) !important;
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, .06) !important;
+}
+
+.sidebar-bottom {
+  background: linear-gradient(180deg, rgba(17, 26, 49, 0), rgba(17, 26, 49, .96) 36%) !important;
+}
+
+.brand {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, .07) !important;
+  box-shadow: none !important;
+}
+
+.brand-icon,
+.login-logo {
+  color: #ffffff !important;
+  background: linear-gradient(145deg, #386ce8, #2249ba) !important;
+  box-shadow: 0 10px 25px rgba(37, 87, 214, .30) !important;
+}
+
+.brand small,
+.brand-text small {
+  color: #8e9ab6 !important;
+}
+
+.nav-btn,
+.sidebar-collapse-btn,
+.sidebar-quick-btn {
+  color: #dfe6f7 !important;
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.sidebar-collapse-btn,
+.sidebar-quick-btn {
+  background: rgba(255, 255, 255, .08) !important;
+  border-color: rgba(255, 255, 255, .10) !important;
+}
+
+.nav-btn .ico {
+  color: #aebce0 !important;
+}
+
+.nav-btn.active,
+.nav-btn:hover {
+  color: #ffffff !important;
+  background: rgba(76, 118, 233, .25) !important;
+  border-color: rgba(255, 255, 255, .10) !important;
+  box-shadow: none !important;
+}
+
+.nav-btn.active .ico,
+.nav-btn:hover .ico {
+  color: #ffffff !important;
+}
+
+.topbar,
+.topbar-modern,
+.panel,
+.case-card,
+.widget-shell,
+.calendar-main-card,
+.calendar-week-card,
+#calendar > .calendar-side-card,
+.calendar-month-panel,
+.calendar-mode-card,
+.modal,
+.calendar-task-dialog,
+.calendar-detail-dialog,
+.calendar-plan-dialog,
+.calendar-case-link-dialog,
+.calendar-case-question-dialog,
+.calendar-confirm-dialog,
+.calendar-conflict-dialog,
+.calendar-dependent-dialog,
+.calendar-move-dialog,
+.calendar-move-time-dialog {
+  color: var(--text) !important;
+  background: var(--panel) !important;
+  border-color: var(--line) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.page-head h2,
+.topbar-title-text h1,
+.topbar h1,
+.panel h3,
+.case-card b,
+.widget-head h3,
+.calendar-week-card-head h3,
+.calendar-task-card b,
+.calendar-week-task b,
+.login-card h1 {
+  color: var(--text) !important;
+}
+
+.page-head p,
+.topbar p,
+.topbar-profile-text small,
+.case-card p,
+.calendar-week-card-head p,
+.calendar-task-card span,
+.calendar-task-card p,
+.calendar-week-task small,
+.calendar-empty-task,
+.widget-dragbar small,
+.calendar-unified-list-main span,
+.calendar-unified-list-main small,
+.login-card p {
+  color: var(--muted) !important;
+}
+
+.btn,
+.topbar-note-btn,
+.topbar-notify-btn,
+.profile-action-btn,
+.avatar,
+.notify,
+.calendar-week-date,
+.calendar-other-toggle {
+  color: #253048 !important;
+  background: #ffffff !important;
+  border-color: var(--line) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.btn:hover,
+.topbar-note-btn:hover,
+.topbar-notify-btn:hover,
+.profile-action-btn:hover,
+.calendar-case-link-choice:hover,
+.calendar-case-link-choice:focus {
+  background: #f8f9fc !important;
+  border-color: var(--line-strong) !important;
+  box-shadow: 0 0 0 3px #edf2ff !important;
+}
+
+.btn.primary,
+.record-create-plus,
+.topbar-notify-badge,
+.calendar-widget-plan-head strong {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, var(--blue), var(--blue-dark)) !important;
+  border-color: var(--blue) !important;
+  box-shadow: 0 10px 25px rgba(37, 87, 214, .22) !important;
+}
+
+.btn:disabled,
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+  color: #7d8699 !important;
+  background: #edf0f4 !important;
+  border-color: #dfe4eb !important;
+}
+
+input,
+select,
+textarea,
+.search-input,
+.date-picker,
+.calendar-dialog-body input,
+.calendar-dialog-body select,
+.calendar-dialog-body textarea,
+.login-form input {
+  color: #253048 !important;
+  background: #ffffff !important;
+  border-color: #dfe4eb !important;
+  caret-color: var(--blue) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #939bad !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+.search-input:focus,
+.date-picker:focus,
+.calendar-dialog-body input:focus,
+.calendar-dialog-body select:focus,
+.calendar-dialog-body textarea:focus,
+.login-form input:focus {
+  border-color: #7f9fea !important;
+  outline-color: #7f9fea !important;
+  box-shadow: 0 0 0 3px #edf2ff !important;
+}
+
+th {
+  color: var(--muted) !important;
+  background: var(--surface-soft) !important;
+}
+
+td,
+th,
+.control-page-row,
+.widget-head,
+.widget-dragbar,
+.calendar-week-tools,
+.calendar-week-day-head,
+.calendar-dialog-actions,
+.modal-footer {
+  border-color: var(--line) !important;
+}
+
+tr:hover,
+.case-preview-row:hover,
+.control-row:hover,
+.calendar-week-day.selected,
+.calendar-week-day-head,
+.widget-dragbar,
+.calendar-toolbar,
+.calendar-week-tools,
+.calendar-mode-card,
+.calendar-day-cell.selected,
+.topbar-notify-btn.has-unread {
+  background: var(--surface-blue) !important;
+}
+
+.case-preview-row,
+.control-row,
+.calendar-week-day,
+.calendar-week-day-body,
+.calendar-day-cell,
+.calendar-task-card,
+.calendar-week-task,
+.calendar-unified-list-item,
+.calendar-case-link-choice,
+.detail-item,
+.modal-metrics div,
+.owner-card,
+.quick-tip,
+.calendar-empty-task {
+  color: var(--text) !important;
+  background: #ffffff !important;
+  border-color: var(--line) !important;
+}
+
+.calendar-week-task,
+.calendar-task-card,
+.calendar-unified-list-item {
+  background: var(--week-task-bg, var(--task-bg, #ffffff)) !important;
+  border-color: var(--line) !important;
+}
+
+.calendar-side-head,
+.calendar-dialog-head,
+.calendar-dialog-head.compact {
+  color: #ffffff !important;
+  background: linear-gradient(180deg, #17223d 0%, #111a31 100%) !important;
+}
+
+.calendar-dialog-body,
+.calendar-detail-body,
+.calendar-move-body,
+.calendar-case-link-body,
+.calendar-conflict-body,
+.calendar-dependent-body,
+.calendar-dialog-actions {
+  background: var(--surface-soft) !important;
+}
+
+.calendar-weekdays span,
+.calendar-week-empty,
+.map-widget-disabled {
+  color: var(--muted) !important;
+  background: var(--surface-soft) !important;
+  border-color: var(--line) !important;
+}
+
+.calendar-day-cell.today .calendar-day-number,
+.time-pill {
+  color: var(--blue) !important;
+  background: var(--primary-soft) !important;
+}
+
+.calendar-day-cell.selected {
+  border-color: var(--blue) !important;
+  box-shadow: 0 0 0 4px rgba(37, 87, 214, .12) !important;
+}
+
+.calendar-event-scope span,
+.calendar-task-types label,
+.event-type-row button,
+.panel-tabs button {
+  color: #657086 !important;
+  background: #ffffff !important;
+  border-color: var(--line) !important;
+}
+
+.calendar-event-scope input:checked + span,
+.event-type-row button.active,
+.panel-tabs button.active {
+  color: var(--blue) !important;
+  background: var(--primary-soft) !important;
+  border-color: #b8c9f4 !important;
+}
+
+.calendar-form-error,
+.login-error {
+  color: #a9313d !important;
+  background: #fff7f8 !important;
+  border-color: #e8a3ab !important;
+}
+
+.calendar-privacy-hint {
+  color: #146c52 !important;
+  background: #eaf8f3 !important;
+}
+
+.status-tag.orange { background: #fff4e6 !important; color: var(--orange) !important; }
+.status-tag.purple { background: #f0ebff !important; color: var(--purple) !important; }
+.status-tag.red { background: #fff0f2 !important; color: var(--red) !important; }
+.status-tag.green { background: #eaf8f3 !important; color: var(--green) !important; }
+
+.schedule-date-band {
+  color: #ffffff !important;
+  background: linear-gradient(90deg, var(--blue-dark), var(--blue)) !important;
+}
+
+.login-screen {
+  background:
+    radial-gradient(circle at top left, rgba(37, 87, 214, .14), transparent 34%),
+    linear-gradient(135deg, #f4f6fb, #ffffff 52%, #f8f9fc) !important;
+}
+
+.modal::backdrop,
+.calendar-task-dialog::backdrop,
+.calendar-detail-dialog::backdrop,
+.calendar-plan-dialog::backdrop,
+.calendar-move-dialog::backdrop,
+.calendar-move-time-dialog::backdrop,
+.calendar-dependent-dialog::backdrop {
+  background: rgba(16, 24, 44, .55) !important;
+}

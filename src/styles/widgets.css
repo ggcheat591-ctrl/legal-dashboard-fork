@@ -1,0 +1,1152 @@
+.widget-shell {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  scrollbar-gutter: stable both-edges;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.widget-shell:hover {
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.widget-dragbar {
+  min-height: 38px;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  background: linear-gradient(180deg,#f8fbff,#eef4ff);
+  border-bottom: 1px solid #dbe7f6;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 950;
+  user-select: none;
+  cursor: default;
+}
+
+body.dashboard-edit-mode .widget-dragbar {
+  display: flex;
+  cursor: grab;
+}
+
+.widget-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.widget-title > span {
+  display: none;
+}
+
+.widget-remove-btn {
+  display: none;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 9px;
+  background: #fee2e2;
+  color: var(--red);
+  font-size: 18px;
+  font-weight: 950;
+}
+
+body.dashboard-edit-mode .widget-remove-btn {
+  display: inline-grid;
+  place-items: center;
+}
+
+.widget-dragbar small {
+  display: none;
+  color: #94a3b8;
+}
+
+body.dashboard-edit-mode .widget-dragbar small {
+  display: inline;
+}
+
+.widget-head {
+  min-height: 58px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #edf1f6;
+}
+
+.widget-head h3 {
+  min-width: 0;
+  margin: 0;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.widget-content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 12px;
+}
+
+.case-preview-row,
+.control-row {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: linear-gradient(180deg,#fff,#f8fbff);
+  margin-bottom: 8px;
+}
+
+.case-preview-row span,
+.control-row span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.map-widget-disabled {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  border: 1px dashed #cbd5e1;
+  border-radius: 18px;
+  color: var(--muted);
+  background: #f8fbff;
+  font-weight: 900;
+  text-align: center;
+}
+
+.status-tag {
+  display: inline-flex;
+  height: 25px;
+  align-items: center;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.status-tag.orange { background: #fff3df; color: #d48300; }
+.status-tag.purple { background: #f1e7ff; color: #8f38ff; }
+.status-tag.red { background: #ffe8e8; color: #e33939; }
+.status-tag.green { background: #e8f7ec; color: #199153; }
+
+
+/* Виджет календаря теперь хранит/показывает недельный план */
+.calendar-widget-plan {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+  overflow: hidden;
+}
+
+.calendar-widget-plan-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid #dbe7f6;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ffffff, #f3f7ff);
+  padding: 11px 12px;
+}
+
+.calendar-widget-plan-head b {
+  display: block;
+  font-size: 14px;
+}
+
+.calendar-widget-plan-head span {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.calendar-widget-plan-head strong {
+  min-width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: #1f5eff;
+  color: #fff;
+}
+
+.calendar-widget-week {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(92px, 1fr));
+  gap: 8px;
+  overflow: auto;
+}
+
+.calendar-widget-day {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.calendar-widget-day.today {
+  border-color: #9db8ff;
+  box-shadow: 0 0 0 3px rgba(31, 94, 255, .08);
+}
+
+.calendar-widget-day-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 8px;
+  background: #f8fbff;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.calendar-widget-day-title b {
+  font-size: 12px;
+}
+
+.calendar-widget-day-title span {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.calendar-widget-day-list {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 7px;
+  overflow: auto;
+}
+
+.calendar-widget-day-list em {
+  color: #94a3b8;
+  font-style: normal;
+  text-align: center;
+  font-size: 12px;
+}
+
+.calendar-widget-task {
+  display: grid;
+  gap: 2px;
+  border-left: 3px solid #1f5eff;
+  border-radius: 10px;
+  background: #f8fbff;
+  padding: 6px;
+}
+
+.calendar-widget-task b {
+  color: #1f3b63;
+  font-size: 11px;
+}
+
+.calendar-widget-task span {
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+
+/* Виджет календаря: план только на сегодня */
+.calendar-widget-today {
+  height: 100%; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 10px; overflow: hidden;
+}
+.calendar-widget-today-head {
+  display: flex; justify-content: space-between; gap: 10px; align-items: center;
+  border: 1px solid #dbe7f6; border-radius: 16px; background: linear-gradient(135deg, #ffffff, #f3f7ff); padding: 11px 12px;
+}
+.calendar-widget-today-head b { display: block; font-size: 14px; }
+.calendar-widget-today-head span { color: #64748b; font-size: 12px; }
+.calendar-widget-today-head strong {
+  min-width: 36px; height: 36px; display: grid; place-items: center; border-radius: 13px; background: #1f5eff; color: #fff;
+}
+.calendar-widget-today-list { min-height: 0; display: grid; align-content: start; gap: 8px; overflow: auto; }
+.calendar-widget-today-task {
+  display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 8px;
+  border: 1px solid #dbe7f6; border-radius: 16px; background: #fff; padding: 9px;
+}
+.calendar-widget-today-task > b {
+  min-height: 36px; display: grid; place-items: center; border-radius: 12px; background: #eff5ff; color: #1f3b63;
+}
+.calendar-widget-today-task strong { display: block; font-size: 12px; }
+.calendar-widget-today-task span { display: block; color: #64748b; font-size: 11px; margin-top: 3px; }
+
+/* Виджет графика: карточки заседаний на сегодня */
+.schedule-widget-item.today-card { display: grid; gap: 5px; border-left: 5px solid #1f5eff; }
+.schedule-widget-time {
+  width: max-content; min-width: 48px; min-height: 30px; display: grid; place-items: center;
+  border-radius: 11px; background: #eff5ff; color: #1f3b63; font-weight: 950;
+}
+.schedule-widget-item.today-card small { color: #64748b; font-size: 12px; }
+
+.registry-widget-real{height:100%;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);gap:12px;overflow:hidden}
+.registry-widget-stats>div{border:1px solid #bfd4ff;border-radius:16px;background:#fff;padding:12px}
+.registry-widget-stats span{display:block;color:#64748b;font-size:12px;margin-bottom:6px}.registry-widget-stats b{font-size:24px}
+.registry-widget-list{display:grid;gap:9px;min-height:0;overflow:auto}.registry-widget-item{border:1px solid #e2e8f0;border-radius:15px;background:#fff;padding:10px}
+.registry-widget-item b{display:block;margin-bottom:4px}.registry-widget-item span,.registry-widget-item p{color:#64748b;font-size:12px;margin:0}
+
+
+/* Виджеты на главном экране теперь визуально выделены */
+.widget-shell {
+  position: relative;
+  border: 1px solid #bcd2ff !important;
+  box-shadow:
+    0 16px 38px rgba(15, 23, 42, .10),
+    0 0 0 4px rgba(31, 94, 255, .035) !important;
+}
+
+.widget-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: linear-gradient(180deg, #1f5eff, #244878);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.widget-shell:hover {
+  border-color: #7aa2ff !important;
+  box-shadow:
+    0 20px 48px rgba(15, 23, 42, .15),
+    0 0 0 4px rgba(31, 94, 255, .07) !important;
+}
+
+.widget-dragbar {
+  background: linear-gradient(135deg, #eef5ff, #ffffff 42%, #edf4ff) !important;
+  border-bottom-color: #cfe0ff !important;
+  color: #1f3b63 !important;
+}
+
+.widget-title {
+  font-weight: 950;
+}
+
+/* Умный виджет календаря: календарь / план / оба */
+.calendar-widget-smart {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+  overflow: hidden;
+}
+
+.calendar-widget-modebar {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.calendar-widget-mode-btn {
+  border: 1px solid #dbe7f6;
+  border-radius: 12px;
+  background: #fff;
+  color: #475569;
+  min-height: 32px;
+  padding: 5px 7px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.calendar-widget-mode-btn.active {
+  background: #1f5eff;
+  border-color: #1f5eff;
+  color: #fff;
+}
+
+.calendar-widget-smart-body,
+.calendar-widget-both {
+  min-height: 0;
+  overflow: auto;
+}
+
+.calendar-widget-both {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+}
+
+.calendar-widget-mini {
+  display: grid;
+  gap: 8px;
+  border: 1px solid #dbe7f6;
+  border-radius: 16px;
+  background: #fff;
+  padding: 10px;
+}
+
+.calendar-widget-mini-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.calendar-widget-mini-head button {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #dbe7f6;
+  border-radius: 10px;
+  background: #f8fbff;
+  color: #1f3b63;
+  font-size: 18px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.calendar-widget-mini-head strong {
+  font-size: 13px;
+}
+
+.calendar-widget-mini-weekdays,
+.calendar-widget-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.calendar-widget-mini-weekdays span {
+  text-align: center;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 950;
+}
+
+.calendar-widget-mini-day {
+  min-height: 32px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  border: 1px solid #eef2f7;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 11px;
+}
+
+.calendar-widget-mini-day.today {
+  border-color: #1f5eff;
+  box-shadow: 0 0 0 2px rgba(31, 94, 255, .10);
+}
+
+.calendar-widget-mini-day.has-tasks {
+  background: #f8fbff;
+}
+
+.calendar-widget-mini-day span {
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  min-width: 15px;
+  height: 15px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: #1f5eff;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 950;
+}
+
+.calendar-widget-smart .calendar-widget-today {
+  min-height: 0;
+}
+
+
+/* Виджет календаря: режим Канбан */
+.calendar-widget-modebar.four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.calendar-widget-modebar.four .calendar-widget-mode-btn {
+  font-size: 11px;
+  padding-inline: 4px;
+}
+
+.calendar-kanban-widget {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+  overflow: hidden;
+}
+
+.calendar-kanban-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #dbe7f6;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ffffff, #f3f7ff);
+  padding: 10px 12px;
+}
+
+.calendar-kanban-head b {
+  font-size: 14px;
+}
+
+.calendar-kanban-head span {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.calendar-kanban-board {
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(138px, 1fr));
+  gap: 8px;
+  padding-bottom: 4px;
+}
+
+.calendar-kanban-column {
+  min-height: 220px;
+  border: 1px solid #dbe7f6;
+  border-radius: 16px;
+  background: #f8fbff;
+  padding: 8px;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 8px;
+}
+
+.calendar-kanban-column.drag-over {
+  border-color: #1f5eff;
+  box-shadow: inset 0 0 0 2px rgba(31, 94, 255, .16);
+}
+
+.calendar-kanban-column-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+.calendar-kanban-column-head strong {
+  font-size: 12px;
+  color: #1f3b63;
+}
+
+.calendar-kanban-column-head span {
+  min-width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  border: 1px solid #dbe7f6;
+  font-size: 11px;
+  font-weight: 950;
+}
+
+.calendar-kanban-cards {
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.calendar-kanban-card {
+  border: 1px solid #dbe4f0;
+  border-radius: 14px;
+  background: #fff;
+  padding: 9px;
+  cursor: grab;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, .06);
+}
+
+.calendar-kanban-card.dragging {
+  opacity: .55;
+  cursor: grabbing;
+}
+
+.calendar-kanban-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.calendar-kanban-card-top b {
+  color: #1f5eff;
+  font-size: 12px;
+}
+
+.calendar-kanban-card-top span {
+  max-width: 74px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #64748b;
+  font-size: 10px;
+}
+
+.calendar-kanban-card > strong {
+  display: block;
+  font-size: 12px;
+  line-height: 1.25;
+  margin-bottom: 5px;
+}
+
+.calendar-kanban-card p {
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1.25;
+  margin: 0 0 8px;
+}
+
+.calendar-kanban-card-actions {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.calendar-kanban-card-actions button {
+  border: 1px solid #dbe7f6;
+  border-radius: 10px;
+  background: #f8fbff;
+  padding: 4px 7px;
+  color: #1f3b63;
+  font-size: 10px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.calendar-kanban-empty {
+  border: 1px dashed #cbd5e1;
+  border-radius: 13px;
+  min-height: 48px;
+  display: grid;
+  place-items: center;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.calendar-kanban-column.overdue .calendar-kanban-column-head strong {
+  color: #b42318;
+}
+
+.calendar-kanban-column.done .calendar-kanban-column-head strong {
+  color: #116329;
+}
+
+
+/* Три отдельных календарных виджета */
+.calendar-mini-widget,
+.calendar-widget-kanban-plan,
+.calendar-today-only-widget {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  overflow: hidden;
+}
+
+.calendar-mini-widget {
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 8px;
+}
+
+.calendar-mini-widget-head,
+.calendar-today-only-head,
+.calendar-widget-kanban-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: 1px solid #dbe7f6;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ffffff, #f3f7ff);
+  padding: 10px 12px;
+}
+
+.calendar-mini-widget-head button {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #dbe7f6;
+  border-radius: 10px;
+  background: #fff;
+  font-weight: 950;
+  color: #1f3b63;
+  cursor: pointer;
+}
+
+.calendar-mini-widget-weekdays,
+.calendar-mini-widget-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.calendar-mini-widget-weekdays span {
+  text-align: center;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 950;
+}
+
+.calendar-mini-widget-grid {
+  min-height: 0;
+  overflow: auto;
+}
+
+.calendar-mini-widget-day {
+  min-height: 34px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  border: 1px solid #eef2f7;
+  border-radius: 10px;
+  background: #fff;
+  color: #334155;
+  cursor: pointer;
+}
+
+.calendar-mini-widget-day.empty {
+  border-color: transparent;
+  background: transparent;
+  cursor: default;
+}
+
+.calendar-mini-widget-day.today {
+  border-color: #1f5eff;
+  box-shadow: 0 0 0 2px rgba(31, 94, 255, .10);
+}
+
+.calendar-mini-widget-day.has-tasks {
+  background: #f8fbff;
+}
+
+.calendar-mini-widget-day span {
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  min-width: 15px;
+  height: 15px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: #1f5eff;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 950;
+}
+
+.calendar-widget-kanban-plan {
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+}
+
+.calendar-widget-kanban-board {
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(170px, 1fr));
+  gap: 10px;
+  padding-bottom: 4px;
+}
+
+.calendar-widget-kanban-column {
+  min-height: 230px;
+  border: 1px solid #dbe7f6;
+  border-radius: 18px;
+  background: #f8fbff;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 8px;
+  padding: 9px;
+}
+
+.calendar-widget-kanban-column-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.calendar-widget-kanban-column-head strong {
+  color: #1f3b63;
+}
+
+.calendar-widget-kanban-column.overdue .calendar-widget-kanban-column-head strong {
+  color: #b42318;
+}
+
+.calendar-widget-kanban-column-head span {
+  min-width: 25px;
+  height: 25px;
+  border: 1px solid #dbe7f6;
+  border-radius: 999px;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 950;
+}
+
+.calendar-widget-kanban-list,
+.calendar-today-only-list {
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+
+.calendar-widget-kanban-task,
+.calendar-today-only-task {
+  border: 1px solid #dbe4f0;
+  border-radius: 15px;
+  background: #fff;
+  padding: 9px;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, .05);
+}
+
+.calendar-widget-kanban-task:hover,
+.calendar-today-only-task:hover {
+  border-color: #93b9ff;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, .10);
+}
+
+.calendar-widget-kanban-task-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.calendar-widget-kanban-task-top b {
+  color: #1f5eff;
+}
+
+.calendar-widget-kanban-task-top span {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.calendar-widget-kanban-task strong,
+.calendar-today-only-task strong {
+  display: block;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.calendar-widget-kanban-task p,
+.calendar-today-only-task span {
+  color: #64748b;
+  font-size: 11px;
+  margin: 4px 0 0;
+}
+
+.calendar-widget-kanban-empty {
+  min-height: 58px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  color: #94a3b8;
+}
+
+.calendar-widget-delete-dialog {
+  width: min(360px, calc(100vw - 34px));
+  border: 0;
+  border-radius: 22px;
+  padding: 0;
+  box-shadow: 0 24px 80px rgba(15, 23, 42, .28);
+}
+
+.calendar-widget-delete-dialog::backdrop {
+  background: rgba(15, 23, 42, .42);
+  backdrop-filter: blur(3px);
+}
+
+.calendar-widget-delete-head {
+  padding: 18px 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.calendar-widget-delete-head h3 {
+  margin: 0;
+}
+
+.calendar-widget-delete-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 18px 18px;
+}
+
+.calendar-today-only-widget {
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+}
+
+.calendar-today-only-head div {
+  display: grid;
+  gap: 3px;
+}
+
+.calendar-today-only-head span {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.calendar-today-only-head strong {
+  min-width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: #1f5eff;
+  color: #fff;
+}
+
+.calendar-today-only-task {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  gap: 9px;
+}
+
+.calendar-today-only-task > b {
+  min-height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #eff5ff;
+  color: #1f3b63;
+}
+
+@media (max-width: 900px) {
+  .calendar-widget-kanban-board {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Виджет критических ситуаций */
+.critical-alerts-widget {
+  min-height: 100%;
+  display: grid;
+  grid-template-columns: minmax(180px, 260px) minmax(0, 1fr);
+  gap: 12px;
+}
+
+.critical-alerts-summary {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid #dbe7f6;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #f8fbff, #eef4ff);
+  padding: 14px;
+}
+
+.critical-alerts-summary span,
+.critical-alerts-summary b {
+  display: block;
+}
+
+.critical-alerts-summary span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.critical-alerts-summary b {
+  margin-top: 5px;
+  color: #11235a;
+  font-size: 17px;
+}
+
+.critical-alerts-list {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  align-content: start;
+  gap: 8px;
+  overflow: auto;
+}
+
+.critical-alert-item {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 9px;
+  border: 1px solid #dbe7f6;
+  border-radius: 15px;
+  background: #fff;
+  padding: 10px;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.critical-alert-item:hover {
+  border-color: #9db8ff;
+  transform: translateY(-1px);
+}
+
+.critical-alert-item.is-unread {
+  border-left: 4px solid #1f5eff;
+}
+
+.critical-alert-item.is-overdue {
+  border-color: #fecaca;
+  background: #fff8f8;
+}
+
+.critical-alert-item.is-overdue.is-unread {
+  border-left-color: #dc2626;
+}
+
+.critical-alert-icon {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #eff5ff;
+}
+
+.critical-alert-item b,
+.critical-alert-item small {
+  display: block;
+}
+
+.critical-alert-item b {
+  color: #0f172a;
+  font-size: 12px;
+}
+
+.critical-alert-item small {
+  display: -webkit-box;
+  margin-top: 3px;
+  overflow: hidden;
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.critical-alert-item em {
+  color: #64748b;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.critical-alert-item.is-overdue em {
+  color: #b91c1c;
+}
+
+.critical-alerts-empty {
+  grid-column: 1 / -1;
+  min-height: 90px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed #cbd5e1;
+  border-radius: 16px;
+  color: #64748b;
+  background: #f8fbff;
+  text-align: center;
+  padding: 14px;
+}
+
+.critical-alerts-empty.error {
+  border-color: #fecaca;
+  color: #b91c1c;
+  background: #fff7f7;
+}
+
+@media (max-width: 900px) {
+  .critical-alerts-widget {
+    grid-template-columns: 1fr;
+  }
+
+  .critical-alerts-summary {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.calendar-widget-kanban-head > b,
+.calendar-today-only-head b,
+.schedule-widget-head span,
+.critical-alerts-summary span,
+.map-widget-info > b {
+  display: none !important;
+}
+
+.calendar-widget-kanban-head,
+.calendar-today-only-head,
+.schedule-widget-head,
+.critical-alerts-summary,
+.map-widget-info {
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .widget-head {
+    align-items: flex-start;
+  }
+
+  .widget-head .btn {
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  .calendar-widget-week,
+  .calendar-widget-kanban-board,
+  .calendar-today-only-task,
+  .critical-alert-item {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .widget-content {
+    padding: 10px;
+  }
+
+  .widget-head {
+    padding: 10px 12px;
+  }
+
+  .case-preview-row,
+  .control-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .calendar-widget-modebar,
+  .calendar-widget-modebar.four {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .critical-alerts-summary {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

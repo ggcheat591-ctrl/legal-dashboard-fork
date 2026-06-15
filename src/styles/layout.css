@@ -1,0 +1,197 @@
+.app {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 292px minmax(0, 1fr);
+}
+
+.main {
+  min-width: 0;
+  padding: 16px;
+}
+
+.content {
+  min-width: 0;
+}
+
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+}
+
+.page-head {
+  margin-bottom: 16px;
+}
+
+.page-head h2 {
+  margin: 0 0 6px;
+  font-size: 28px;
+}
+
+.page-head p {
+  margin: 0;
+  color: var(--muted);
+}
+
+
+body.sidebar-collapsed .app {
+  grid-template-columns: 86px minmax(0, 1fr);
+}
+
+
+/* Левое меню всегда статично при прокрутке разделов */
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden auto;
+  align-self: start;
+}
+
+.main {
+  min-height: 100vh;
+}
+
+
+/* Плавное сворачивание главного меню */
+.app { transition: grid-template-columns .26s ease; }
+.sidebar { transition: width .26s ease, padding .26s ease, opacity .18s ease; }
+.nav-btn, .brand, .sidebar-collapse-btn, .main { transition: .22s ease; }
+
+
+/* Стабильная анимация ширины меню без вертикального "болтания" */
+.app {
+  transition: grid-template-columns .22s cubic-bezier(.2, 0, .2, 1) !important;
+}
+
+.sidebar {
+  transition: padding-left .22s cubic-bezier(.2, 0, .2, 1),
+              padding-right .22s cubic-bezier(.2, 0, .2, 1) !important;
+}
+
+.nav-btn,
+.brand,
+.sidebar-collapse-btn,
+.main {
+  transition-property: background, border-color, color, box-shadow !important;
+  transition-duration: .16s !important;
+  transition-timing-function: ease !important;
+}
+
+
+/* Полностью отключаем анимацию главного меню, чтобы не было визуального глюка */
+.app,
+.sidebar,
+.brand,
+.nav,
+.nav-btn,
+.nav-btn *,
+.sidebar-collapse-btn,
+.sidebar-collapse-btn *,
+body.sidebar-collapsed .sidebar,
+body.sidebar-collapsed .brand,
+body.sidebar-collapsed .nav-btn,
+body.sidebar-collapsed .nav-btn *,
+body.sidebar-collapsed .sidebar-collapse-btn,
+body.sidebar-collapsed .sidebar-collapse-btn * {
+  transition: none !important;
+  animation: none !important;
+}
+
+
+/* ===== Figma-like global chrome refresh ===== */
+body {
+  background:
+    radial-gradient(circle at top left, rgba(60, 110, 255, .08), transparent 24%),
+    linear-gradient(180deg, #f8faff 0%, #f2f5ff 100%);
+  color: var(--text);
+}
+
+.app {
+  grid-template-columns: 122px minmax(0, 1fr) !important;
+  gap: 18px;
+  padding: 4px 12px 12px 12px;
+  background: transparent;
+}
+
+.main {
+  min-width: 0;
+  padding: 14px 16px 16px 0;
+}
+
+.content {
+  min-width: 0;
+}
+
+.page-head h2 {
+  font-size: 34px;
+  line-height: 1.08;
+  color: #11235a;
+  letter-spacing: -.03em;
+}
+
+body.sidebar-collapsed .app {
+  grid-template-columns: 92px minmax(0, 1fr) !important;
+}
+
+body.sidebar-collapsed .main {
+  padding-left: 0;
+}
+
+
+/* ADJUST_AFTER_REFERENCE: ширина меню как раньше */
+.app {
+  grid-template-columns: 292px minmax(0, 1fr) !important;
+  column-gap: 18px;
+  row-gap: 0;
+  padding-left: 0 !important;
+}
+
+body.sidebar-collapsed .app {
+  grid-template-columns: 92px minmax(0, 1fr) !important;
+}
+
+@media (max-width: 1024px) {
+  .app {
+    column-gap: 12px;
+  }
+
+  .main {
+    padding: 12px 12px 14px 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .app,
+  body.sidebar-collapsed .app {
+    grid-template-columns: 92px minmax(0, 1fr) !important;
+    column-gap: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+  }
+
+  .main {
+    padding: 10px 0 12px;
+  }
+
+  .page-head h2 {
+    font-size: 26px;
+    line-height: 1.15;
+  }
+}
+
+@media (max-width: 480px) {
+  .app,
+  body.sidebar-collapsed .app {
+    grid-template-columns: 76px minmax(0, 1fr) !important;
+    column-gap: 8px;
+    padding-right: 8px;
+  }
+
+  .page-head h2 {
+    font-size: 22px;
+  }
+}

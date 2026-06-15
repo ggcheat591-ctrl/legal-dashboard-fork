@@ -1,0 +1,1292 @@
+.emergency-head {
+  align-items: flex-start;
+}
+
+.emergency-workspace {
+  display: grid;
+  gap: 18px;
+}
+
+.emergency-editor-card,
+.emergency-table-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.emergency-editor-card::before,
+.emergency-table-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 12px;
+  background: linear-gradient(180deg, #191a4a, #1f3b63);
+}
+
+.emergency-editor-head,
+.emergency-table-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 20px 24px 16px 42px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fbff;
+}
+
+.emergency-editor-head h3,
+.emergency-table-title h3 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.emergency-editor-head p,
+.emergency-table-title p {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.emergency-form-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  padding: 18px 24px 14px 42px;
+}
+
+.emergency-form-grid label {
+  display: grid;
+  gap: 6px;
+}
+
+.emergency-form-grid label.wide {
+  grid-column: span 2;
+}
+
+.emergency-form-grid span {
+  font-size: 12px;
+  font-weight: 900;
+  color: #334155;
+}
+
+.emergency-form-grid input,
+.emergency-form-grid textarea {
+  width: 100%;
+  border: 1px solid #dbe4f0;
+  border-radius: 14px;
+  padding: 10px 12px;
+  font: inherit;
+  outline: none;
+  background: #fff;
+}
+
+.emergency-form-grid textarea {
+  resize: vertical;
+  min-height: 66px;
+}
+
+.emergency-form-grid input:focus,
+.emergency-form-grid textarea:focus {
+  border-color: #9db8ff;
+  box-shadow: 0 0 0 4px rgba(31, 94, 255, .08);
+}
+
+.emergency-editor-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 16px 24px 22px 42px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.emergency-left-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.emergency-table-wrap {
+  padding: 18px 24px 24px 42px;
+  overflow: auto;
+}
+
+.emergency-table {
+  width: 100%;
+  min-width: 1360px;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  table-layout: fixed;
+}
+
+.emergency-table th {
+  color: #64748b;
+  font-size: 13px;
+  text-align: left;
+  padding: 0 10px 4px;
+}
+
+.emergency-table td {
+  background: #fff;
+  border-top: 1px solid #dbe4f0;
+  border-bottom: 1px solid #dbe4f0;
+  padding: 12px 10px;
+  vertical-align: top;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.emergency-table tr[data-emergency-row] {
+  cursor: pointer;
+}
+
+.emergency-table tr[data-emergency-row]:hover td,
+.emergency-table tr[data-emergency-row].selected td {
+  background: #f8fbff;
+  border-color: #bcd2ff;
+}
+
+.emergency-table td:first-child {
+  border-left: 1px solid #dbe4f0;
+  border-top-left-radius: 16px;
+  border-bottom-left-radius: 16px;
+}
+
+.emergency-table td:last-child {
+  border-right: 1px solid #dbe4f0;
+  border-top-right-radius: 16px;
+  border-bottom-right-radius: 16px;
+}
+
+.emergency-table .strong {
+  font-weight: 950;
+  color: #0f172a;
+}
+
+.emergency-widget-real {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
+  overflow: hidden;
+}
+
+.emergency-widget-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.emergency-widget-stats > div {
+  border: 1px solid #bfd4ff;
+  border-radius: 16px;
+  background: #fff;
+  padding: 12px;
+}
+
+.emergency-widget-stats span {
+  display: block;
+  color: #64748b;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.emergency-widget-stats b {
+  font-size: 24px;
+}
+
+.emergency-widget-list {
+  display: grid;
+  gap: 9px;
+  min-height: 0;
+  overflow: auto;
+}
+
+.emergency-widget-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 15px;
+  background: #fff;
+  padding: 10px;
+}
+
+.emergency-widget-item b {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.emergency-widget-item span,
+.emergency-widget-item p {
+  color: #64748b;
+  font-size: 12px;
+  margin: 0;
+}
+
+@media (max-width: 1240px) {
+  .emergency-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .emergency-form-grid label.wide {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .emergency-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Карточка аварийного фонда изначально свернута */
+.emergency-editor-card:not(.is-open) form { display: none; }
+.emergency-editor-card:not(.is-open) .emergency-editor-head { border-bottom: 0; }
+.emergency-head-actions { display: flex; align-items: center; gap: 10px; }
+
+.emergency-archive-dialog {
+  width: min(1280px, calc(100vw - 34px));
+  height: min(760px, calc(100vh - 34px));
+  border: 0; border-radius: 24px; padding: 0;
+  box-shadow: 0 30px 90px rgba(15, 23, 42, .30);
+}
+.emergency-archive-dialog::backdrop { background: rgba(15, 23, 42, .45); backdrop-filter: blur(4px); }
+.emergency-archive-head {
+  display: flex; justify-content: space-between; gap: 16px; align-items: flex-start;
+  padding: 18px 22px; background: #f8fbff; border-bottom: 1px solid #dbe7ff;
+}
+.emergency-archive-head h3 { margin: 0; font-size: 22px; }
+.emergency-archive-head p { margin: 4px 0 0; color: #64748b; }
+.emergency-archive-body { height: calc(100% - 82px); overflow: auto; padding: 16px 20px; }
+.emergency-table.archive { min-width: 1000px; }
+.archive-actions-cell { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Точная карточка аварийного фонда из прикрепленного файла */
+.emergency-two-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 18px 24px 14px 42px; }
+.emergency-inner-panel { border: 1px solid #dbe7ff; border-radius: 20px; background: #fff; overflow: hidden; }
+.emergency-inner-panel h4 { margin: 0; padding: 12px 14px; background: #d8e4f0; color: #111827; }
+.emergency-inner-panel.obligation { background: #a8c0d8; }
+.emergency-form-grid.compact { grid-template-columns: repeat(2, minmax(0,1fr)); padding: 14px; }
+.emergency-form-grid.compact label.wide { grid-column: 1 / -1; }
+.review-ready-check { display: inline-flex; align-items: center; gap: 8px; border: 1px solid #dbe4f0; border-radius: 14px; padding: 8px 10px; background:#fff; font-weight:900; color:#334155; }
+.editor-toggle { min-width: 42px; font-size: 20px; line-height: 1; }
+@media (max-width: 1100px) { .emergency-two-panels { grid-template-columns: 1fr; } }
+
+.editor-toggle{min-width:42px;font-size:20px;line-height:1}
+.case-dialog-buttons,.registry-editor-actions,.emergency-editor-actions,.controlled-editor-actions{align-items:center}
+.case-dialog-buttons{display:flex;align-items:center;gap:12px}
+
+/* Исполнение принятых обязательств — такой же белый фон, как у основных данных */
+.emergency-inner-panel.obligation {
+  background: #fff !important;
+}
+
+.emergency-editor-card:not(.is-open) form {
+  display: none !important;
+}
+
+.emergency-editor-card:not(.is-open) .emergency-editor-head {
+  border-bottom: 0 !important;
+}
+
+.emergency-editor-head .review-ready-check {
+  display: none !important;
+}
+
+.emergency-editor-actions .case-dialog-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.emergency-editor-actions .review-ready-check {
+  display: inline-flex !important;
+}
+
+/* Emergency fund UI refresh */
+.emergency-title-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.emergency-title-row h2 {
+  margin: 0;
+}
+
+.emergency-refresh-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  color: #1f5eff;
+  background: #fff;
+  border: 1px solid #dbe7ff;
+  box-shadow: 0 10px 24px rgba(31, 94, 255, .09);
+  transition: transform .24s cubic-bezier(.16, 1, .3, 1), box-shadow .24s ease;
+}
+
+.emergency-refresh-icon:hover {
+  transform: translateY(-2px) rotate(24deg);
+  box-shadow: 0 16px 32px rgba(31, 94, 255, .16);
+}
+
+.emergency-head-controls {
+  align-items: center;
+}
+
+.emergency-view-switch {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid #dbe7ff;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.emergency-view-btn {
+  appearance: none;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: #334155;
+  padding: 9px 14px;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.emergency-view-btn.is-active {
+  color: #fff;
+  background: #1f5eff;
+  box-shadow: 0 12px 24px rgba(31, 94, 255, .20);
+}
+
+.emergency-cards-pane {
+  padding: 18px 24px 24px 42px;
+}
+
+.emergency-cards-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
+.emergency-case-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #dfe8f5;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #fff, #f8fbff);
+  padding: 18px;
+  cursor: pointer;
+  box-shadow: 0 14px 32px rgba(15, 23, 42, .055);
+  transition: transform .34s cubic-bezier(.16, 1, .3, 1), box-shadow .28s ease, border-color .28s ease;
+  animation: emergencyMacOpen .38s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.emergency-case-card:hover,
+.emergency-case-card.selected {
+  transform: translateY(-4px) scale(1.01);
+  border-color: #9db8ff;
+  box-shadow: 0 26px 54px rgba(31, 94, 255, .13);
+}
+
+.emergency-case-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.emergency-case-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: #eef5ff;
+  color: #1f5eff;
+  box-shadow: inset 0 0 0 1px #dbe7ff;
+  flex: 0 0 auto;
+}
+
+.emergency-case-kicker {
+  display: block;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 900;
+  margin-bottom: 2px;
+}
+
+.emergency-case-card h4 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 20px;
+}
+
+.emergency-quarter-pill {
+  margin-left: auto;
+  border-radius: 999px;
+  background: #ecfdf5;
+  color: #15803d;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.emergency-case-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.emergency-card-field {
+  display: grid;
+  gap: 4px;
+  border: 1px solid #e7eef8;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .82);
+  padding: 10px;
+}
+
+.emergency-card-field.wide {
+  grid-column: 1 / -1;
+}
+
+.emergency-card-field span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.emergency-card-field strong {
+  color: #1f2937;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.emergency-import-dialog,
+.emergency-reports-dialog {
+  width: min(1180px, calc(100vw - 34px));
+  max-height: min(820px, calc(100vh - 34px));
+  border: 0;
+  border-radius: 24px;
+  padding: 0;
+  box-shadow: 0 30px 90px rgba(15, 23, 42, .30);
+}
+
+.emergency-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 22px;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fbff;
+}
+
+.emergency-import-body,
+.emergency-reports-body {
+  max-height: min(68vh, 640px);
+  overflow: auto;
+}
+
+.emergency-import-table {
+  min-width: 1280px;
+}
+
+.emergency-import-table tr.is-match td {
+  background: #f0fdf4;
+}
+
+.emergency-import-table tr.is-miss td {
+  background: #fff7ed;
+}
+
+.emergency-import-table tr.is-already-executed td {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.emergency-import-check-column {
+  width: 82px;
+  text-align: center !important;
+}
+
+.emergency-import-check-column input {
+  width: 20px;
+  height: 20px;
+  accent-color: #1f5eff;
+  cursor: pointer;
+}
+
+.emergency-import-check-column input:disabled {
+  cursor: not-allowed;
+}
+
+.emergency-execution-people {
+  margin: 0 22px 22px;
+  border: 1px solid #dbe7ff;
+  border-radius: 18px;
+  background: #f8fbff;
+  padding: 14px;
+}
+
+.emergency-execution-people-title {
+  margin-bottom: 10px;
+  color: #1e3a8a;
+  font-size: 13px;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.emergency-execution-people-list {
+  display: grid;
+  gap: 8px;
+}
+
+.emergency-execution-person-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid #bbf7d0;
+  border-radius: 14px;
+  background: #f0fdf4;
+  padding: 10px 12px;
+}
+
+.emergency-execution-person-item strong {
+  color: #166534;
+}
+
+.emergency-execution-person-item span {
+  color: #4b5563;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.emergency-fio-status-list {
+  display: grid;
+  gap: 5px;
+}
+
+.emergency-fio-status-item {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 6px;
+  color: #334155;
+  line-height: 1.3;
+}
+
+.emergency-fio-status-item b {
+  color: #94a3b8;
+}
+
+.emergency-fio-status-item.is-executed {
+  color: #166534;
+  font-weight: 850;
+}
+
+.emergency-fio-status-item.is-executed b {
+  color: #16a34a;
+}
+
+.emergency-card-field-html {
+  min-width: 0;
+}
+
+.emergency-reports-toolbar {
+  padding: 14px 22px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.emergency-reports-toolbar label {
+  display: inline-grid;
+  gap: 6px;
+  font-weight: 900;
+  color: #334155;
+}
+
+.emergency-reports-toolbar select {
+  min-width: 220px;
+  border: 1px solid #dbe4f0;
+  border-radius: 14px;
+  padding: 10px 12px;
+  font: inherit;
+}
+
+.emergency-report-section {
+  padding: 18px 22px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.emergency-report-section h4,
+.emergency-report-section h5 {
+  margin: 0 0 12px;
+  color: #0f172a;
+}
+
+.emergency-report-note {
+  border: 1px dashed #f59e0b;
+  border-radius: 16px;
+  background: #fffbeb;
+  color: #92400e;
+  padding: 12px 14px;
+  font-weight: 750;
+}
+
+.emergency-report-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+}
+
+.emergency-report-table th,
+.emergency-report-table td {
+  border: 1px solid #e2e8f0;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.emergency-report-table th {
+  background: #f8fbff;
+  color: #475569;
+}
+
+.emergency-report-bars {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0 4px;
+}
+
+.emergency-report-bar {
+  display: grid;
+  grid-template-columns: minmax(150px, 240px) 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.emergency-report-bar span {
+  font-weight: 850;
+}
+
+.emergency-report-bar b {
+  height: 14px;
+  width: var(--bar);
+  min-width: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #93c5fd, #1f5eff);
+}
+
+.emergency-report-bar em {
+  font-style: normal;
+  color: #475569;
+  font-weight: 900;
+}
+
+.emergency-heatmap {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.emergency-heatmap-cell {
+  border-radius: 16px;
+  padding: 12px;
+  background: color-mix(in srgb, #ef4444 var(--heat), #eff6ff);
+  color: #0f172a;
+}
+
+.emergency-heatmap-cell strong,
+.emergency-heatmap-cell span {
+  display: block;
+}
+
+@keyframes emergencyMacOpen {
+  from { opacity: 0; transform: translateY(12px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Emergency fund editor: form layout close to the reference card screen, without step wording in section title */
+.emergency-form-shell {
+  display: grid;
+  grid-template-columns: 330px minmax(0, 1fr);
+  gap: 0;
+  padding: 0;
+  background: #fff;
+}
+
+.emergency-form-nav {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  padding: 30px 22px 30px 30px;
+  border-right: 1px solid #e2e8f0;
+  background: linear-gradient(180deg, #f8fbff, #fff);
+}
+
+.emergency-form-nav::before {
+  content: "";
+  position: absolute;
+  top: 54px;
+  bottom: 54px;
+  left: 53px;
+  width: 2px;
+  background: #dbe7ff;
+}
+
+.emergency-form-nav-item {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  column-gap: 12px;
+  row-gap: 2px;
+  align-items: center;
+  padding: 14px 12px;
+  border-radius: 18px;
+  color: #475569;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+}
+
+.emergency-form-nav-item:hover,
+.emergency-form-nav-item:focus-visible {
+  background: #f3f7ff;
+  outline: none;
+  transform: translateX(2px);
+}
+
+.emergency-form-nav-item.is-active {
+  background: #eef5ff;
+  color: #1f5eff;
+  box-shadow: inset 0 0 0 1px #dbe7ff;
+}
+
+.emergency-form-nav-item span {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #dbe7ff;
+  color: #1f5eff;
+  font-weight: 950;
+}
+
+.emergency-form-nav-item b {
+  font-size: 15px;
+  color: #1e293b;
+}
+
+.emergency-form-nav-item small {
+  grid-column: 2;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.emergency-form-content {
+  display: grid;
+  gap: 18px;
+  padding: 26px 30px 28px;
+  background: #fff;
+}
+
+.emergency-form-content .emergency-inner-panel {
+  display: none;
+  border-radius: 22px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, .04);
+}
+
+.emergency-form-content .emergency-inner-panel.is-active {
+  display: block;
+  animation: emergencyMacOpen .22s ease-out;
+}
+
+.emergency-form-content .emergency-inner-panel h4 {
+  background: transparent;
+  color: #0f172a;
+  font-size: 22px;
+  padding: 18px 22px 4px;
+}
+
+.emergency-section-hint {
+  margin: 0;
+  padding: 0 22px 4px;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.emergency-form-content .emergency-form-grid.compact {
+  padding: 16px 22px 22px;
+}
+
+.emergency-form-content .emergency-form-grid input,
+.emergency-form-content .emergency-form-grid textarea {
+  min-height: 56px;
+  border-radius: 16px;
+  font-size: 15px;
+}
+
+.emergency-table tr[data-emergency-row],
+.emergency-case-card {
+  cursor: pointer;
+}
+
+.emergency-import-summary {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 14px;
+  border: 1px solid #dbe7ff;
+  border-radius: 16px;
+  background: #f8fbff;
+  padding: 12px 14px;
+  color: #334155;
+}
+
+.emergency-import-summary b,
+.emergency-import-summary strong {
+  color: #0f172a;
+}
+
+.emergency-import-summary em {
+  color: #92400e;
+  font-style: normal;
+  font-weight: 800;
+}
+
+[data-emergency-import-apply]:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+@media (max-width: 1040px) {
+  .emergency-form-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .emergency-form-nav {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    border-right: 0;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .emergency-form-nav::before {
+    display: none;
+  }
+}
+
+/* Requested emergency fund layout refinements */
+.emergency-workspace {
+  grid-template-columns: 1fr;
+}
+
+.emergency-editor-card {
+  order: 2;
+}
+
+.emergency-table-card {
+  order: 1;
+}
+
+.emergency-obligation-summary {
+  display: grid;
+  gap: 12px;
+  padding: 14px 24px 16px 42px;
+  border-top: 1px solid #eef3fb;
+  background: linear-gradient(180deg, #fff, #f8fbff);
+}
+
+.emergency-obligation-summary-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #334155;
+}
+
+.emergency-obligation-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(170px, 1fr));
+  max-width: 1120px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, .055);
+}
+
+.emergency-obligation-stat {
+  display: grid;
+  gap: 8px;
+  min-height: 82px;
+  padding: 14px 18px;
+  border-right: 1px solid #e2e8f0;
+}
+
+.emergency-obligation-stat:last-child {
+  border-right: 0;
+}
+
+.emergency-obligation-stat span {
+  color: #334155;
+  font-size: 12px;
+  line-height: 1.25;
+  font-weight: 900;
+}
+
+.emergency-obligation-stat strong {
+  color: #1f5eff;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.emergency-obligation-stat:nth-child(2) strong,
+.emergency-obligation-stat:nth-child(4) strong {
+  color: #16a34a;
+}
+
+.emergency-editor-actions-top {
+  padding: 16px 30px 0;
+  border-top: 0;
+  border-bottom: 0;
+}
+
+.emergency-editor-card:not(.is-open) .emergency-obligation-summary {
+  border-bottom: 0;
+}
+
+.emergency-editor-card:not(.is-open) form {
+  display: none !important;
+}
+
+.emergency-cards-grid {
+  grid-template-columns: repeat(auto-fill, minmax(520px, 1fr));
+  align-items: start;
+}
+
+.emergency-case-card {
+  min-height: 176px;
+  padding: 14px 16px 42px;
+}
+
+.emergency-case-card.is-collapsed .emergency-case-fields-main .emergency-card-field:nth-child(n+4) {
+  display: none;
+}
+
+.emergency-case-card-head {
+  margin-bottom: 10px;
+}
+
+.emergency-case-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+}
+
+.emergency-case-card h4 {
+  font-size: 17px;
+}
+
+.emergency-card-badges {
+  margin-left: auto;
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.emergency-review-pill {
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4338ca;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.emergency-case-fields {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.emergency-card-field {
+  padding: 8px 10px;
+}
+
+.emergency-card-field span {
+  font-size: 11px;
+}
+
+.emergency-card-field strong {
+  font-size: 12px;
+}
+
+.emergency-case-extra {
+  display: grid;
+  gap: 12px;
+  margin-top: 10px;
+  animation: emergencyMacOpen .22s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.emergency-general-more {
+  justify-self: end;
+}
+
+.emergency-card-toggle {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  transform: translateX(-50%);
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 26px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #1f5eff;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform .18s ease, background .18s ease;
+}
+
+.emergency-card-toggle:hover {
+  transform: translateX(-50%) translateY(-1px);
+  background: rgba(31, 94, 255, .08);
+}
+
+.emergency-case-card.is-review-ready::after {
+  content: "Отзыв готов";
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  color: #4338ca;
+  font-size: 11px;
+  font-weight: 950;
+  opacity: .9;
+}
+
+@media (max-width: 1120px) {
+  .emergency-obligation-summary-grid {
+    grid-template-columns: repeat(2, minmax(160px, 1fr));
+  }
+  .emergency-obligation-stat:nth-child(2) {
+    border-right: 0;
+  }
+  .emergency-obligation-stat:nth-child(n+3) {
+    border-top: 1px solid #e2e8f0;
+  }
+  .emergency-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .emergency-obligation-summary-grid,
+  .emergency-case-fields {
+    grid-template-columns: 1fr;
+  }
+  .emergency-obligation-stat {
+    border-right: 0;
+    border-top: 1px solid #e2e8f0;
+  }
+  .emergency-obligation-stat:first-child {
+    border-top: 0;
+  }
+}
+
+/* Emergency fund v3: aggregate totals and floating editor */
+.emergency-obligation-summary-page {
+  margin: 0 0 18px;
+  position: relative;
+  z-index: 1;
+}
+
+.emergency-workspace .emergency-editor-card {
+  order: -1;
+}
+
+.emergency-editor-card {
+  transition: transform .22s cubic-bezier(.16, 1, .3, 1), box-shadow .22s ease, opacity .18s ease;
+}
+
+.emergency-editor-card:not(.is-open) {
+  min-height: auto;
+}
+
+.emergency-editor-card.is-open {
+  position: fixed;
+  left: 34px;
+  right: 34px;
+  top: auto;
+  bottom: 24px;
+  z-index: 1000;
+  max-height: min(86vh, 900px);
+  overflow: auto;
+  box-shadow: 0 32px 90px rgba(15, 23, 42, .32);
+  animation: emergencyEditorSlideUp .24s cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.emergency-editor-card.is-open::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: rgba(15, 23, 42, .28);
+  backdrop-filter: blur(2px);
+}
+
+.emergency-editor-card.is-open .emergency-editor-head {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+}
+
+.emergency-editor-card:not(.is-open) form {
+  display: none;
+}
+
+.emergency-editor-card:not(.is-open) .emergency-editor-head {
+  border-bottom: 0;
+}
+
+.emergency-cards-grid {
+  grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+  align-items: start;
+}
+
+.emergency-case-card {
+  min-height: 156px;
+  padding: 14px 16px 38px;
+  cursor: pointer;
+}
+
+.emergency-case-card-head-compact {
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.emergency-case-card .emergency-case-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  font-size: 17px;
+}
+
+.emergency-case-card h4 {
+  font-size: 16px;
+  line-height: 1.15;
+}
+
+.emergency-case-fields-compact {
+  grid-template-columns: .8fr 1.2fr 1.2fr;
+  gap: 8px;
+}
+
+.emergency-case-fields-compact .emergency-card-field {
+  min-height: 54px;
+  padding: 7px 9px;
+}
+
+.emergency-case-fields-compact .emergency-card-field span {
+  font-size: 10px;
+}
+
+.emergency-case-fields-compact .emergency-card-field strong {
+  font-size: 12px;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.emergency-case-fields-compact .emergency-card-field.wide {
+  grid-column: auto;
+}
+
+.emergency-case-card.is-review-ready::after {
+  content: none;
+}
+
+.emergency-card-toggle {
+  bottom: 6px;
+  width: 42px;
+  height: 28px;
+  font-size: 24px;
+}
+
+.emergency-card-toggle span {
+  transform: translateY(-2px);
+}
+
+@keyframes emergencyEditorSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(34px) scale(.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 760px) {
+  .emergency-editor-card.is-open {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    max-height: calc(100vh - 20px);
+  }
+  .emergency-cards-grid,
+  .emergency-case-fields-compact {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Emergency fund: linked general case button in compact cards/table */
+.emergency-case-card .emergency-general-more {
+  position: absolute;
+  right: 14px;
+  bottom: 10px;
+  z-index: 2;
+}
+
+.emergency-table .actions-cell {
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
+}
+
+/* Emergency fund: use the registry create controls instead of a duplicate header button/strip. */
+.emergency-createbar {
+  order: -2;
+}
+
+.emergency-editor-card:not(.is-open) {
+  display: none !important;
+}
+
+.emergency-editor-card.is-open {
+  display: block !important;
+}
+
+.emergency-editor-card.is-open::before {
+  display: none !important;
+}
+.emergency-field-hint{display:block;margin-top:5px;color:#64748b;font-size:11px;line-height:1.35}

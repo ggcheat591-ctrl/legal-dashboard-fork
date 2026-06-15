@@ -1,0 +1,11 @@
+node_modules/
+dist/
+build/
+release/
+out/
+data/
+legal-dashboard/
+*.db
+*.sqlite
+*.sqlite3
+*.log

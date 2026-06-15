@@ -1,0 +1,73 @@
+.table-wrap,
+.table-widget,
+.schedule-widget-table {
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 680px;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #edf1f6;
+  text-align: left;
+  font-size: 13px;
+}
+
+th {
+  background: #f8fbff;
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.time-pill {
+  display: inline-flex;
+  min-width: 68px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #eef4ff;
+  color: var(--blue);
+  font-weight: 950;
+}
+
+.schedule-date-band {
+  padding: 11px 14px;
+  background: linear-gradient(90deg,#173c95,#2a62ff);
+  color: #fff;
+  font-weight: 950;
+  display: flex;
+  justify-content: space-between;
+}
+
+td,
+th {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 768px) {
+  th,
+  td {
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  table {
+    min-width: 620px;
+  }
+
+  th,
+  td {
+    font-size: 12px;
+  }
+}

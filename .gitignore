@@ -1,0 +1,70 @@
+# Dependencies
+
+node_modules/
+
+# Builds
+
+dist/
+build/
+release/
+out/
+
+# Environment files
+
+.env
+.env.*
+!.env.example
+
+# Logs
+
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Temporary files
+
+*.tmp
+*.temp
+*.bak
+*.backup
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# SQLite / local data
+
+*.db
+*.sqlite
+*.sqlite3
+
+# Electron/Vite cache
+
+.vite/
+.cache/
+
+# Local backups
+
+backups/
+backup/
+*.local
+
+# Nested duplicate project
+legal-dashboard/
+
+# User-generated data
+data/**
+!data/.gitkeep
+uploads/
+
+# Design reference prototype
+src/Legal-Dashboard-Static-Prototype/
+
+# Temporary project archives and reports
+*.zip
+current-changes.diff
+
+# Accidentally created file
+/npm

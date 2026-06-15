@@ -1,0 +1,162 @@
+.btn {
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  color: #334155;
+  padding: 0 14px;
+  font-weight: 900;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn.primary {
+  background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+  border-color: var(--blue);
+  color: #fff;
+}
+
+.search-input,
+.date-picker {
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0 12px;
+}
+
+
+/* GLOBAL_SEARCH_ICON_LEFT_PATCH: во всех поисках лупа слева */
+.search-field-wrap {
+  position: relative;
+  flex: 1 1 560px;
+  min-width: min(100%, 320px);
+}
+
+.search-field-wrap .search-input {
+  width: 100%;
+  padding-left: 52px !important;
+  padding-right: 16px !important;
+}
+
+.search-field-icon {
+  position: absolute;
+  left: 18px !important;
+  right: auto !important;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #64748b;
+  font-size: 18px;
+  line-height: 1;
+}
+
+
+/* ===== Buttons & inputs refresh ===== */
+.btn {
+  min-height: 52px;
+  height: 52px;
+  padding: 0 20px;
+  border-radius: 18px;
+  border-color: #e5ebfb;
+  color: #2d3b63;
+  background: rgba(255,255,255,.96);
+  box-shadow: 0 10px 26px rgba(17, 35, 90, .04);
+}
+
+.btn:hover {
+  border-color: #cfd9f8;
+}
+
+.btn.primary {
+  background: linear-gradient(135deg, #2f69ff, #1751ee);
+  border-color: #2f69ff;
+  box-shadow: 0 16px 30px rgba(47, 105, 255, .22);
+}
+
+.btn.small {
+  min-height: 40px;
+  height: 40px;
+  border-radius: 14px;
+  font-size: 13px;
+}
+
+.btn-soft {
+  gap: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-input,
+.date-picker {
+  height: 58px;
+  border-radius: 20px;
+  border-color: #e5ebfb;
+  padding: 0 18px;
+  font-size: 16px;
+  background: rgba(255,255,255,.96);
+}
+
+
+/* ADJUST_AFTER_REFERENCE: возвращаем менее жирный текст кнопок */
+.btn {
+  font-weight: 650 !important;
+}
+
+input,
+select,
+textarea,
+button {
+  max-width: 100%;
+}
+
+textarea,
+input,
+select {
+  min-width: 0;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .btn {
+    white-space: normal;
+    line-height: 1.15;
+  }
+
+  .search-field-wrap {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+
+  .search-input,
+  .date-picker {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn {
+    min-height: 44px;
+    height: auto;
+    padding: 10px 14px;
+  }
+
+  .btn.small {
+    min-height: 38px;
+    height: auto;
+  }
+
+  .search-input,
+  .date-picker {
+    height: 48px;
+    font-size: 14px;
+  }
+}

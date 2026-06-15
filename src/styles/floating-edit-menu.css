@@ -1,0 +1,183 @@
+.floating-edit-menu {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 10000;
+  display: grid;
+  justify-items: end;
+  gap: 12px;
+}
+
+.floating-edit-actions {
+  display: grid;
+  gap: 10px;
+  justify-items: end;
+  opacity: 0;
+  transform: translateY(18px) scale(.96);
+  pointer-events: none;
+  transition: .18s ease;
+}
+
+.floating-edit-menu.actions-visible .floating-edit-actions,
+.floating-edit-menu.add-menu-visible .floating-edit-actions {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.floating-edit-btn {
+  width: 54px;
+  height: 54px;
+  border: 0;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+  box-shadow: 0 18px 38px rgba(31,94,255,.34);
+  font-size: 22px;
+  font-weight: 950;
+}
+
+.floating-edit-btn.main {
+  width: 62px;
+  height: 62px;
+  border-radius: 22px;
+  font-size: 26px;
+  background: linear-gradient(135deg,#0f172a,var(--blue));
+}
+
+body.dashboard-edit-mode .floating-edit-btn.main {
+  background: linear-gradient(135deg,var(--green),var(--blue));
+}
+
+.floating-edit-btn.save { background: linear-gradient(135deg,#16a34a,#13a06f); }
+.floating-edit-btn.reset { background: linear-gradient(135deg,#f97316,#d97706); }
+
+.floating-edit-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.floating-edit-label {
+  position: absolute;
+  right: 66px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: #0f172a;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(8px);
+  transition: .16s ease;
+}
+
+.floating-edit-item:hover .floating-edit-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.floating-add-menu {
+  position: absolute;
+  right: 72px;
+  bottom: 214px;
+  width: 340px;
+  max-height: 380px;
+  overflow: auto;
+  display: none;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(15,23,42,.22);
+}
+
+.floating-add-menu.active {
+  display: grid;
+}
+
+.add-option {
+  border: 1px solid transparent;
+  background: #fff;
+  border-radius: 13px;
+  padding: 11px 12px;
+  display: grid;
+  grid-template-columns: 28px minmax(0,1fr);
+  gap: 9px;
+  align-items: center;
+  text-align: left;
+  color: var(--text);
+  font-weight: 850;
+}
+
+.add-option:hover {
+  border-color: #b8cbff;
+  background: #f8fbff;
+}
+
+.empty {
+  padding: 14px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 14px;
+  color: var(--muted);
+  text-align: center;
+  font-weight: 850;
+  background: #f8fafc;
+}
+
+.toast {
+  position: fixed;
+  right: 24px;
+  bottom: 110px;
+  background: #0f172a;
+  color: #fff;
+  border-radius: 16px;
+  padding: 12px 16px;
+  font-weight: 850;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: .2s ease;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body:not([data-current-view="dashboard"]) .floating-edit-menu {
+  display: none;
+}
+
+/* Кнопки над карандашом больше не раскрываются от наведения на пустую область.
+   Появляются только после наведения непосредственно на карандаш. */
+.floating-edit-menu:not(.actions-visible):not(.add-menu-visible) .floating-edit-actions {
+  opacity: 0;
+  transform: translateY(18px) scale(.96);
+  pointer-events: none;
+}
+
+.floating-edit-menu.actions-visible .floating-edit-actions,
+.floating-edit-menu.add-menu-visible .floating-edit-actions {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+
+/* Фикс растянутого карандашика на главном экране */
+.floating-edit-menu {
+  width: max-content !important; height: max-content !important; max-height: none !important; align-items: end !important;
+}
+.floating-edit-btn, .floating-edit-btn.main {
+  width: 54px !important; height: 54px !important; min-width: 54px !important; min-height: 54px !important;
+  max-width: 62px !important; max-height: 62px !important; flex: 0 0 auto !important; align-self: end !important;
+}
+.floating-edit-btn.main { width: 62px !important; height: 62px !important; }

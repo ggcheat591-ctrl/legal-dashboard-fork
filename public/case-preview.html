@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Карточка дела</title>
+  <style>
+    :root {
+      --text: #111;
+      --muted: #777;
+      --line: #1f1f1f;
+      --grid: #d6d6d6;
+      --soft: #f2f2f2;
+      --toolbar-bg: #f6f9fd;
+      --blue: #2563eb;
+      --blue-dark: #17345f;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #eef3fb;
+      color: var(--text);
+      font-family: Arial, "Helvetica Neue", sans-serif;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .print-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      padding: 18px 28px;
+      background: rgba(255, 255, 255, .96);
+      border-bottom: 1px solid #d7dfec;
+      box-shadow: 0 8px 22px rgba(17, 24, 39, .06);
+      backdrop-filter: blur(10px);
+    }
+
+    .print-toolbar h1 {
+      margin: 0;
+      color: var(--blue-dark);
+      font-size: 24px;
+      line-height: 1.15;
+    }
+
+    .print-toolbar p {
+      margin: 5px 0 0;
+      color: #52627a;
+      font-size: 15px;
+    }
+
+    .print-toolbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    button {
+      min-height: 44px;
+      padding: 0 22px;
+      border: 1px solid #cfe0ff;
+      border-radius: 14px;
+      background: #fff;
+      color: var(--blue-dark);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button.primary {
+      background: var(--blue);
+      color: #fff;
+      border-color: var(--blue);
+      box-shadow: 0 10px 24px rgba(37, 99, 235, .18);
+    }
+
+    .page-wrap {
+      max-width: 900px;
+      margin: 28px auto;
+      padding: 0 16px 34px;
+    }
+
+    .paper {
+      width: 210mm;
+      max-width: 100%;
+      min-height: 297mm;
+      margin: 0 auto;
+      padding: 12mm 12mm 11mm;
+      background: #fff;
+      box-shadow: 0 18px 50px rgba(23, 52, 95, .14);
+    }
+
+    .document-title {
+      margin: 0 0 12px;
+      text-align: center;
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: .01em;
+      text-transform: uppercase;
+    }
+
+    .generated-line {
+      margin-bottom: 10px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .top-rule,
+    .bottom-rule {
+      border-top: 2px solid var(--line);
+    }
+
+    .case-numbers {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 16px 0 17px;
+      color: #666;
+      font-size: 16px;
+      text-transform: uppercase;
+    }
+
+    .case-numbers strong {
+      color: #000;
+      font-size: 17px;
+      font-weight: 800;
+      border-bottom: 2px solid #000;
+    }
+
+    .section {
+      margin-top: 22px;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .section-title {
+      margin: 0 0 8px;
+      padding-bottom: 6px;
+      border-bottom: 1.5px solid var(--line);
+      font-size: 16px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 16px;
+      row-gap: 8px;
+      padding-top: 3px;
+    }
+
+    .detail-row {
+      min-height: 23px;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .detail-row.wide { grid-column: 1 / -1; }
+
+    .detail-label {
+      flex: 0 0 auto;
+      font-weight: 800;
+    }
+
+    .detail-value {
+      flex: 0 1 auto;
+      min-width: 70px;
+      border-bottom: 1px dotted #cfcfcf;
+      font-weight: 500;
+      word-break: break-word;
+    }
+
+    .status-box {
+      display: inline-block;
+      min-height: 26px;
+      padding: 2px 10px;
+      border: 1px solid #cfcfcf;
+      background: #fafafa;
+      font-weight: 500;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      border: 1px solid var(--grid);
+    }
+
+    th,
+    td {
+      padding: 8px 9px;
+      border: 1px solid var(--grid);
+      text-align: left;
+      vertical-align: top;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    th {
+      background: var(--soft);
+      font-weight: 800;
+      font-size: 15px;
+    }
+
+    td { font-size: 15px; }
+
+    .chronology-card {
+      padding: 12px 10px;
+      border: 1px solid var(--grid);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .chronology-title {
+      margin: 0 0 8px;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .chronology-title small {
+      color: #777;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .footer-meta {
+      display: grid;
+      gap: 4px;
+      margin-top: 28px;
+      padding-top: 34px;
+      border-top: 1.5px solid #000;
+      text-align: right;
+      font-size: 15px;
+    }
+
+    .error-card {
+      max-width: 760px;
+      margin: 76px auto;
+      padding: 34px;
+      border: 1px solid #fecaca;
+      border-radius: 18px;
+      background: #fff1f2;
+      color: #991b1b;
+    }
+
+    .error-card h2 { margin-top: 0; }
+
+    @page { size: A4 portrait; margin: 0; }
+
+    @media print {
+      html, body {
+        width: 210mm;
+        min-height: 297mm;
+        background: #fff;
+        color: #000;
+        font-family: Arial, "Helvetica Neue", sans-serif;
+      }
+
+      body { margin: 0; font-size: 12pt; }
+      .print-toolbar { display: none !important; }
+      .page-wrap { max-width: none; margin: 0; padding: 0; }
+      .paper { width: 210mm; min-height: 297mm; padding: 12mm; box-shadow: none; }
+      .section, .chronology-card, tr { break-inside: avoid; page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <header class="print-toolbar">
+    <div>
+      <h1>Предпросмотр карточки дела</h1>
+      <p>Нажмите «Печать» и выберите принтер или «Сохранить как PDF».</p>
+    </div>
+    <div class="print-toolbar-actions">
+      <button class="primary" type="button" data-print>Печать</button>
+      <button type="button" data-save-pdf>Скачать PDF</button>
+      <button type="button" data-close>Закрыть</button>
+    </div>
+  </header>
+
+  <main class="page-wrap" id="app">
+    <section class="paper">
+      <p>Загрузка карточки дела...</p>
+    </section>
+  </main>
+
+  <script>
+    const app = document.getElementById('app');
+
+    document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
+    document.querySelector('[data-save-pdf]')?.addEventListener('click', () => window.print());
+    document.querySelector('[data-close]')?.addEventListener('click', () => {
+      window.close();
+      setTimeout(() => {
+        if (!window.closed) history.back();
+      }, 100);
+    });
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function text(value, fallback = '—') {
+      const result = String(value ?? '').trim();
+      return result || fallback;
+    }
+
+    function value(value, fallback = '—') {
+      return escapeHtml(text(value, fallback));
+    }
+
+    function formatDateTime(date = new Date()) {
+      return new Intl.DateTimeFormat('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(date).replace(',', '');
+    }
+
+    function parseJson(value) {
+      if (!value) return null;
+      if (Array.isArray(value) || typeof value === 'object') return value;
+      try { return JSON.parse(value); } catch { return null; }
+    }
+
+    function getStatus(row) {
+      if (Number(row.control_flag) === 1) return 'Контрольное';
+      if (Number(row.attendance_flag) === 1) return 'Явочное';
+      if (Number(row.emergency_fund_flag) === 1) return 'Аварийный фонд';
+      if (Number(row.registry_flag) === 1) return 'Выморочка';
+      return 'Не контрольное';
+    }
+
+    function detail(label, val, wide = false, raw = false, extraClass = '') {
+      return `
+        <div class="detail-row ${wide ? 'wide' : ''} ${extraClass}">
+          <span class="detail-label">${escapeHtml(label)}:</span>
+          <span class="detail-value">${raw ? String(val || '—') : value(val)}</span>
+        </div>
+      `;
+    }
+
+    function statusDetail(row) {
+      return `
+        <div class="detail-row">
+          <span class="detail-label">Статус:</span>
+          <span class="status-box">${value(getStatus(row))}</span>
+        </div>
+      `;
+    }
+
+    function collectParties(row) {
+      const source = parseJson(row.parties_json || row.parties || row.sides_json);
+      if (Array.isArray(source) && source.length) {
+        return source.map(item => ({
+          position: item.position || item.procedural_position || item.role || '—',
+          name: item.name || item.full_name || item.title || '—',
+          notes: item.notes || item.note || item.comment || '-'
+        }));
+      }
+
+      const parties = [];
+      const plaintiff = text(row.plaintiff, '');
+      const defendant = text(row.defendant, '');
+      const procedural = text(row.procedural_position, 'Истец');
+
+      if (plaintiff) parties.push({ position: procedural, name: plaintiff, notes: '-' });
+      if (defendant) parties.push({ position: 'Ответчик', name: defendant, notes: '-' });
+      if (!parties.length) parties.push({ position: '—', name: '—', notes: '-' });
+      return parties;
+    }
+
+    function renderParties(row) {
+      return collectParties(row).map(item => `
+        <tr>
+          <td>${value(item.position)}</td>
+          <td>${value(item.name)}</td>
+          <td>${value(item.notes, '-')}</td>
+        </tr>
+      `).join('');
+    }
+
+    function getChronology(row) {
+      const source = parseJson(row.chronology_json || row.history_json || row.events_json);
+      if (Array.isArray(source) && source.length) {
+        return source.map((item, index) => ({
+          number: index + 1,
+          instance: item.instance || item.title || item.stage || 'Событие',
+          date: item.date || item.event_date || item.created_at || '',
+          result: item.result || item.status || item.comment || '—'
+        }));
+      }
+
+      const date = row.judicial_act_date_first || row.registration_date || row.updated_at || row.created_at || '';
+      return [{
+        number: 1,
+        instance: 'Первая инстанция',
+        date,
+        result: row.review_result || 'на рассмотрении'
+      }];
+    }
+
+    function renderChronology(row) {
+      return getChronology(row).map(item => `
+        <div class="chronology-card">
+          <p class="chronology-title">${item.number}. ${value(item.instance)} <small>(${value(item.date)})</small></p>
+          <div><strong>Итог:</strong> ${value(item.result)}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderCase(row) {
+      const generatedAt = formatDateTime();
+      const executor = text(row.executor, '—');
+      document.title = `Карточка дела ${row.case_no || row.court_no || row.id || ''}`.trim();
+
+      const addressLine = text(row.claim_address, '');
+
+      app.innerHTML = `
+        <section class="paper">
+          <h2 class="document-title">КАРТОЧКА ДЕЛА</h2>
+          <div class="generated-line">Сформировано: ${escapeHtml(generatedAt)} | Исполнитель: ${value(executor)}</div>
+          <div class="top-rule"></div>
+
+          <div class="case-numbers">
+            <div>ВНУТРЕННИЙ НОМЕР: <strong>${value(row.case_no || row.id)}</strong></div>
+            <div>НОМЕР ДЕЛА В СУДЕ: <strong>${value(row.court_no)}</strong></div>
+          </div>
+
+          <section class="section">
+            <h3 class="section-title">ОСНОВНЫЕ СВЕДЕНИЯ</h3>
+            <div class="details-grid">
+              ${detail('Суд', row.court)}
+              ${detail('Судья', row.judge)}
+              ${detail('Исполнитель', row.executor, true)}
+              ${detail('Категория', row.category, true)}
+              ${detail('Дата регистрации', row.registration_date)}
+              ${statusDetail(row)}
+              ${detail('Предмет спора', row.claim_subject, true)}
+              ${addressLine ? detail('Адрес', row.claim_address, true) : ''}
+            </div>
+          </section>
+
+          <section class="section">
+            <h3 class="section-title">СТОРОНЫ ДЕЛА</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 35%">Процессуальное положение</th>
+                  <th>Наименование стороны</th>
+                  <th style="width: 16%">Примечания</th>
+                </tr>
+              </thead>
+              <tbody>${renderParties(row)}</tbody>
+            </table>
+          </section>
+
+          <section class="section">
+            <h3 class="section-title">ХРОНОЛОГИЯ ДЕЛА</h3>
+            ${renderChronology(row)}
+          </section>
+
+          <div class="footer-meta">
+            <div>Дата формирования: ${escapeHtml(generatedAt)}</div>
+            <div>Пользователь: ${value(executor)}</div>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderError(title, message) {
+      app.innerHTML = `
+        <section class="error-card">
+          <h2>${escapeHtml(title)}</h2>
+          <p>${escapeHtml(message)}</p>
+        </section>
+      `;
+    }
+
+    async function loadCase() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+
+      if (!id) {
+        renderError('Не удалось открыть карточку дела', 'В адресе предпросмотра отсутствует ID дела.');
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/general-cases/${encodeURIComponent(id)}`, { headers: { Accept: 'application/json' } });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const row = await response.json();
+        if (!row || !row.id) {
+          renderError('Не удалось открыть карточку дела', 'Дело не найдено в базе данных.');
+          return;
+        }
+        renderCase(row);
+      } catch (error) {
+        renderError('Не удалось открыть карточку дела', `Ошибка загрузки данных: ${error.message}`);
+      }
+    }
+
+    loadCase();
+  </script>
+</body>
+</html>

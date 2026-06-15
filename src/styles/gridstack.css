@@ -1,0 +1,14 @@
+.grid-stack-item-content {
+  inset: 8px !important;
+  border-radius: 22px;
+  overflow: hidden;
+  background: transparent;
+}
+
+.grid-stack-item .ui-resizable-handle {
+  display: none !important;
+}
+
+body.dashboard-edit-mode .grid-stack-item .ui-resizable-handle {
+  display: block !important;
+}

@@ -1,0 +1,98 @@
+{
+  "name": "legal-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "npm run build:map && vite build",
+    "build:app": "vite build",
+    "build:map": "npm --prefix external/your-map-source run build && node scripts/sync-map-build.cjs",
+    "preview": "vite preview",
+    "desktop:dev": "npm run build && set ELECTRON_RUN_AS_NODE=& electron .",
+    "dist:win": "npm run build && electron-builder --win --x64",
+    "dist:portable": "npm run build && electron-builder --win portable --x64",
+    "dist:installer": "npm run build && electron-builder --win nsis --x64",
+    "dist:work": "npm run build && electron-builder --win nsis portable --x64"
+  },
+  "dependencies": {
+    "gridstack": "^10.3.1",
+    "leaflet": "^1.9.4",
+    "sqlite3": "^6.0.1",
+    "proxy-agent": "^6.5.0",
+    "http-proxy-agent": "^7.0.2",
+    "https-proxy-agent": "^7.0.6",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "vite": "latest",
+    "electron": "latest",
+    "electron-builder": "latest"
+  },
+  "main": "electron/main.cjs",
+  "build": {
+    "appId": "ru.legal.dashboard",
+    "productName": "Legal Dashboard",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "server/**/*",
+      "data/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "data",
+        "to": "data",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "public",
+        "to": "public",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "asarUnpack": [
+      "**/*.node",
+      "node_modules/sqlite3/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "${productName}-${version}-${arch}-${os}.${ext}"
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-${arch}-Portable.${ext}"
+    },
+    "nsis": {
+      "artifactName": "${productName}-${version}-${arch}-Setup.${ext}",
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Legal Dashboard"
+    }
+  },
+  "proxy:dev": "set MAP_PROXY_URL=http://192.168.227.254:3128&& npm run dev",
+  "desktop:proxy": "set MAP_PROXY_URL=http://192.168.227.254:3128&& npm run desktop:dev"
+}

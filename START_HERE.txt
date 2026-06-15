@@ -1,0 +1,21 @@
+START HERE
+
+1. Delete your old folder:
+   C:\Users\user\Downloads\1\1\legal-dashboard
+
+2. Extract this ZIP into:
+   C:\Users\user\Downloads\1\1\
+
+3. Open Command Prompt and run:
+
+   cd /d "C:\Users\user\Downloads\1\1\legal-dashboard"
+   dir /b fix*
+   fix-npm-audit.cmd
+
+4. After that build EXE:
+
+   build-exe.cmd
+
+5. Output EXE files will be in:
+
+   C:\Users\user\Downloads\1\1\legal-dashboard\release\

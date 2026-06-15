@@ -1,0 +1,1352 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #111827;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  height: 100%;
+  background: #f3f4f6;
+}
+
+.sidebar {
+  padding: 16px;
+  overflow: auto;
+  border-right: 1px solid #e5e7eb;
+  background: #ffffff;
+  z-index: 500;
+}
+
+.brand {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.logo {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: #fff;
+  background: #111827;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 20px;
+}
+
+h2 {
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+
+.brand p,
+.hint p,
+.stats {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.panel,
+.hint {
+  padding: 14px;
+  margin-bottom: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  background: #f9fafb;
+}
+
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+label {
+  display: block;
+  margin: 10px 0;
+  font-size: 12px;
+  color: #374151;
+}
+
+input,
+select {
+  width: 100%;
+  margin-top: 5px;
+  padding: 9px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+}
+
+input[type="checkbox"] {
+  width: auto;
+}
+
+input[type="range"] {
+  padding: 0;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+button,
+.fileButton {
+  border: 0;
+  border-radius: 10px;
+  padding: 9px 10px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  background: #111827;
+  color: #fff;
+  text-align: center;
+}
+
+button:hover,
+.fileButton:hover {
+  opacity: 0.9;
+}
+
+.layers {
+  display: grid;
+  gap: 8px;
+}
+
+.layerRow {
+  display: grid;
+  grid-template-columns: auto 14px 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.color {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.layer {
+  color: #111827;
+  background: #e5e7eb;
+  text-align: left;
+}
+
+.layer.active {
+  color: #fff;
+  background: #2563eb;
+}
+
+.danger,
+.dangerWide {
+  background: #dc2626;
+}
+
+.danger {
+  width: 32px;
+}
+
+.actions {
+  display: grid;
+  gap: 8px;
+}
+
+.fileButton {
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+
+.fileButton input {
+  display: none;
+}
+
+.stats {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #e5e7eb;
+  line-height: 1.5;
+}
+
+.mapWrap,
+.map {
+  min-height: 100%;
+  height: 100%;
+}
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+}
+
+.popup p {
+  margin-top: 6px;
+}
+
+@media (max-width: 900px) {
+  .app {
+    grid-template-columns: 1fr;
+    grid-template-rows: 420px 1fr;
+  }
+
+  .sidebar {
+    grid-row: 2;
+    border-right: 0;
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .mapWrap {
+    grid-row: 1;
+  }
+}
+.nspdList {
+  display: grid;
+  gap: 10px;
+}
+
+.nspdCard {
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.addWms {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.addWms h3 {
+  margin: 0 0 8px;
+  font-size: 13px;
+}
+
+.addWms input {
+  margin-bottom: 8px;
+}
+
+.areaBox,
+.coordSearch {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.areaBox h3,
+.coordSearch h3 {
+  margin: 10px 0 8px;
+  font-size: 13px;
+}
+
+.coords {
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 10px;
+  background: #fff7ed;
+  color: #7c2d12;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.areaLayers {
+  max-height: 170px;
+  overflow: auto;
+  padding: 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.coordSearch {
+  display: grid;
+  gap: 8px;
+}
+
+
+.smallText {
+  margin: 4px 0 10px;
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.miniActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+
+.nspdCompactRow {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.nspdLayerButton {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.iconButton {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 10px;
+  background: #e5e7eb;
+  color: #111827;
+  font-weight: 700;
+}
+
+.nspdDetails {
+  grid-column: 1 / -1;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.detailsBox {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.detailsBox summary {
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  color: #374151;
+}
+
+.techDetails {
+  background: #f9fafb;
+}
+
+.techDetails summary {
+  color: #6b7280;
+}
+
+.miniActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+
+.boundsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.legendPanel {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  z-index: 900;
+  max-width: min(720px, calc(100vw - 420px));
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.legendToggle {
+  width: 100%;
+  border-radius: 0;
+  background: #111827;
+  color: #fff;
+}
+
+.legendBody {
+  max-height: 45vh;
+  overflow: auto;
+  padding: 10px;
+}
+
+.legendBody img {
+  display: block;
+  width: 900px;
+  max-width: none;
+}
+
+.mapWrap {
+  position: relative;
+}
+
+@media (max-width: 900px) {
+  .legendPanel {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    max-width: none;
+  }
+
+  .legendBody img {
+    width: 760px;
+  }
+}
+
+
+.floatingTools {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.floatBtn {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  font-size: 18px;
+}
+
+.floatBtn.active {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.floatPanel {
+  width: 310px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(6px);
+}
+
+.floatPanel p {
+  margin: 8px 0 10px;
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.floatPanel input {
+  margin-bottom: 8px;
+}
+
+.floatAreaBox {
+  margin-top: 10px;
+}
+
+.floatLayerList {
+  max-height: 180px;
+  overflow: auto;
+  margin: 8px 0;
+  padding: 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+}
+
+@media (max-width: 900px) {
+  .floatingTools {
+    top: 12px;
+    right: 12px;
+  }
+
+  .floatPanel {
+    width: min(310px, calc(100vw - 28px));
+  }
+}
+
+
+.addressSearch {
+  position: relative;
+  width: 260px;
+  min-height: 42px;
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  align-items: center;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  backdrop-filter: blur(6px);
+}
+
+.addressSearch.active {
+  width: 360px;
+}
+
+.addressIcon {
+  display: grid;
+  place-items: center;
+  color: #6b7280;
+  font-size: 18px;
+}
+
+.addressSearch input {
+  width: 100%;
+  margin: 0;
+  padding: 9px 4px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+}
+
+.addressClear {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  margin-right: 5px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  color: #111827;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.addressSuggestBox {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  width: min(460px, calc(100vw - 40px));
+  max-height: 300px;
+  overflow: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
+  z-index: 920;
+}
+
+.addressSuggest {
+  width: 100%;
+  display: block;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 0;
+  background: #ffffff;
+  color: #111827;
+  text-align: left;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.addressSuggest:hover {
+  background: #f3f4f6;
+}
+
+.addressSuggest.muted {
+  color: #6b7280;
+  cursor: default;
+}
+
+@media (max-width: 900px) {
+  .addressSearch,
+  .addressSearch.active {
+    width: min(320px, calc(100vw - 28px));
+  }
+}
+
+
+.addressGo {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  margin-right: 4px;
+  border-radius: 999px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 1;
+}
+
+
+.warningBox {
+  margin: 8px 0 10px;
+  padding: 10px;
+  border-radius: 12px;
+  background: #fff7ed;
+  color: #9a3412;
+  border: 1px solid #fed7aa;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+
+.functionalLegendPanel {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  z-index: 880;
+  width: min(360px, calc(100vw - 40px));
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  backdrop-filter: blur(6px);
+}
+
+.functionalLegendPanel summary {
+  cursor: pointer;
+  padding: 12px 14px;
+  color: #111827;
+  font-weight: 800;
+  font-size: 14px;
+  list-style: none;
+}
+
+.functionalLegendPanel summary::-webkit-details-marker {
+  display: none;
+}
+
+.functionalLegendPanel summary::after {
+  content: "▾";
+  float: right;
+  color: #6b7280;
+}
+
+.functionalLegendPanel[open] summary::after {
+  content: "▴";
+}
+
+.legendContent {
+  max-height: 360px;
+  overflow: auto;
+  padding: 0 14px 14px;
+}
+
+.legendItem {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 10px;
+  padding: 9px 0;
+  border-top: 1px solid #f3f4f6;
+}
+
+.legendSwatch {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  border-radius: 5px;
+  border: 1px solid rgba(17, 24, 39, 0.18);
+}
+
+.legendItem b {
+  font-size: 13px;
+}
+
+.legendItem p {
+  margin-top: 2px;
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.legendNote {
+  margin-top: 8px;
+  padding: 9px;
+  border-radius: 12px;
+  background: #f9fafb;
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+@media (max-width: 900px) {
+  .functionalLegendPanel {
+    right: 12px;
+    bottom: 12px;
+  }
+}
+
+
+.cadNumbersBox {
+  width: 100%;
+  min-height: 86px;
+  resize: vertical;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 13px;
+  line-height: 1.45;
+  outline: none;
+}
+
+.cadNumbersBox:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+
+button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+
+/* Скрываем нижний правый блок атрибуции Leaflet/тайлов, чтобы убрать лишний флаг/значок. */
+.leaflet-control-attribution {
+  display: none !important;
+}
+
+.nspdObjectPanel {
+  position: absolute;
+  left: 18px;
+  top: 84px;
+  z-index: 900;
+  width: 390px;
+  max-height: calc(100% - 120px);
+  overflow: auto;
+  background: #ffffff;
+  color: #111827;
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.22);
+  border: 1px solid rgba(148, 163, 184, 0.45);
+}
+
+.nspdObjectHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.nspdObjectHeader button {
+  border: 0;
+  background: #f3f4f6;
+  color: #374151;
+  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.nspdObjectTitle {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.28;
+}
+
+.nspdObjectSubtitle {
+  margin-top: 8px;
+  display: inline-block;
+  color: #2563eb;
+  border-bottom: 2px solid #2563eb;
+  padding-bottom: 6px;
+  font-size: 13px;
+}
+
+.nspdObjectRows {
+  padding: 8px 16px 16px;
+}
+
+.nspdObjectRow {
+  display: grid;
+  grid-template-columns: 132px 1fr;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.nspdObjectLabel {
+  color: #374151;
+  font-size: 13px;
+  line-height: 1.32;
+}
+
+.nspdObjectValue {
+  color: #111827;
+  font-size: 14px;
+  line-height: 1.34;
+  white-space: pre-wrap;
+}
+
+.nspdObjectMessage,
+.nspdObjectNote {
+  padding: 14px 16px;
+  color: #4b5563;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.nspdObjectNote {
+  border-top: 1px solid #e5e7eb;
+  background: #f8fafc;
+}
+
+@media (max-width: 900px) {
+  .nspdObjectPanel {
+    left: 10px;
+    right: 10px;
+    top: 76px;
+    width: auto;
+  }
+}
+
+/* v35: современное оформление панели и карты */
+:root {
+  --bg: #eef4fb;
+  --panel: rgba(255, 255, 255, 0.88);
+  --panel-solid: #ffffff;
+  --line: rgba(148, 163, 184, 0.28);
+  --text: #0f172a;
+  --muted: #64748b;
+  --primary: #0284c7;
+  --primary-dark: #0369a1;
+  --danger: #ef4444;
+  --shadow: 0 18px 48px rgba(15, 23, 42, 0.16);
+}
+
+html,
+body,
+#root {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.app {
+  grid-template-columns: 380px 1fr;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(14, 165, 233, 0.18), transparent 34%),
+    linear-gradient(135deg, #f8fbff 0%, #eaf2fb 100%);
+}
+
+.sidebar {
+  margin: 14px 0 14px 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 26px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.brand {
+  padding: 10px 10px 16px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.overviewToggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  margin: 0 0 14px;
+  padding: 5px;
+  border: 1px solid rgba(148, 163, 184, 0.36);
+  border-radius: 16px;
+  background: rgba(226, 232, 240, 0.7);
+}
+
+.overviewToggle button {
+  min-width: 0;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: #475569;
+  box-shadow: none;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.overviewToggle button:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: none;
+}
+
+.overviewToggle button.active {
+  background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+  color: #ffffff;
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.22);
+}
+
+.logo {
+  background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+  box-shadow: 0 10px 28px rgba(37, 99, 235, 0.25);
+  letter-spacing: 0.04em;
+}
+
+h1 {
+  font-size: 19px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  color: #0f172a;
+  font-size: 14px;
+  letter-spacing: -0.01em;
+}
+
+.panel,
+.hint,
+.detailsBox,
+.nspdDetails,
+.floatPanel,
+.functionalLegendPanel,
+.nspdObjectPanel,
+.addressSearch,
+.addressSuggestBox {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 12px 34px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.panel {
+  padding: 15px;
+  border-radius: 22px;
+}
+
+.panelHeader h2 {
+  margin-bottom: 0;
+}
+
+input,
+select,
+.cadNumbersBox {
+  border-color: rgba(148, 163, 184, 0.42);
+  border-radius: 14px;
+  background: rgba(248, 250, 252, 0.92);
+  transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+}
+
+input:focus,
+select:focus,
+.cadNumbersBox:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.14);
+}
+
+button,
+.fileButton {
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--primary) 0%, #2563eb 100%);
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.18);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+}
+
+button:hover,
+.fileButton:hover {
+  transform: translateY(-1px);
+  opacity: 1;
+  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.22);
+}
+
+.layer,
+.iconButton {
+  background: rgba(226, 232, 240, 0.86);
+  color: #0f172a;
+  box-shadow: none;
+}
+
+.layer.active,
+.floatBtn.active {
+  background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+  color: #ffffff;
+}
+
+.danger,
+.dangerWide {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.mapWrap {
+  margin: 14px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  background: #dbeafe;
+}
+
+.leaflet-container {
+  background: #dbeafe;
+}
+
+.leaflet-control-zoom a,
+.leaflet-bar a {
+  border: 0 !important;
+  color: #0f172a !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(10px);
+}
+
+.leaflet-bar {
+  overflow: hidden;
+  border: 1px solid var(--line) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12) !important;
+}
+
+.nspdObjectPanel {
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.nspdObjectHeader {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(37, 99, 235, 0.08));
+}
+
+.nspdObjectTitle {
+  color: #0f172a;
+}
+
+.nspdObjectSubtitle {
+  color: var(--primary-dark);
+  border-bottom-color: var(--primary);
+}
+
+@media (max-width: 900px) {
+  .app {
+    grid-template-columns: 1fr;
+    grid-template-rows: 430px 1fr;
+  }
+
+  .sidebar,
+  .mapWrap {
+    margin: 10px;
+    border-radius: 22px;
+  }
+}
+
+.nspdInfoLayerChoices {
+  display: grid;
+  gap: 10px;
+}
+
+.nspdInfoLayerChoices button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  border: 1px solid rgba(37, 99, 235, 0.20);
+  border-radius: 16px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #0f172a;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.nspdInfoLayerChoices button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(37, 99, 235, 0.45);
+  box-shadow: 0 14px 32px rgba(37, 99, 235, 0.15);
+}
+
+.nspdInfoLayerChoices button span {
+  font-weight: 700;
+  text-align: left;
+}
+
+.nspdInfoLayerChoices button small {
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.nspdLayerSelectorBox {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0 14px;
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  background: linear-gradient(180deg, rgba(239, 246, 255, 0.96), rgba(255, 255, 255, 0.96));
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+}
+
+.nspdLayerSelectorBox label {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #2563eb;
+}
+
+.nspdLayerSelectorBox select {
+  width: 100%;
+  border: 1px solid rgba(37, 99, 235, 0.24);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #ffffff;
+  color: #0f172a;
+  font-weight: 700;
+  outline: none;
+}
+
+.nspdLayerSelectorBox select:focus {
+  border-color: rgba(37, 99, 235, 0.65);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+/* v42: разделы НСПД-слоёв */
+.nspdGroups {
+  display: grid;
+  gap: 12px;
+}
+
+.nspdGroup {
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(248,250,252,0.96), rgba(255,255,255,0.88));
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+}
+
+.nspdGroupHeader {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+}
+
+.nspdGroupTitle {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  min-width: 0;
+  padding: 9px 10px;
+  border: 0;
+  background: transparent;
+  color: #0f172a;
+  text-align: left;
+  box-shadow: none;
+}
+
+.nspdGroupTitle:hover {
+  background: rgba(226, 232, 240, 0.72);
+}
+
+.nspdGroupTitle strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nspdGroupTitle small {
+  min-width: 24px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 11px;
+  text-align: center;
+}
+
+.nspdOrderButtons {
+  display: flex;
+  gap: 5px;
+}
+
+.nspdOrderButtons button,
+.nspdCompactRow .iconButton {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 10px;
+  background: #eef2ff;
+  color: #1e3a8a;
+  box-shadow: none;
+}
+
+.nspdOrderButtons button:hover,
+.nspdCompactRow .iconButton:hover {
+  background: #dbeafe;
+}
+
+.nspdGroupLayers {
+  padding: 0 8px 10px;
+}
+
+.nspdSubgroups {
+  display: grid;
+  gap: 8px;
+  padding: 0 8px 10px;
+}
+
+.nspdSubgroup {
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.78);
+  overflow: hidden;
+}
+
+.nspdSubgroupHeader {
+  grid-template-columns: auto 1fr auto;
+  padding: 6px;
+}
+
+.nspdCompactRow {
+  grid-template-columns: auto 1fr auto auto auto;
+}
+
+.nspdDetails select {
+  width: 100%;
+}
+
+.emptyGroup {
+  padding: 10px;
+  border: 1px dashed rgba(148, 163, 184, 0.52);
+  border-radius: 14px;
+  color: #64748b;
+  font-size: 12px;
+  text-align: center;
+}
+
+.secondaryWide {
+  width: 100%;
+  margin-top: 10px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  color: #0f172a;
+}
+
+.addWms select {
+  margin-bottom: 8px;
+}
+
+/* v43: drag-and-drop ordering and NSPD-only legend */
+.layerRow {
+  grid-template-columns: 22px auto 14px 1fr auto;
+  padding: 6px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.62);
+  border: 1px solid rgba(226,232,240,0.8);
+}
+
+.dragHandle {
+  width: 22px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  color: #64748b;
+  cursor: grab;
+  user-select: none;
+  font-weight: 800;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+.dragging {
+  opacity: 0.52;
+  outline: 2px dashed rgba(37,99,235,0.55);
+  outline-offset: 2px;
+}
+
+.nspdGroupHeader {
+  grid-template-columns: 24px 1fr auto;
+}
+
+.nspdCompactRow {
+  grid-template-columns: 22px auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 7px;
+  border-radius: 14px;
+  border: 1px solid rgba(226,232,240,0.85);
+  background: rgba(255,255,255,0.72);
+}
+
+.nspdCompactRow .nspdDetails {
+  grid-column: 1 / -1;
+}
+
+.nspdLegendPanel {
+  left: clamp(380px, 28vw, 520px);
+  right: auto;
+  bottom: 18px;
+  max-width: min(430px, calc(100vw - 560px));
+}
+
+.nspdLegendPanel .legendContent {
+  max-height: 420px;
+}
+
+.legendSection + .legendSection {
+  margin-top: 16px;
+}
+
+.legendSectionTitle {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #1f2937;
+}
+
+.nspdLegendItem {
+  grid-template-columns: 26px 1fr;
+}
+
+.nspdLegendItem .legendSwatch {
+  width: 22px;
+  height: 14px;
+  border-radius: 4px;
+  margin-top: 5px;
+  box-shadow: inset 0 0 0 1px rgba(15,23,42,0.08);
+}
+
+.nspdLegendItem b {
+  font-weight: 500;
+  line-height: 1.45;
+}

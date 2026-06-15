@@ -1,0 +1,917 @@
+.utility-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 11000;
+  background: rgba(15, 23, 42, .22);
+  backdrop-filter: blur(2px);
+}
+
+.utility-panel {
+  position: fixed;
+  left: 278px;
+  top: 20px;
+  bottom: 20px;
+  z-index: 11001;
+  width: min(760px, calc(100vw - 320px));
+  border: 1px solid #dbe7ff;
+  border-radius: 26px;
+  background: #fff;
+  box-shadow: 0 26px 80px rgba(15, 23, 42, .28);
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.utility-panel.compact {
+  width: min(440px, calc(100vw - 320px));
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.utility-panel[hidden],
+.utility-backdrop[hidden] {
+  display: none !important;
+}
+
+.utility-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 22px 24px;
+  background: linear-gradient(135deg, #f8fbff, #eef5ff);
+  border-bottom: 1px solid #dbe7ff;
+}
+
+.utility-panel-head h3 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.utility-panel-head p {
+  margin: 4px 0 0;
+  color: #64748b;
+}
+
+.notes-tools {
+  display: flex;
+  gap: 10px;
+  padding: 14px 18px;
+  border-bottom: 1px solid #edf2fa;
+}
+
+.notes-layout {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+}
+
+.notes-list {
+  min-height: 0;
+  overflow: auto;
+  padding: 12px;
+  border-right: 1px solid #edf2fa;
+  background: #f8fbff;
+}
+
+.note-list-item {
+  width: 100%;
+  display: grid;
+  gap: 5px;
+  text-align: left;
+  border: 1px solid transparent;
+  border-radius: 15px;
+  background: transparent;
+  padding: 11px 12px;
+  cursor: pointer;
+}
+
+.note-list-item:hover,
+.note-list-item.active {
+  background: #fff;
+  border-color: #bfdbfe;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, .08);
+}
+
+.note-list-item b {
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.note-list-item span {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.note-editor {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: 16px;
+}
+
+.note-title-input,
+.note-text-input {
+  width: 100%;
+  border: 1px solid #dbe4f0;
+  border-radius: 16px;
+  padding: 12px 14px;
+  font: inherit;
+  outline: none;
+}
+
+.note-title-input:focus,
+.note-text-input:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, .10);
+}
+
+.note-title-input {
+  font-size: 18px;
+  font-weight: 850;
+}
+
+.note-text-input {
+  resize: none;
+  line-height: 1.5;
+}
+
+.note-save-state {
+  color: #64748b;
+  font-size: 12px;
+  text-align: right;
+}
+
+.notifications-list {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 16px;
+  overflow: auto;
+}
+
+.notification-card {
+  border: 1px solid #dbe7ff;
+  border-radius: 18px;
+  background: #f8fbff;
+  padding: 14px;
+  display: grid;
+  gap: 6px;
+}
+
+.notification-card b {
+  color: #0f172a;
+}
+
+.notification-card span {
+  color: #64748b;
+  line-height: 1.4;
+}
+
+@media (max-width: 980px) {
+  .utility-panel,
+  .utility-panel.compact {
+    left: 12px;
+    right: 12px;
+    width: auto;
+  }
+
+  .notes-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .notes-list {
+    max-height: 160px;
+    border-right: 0;
+    border-bottom: 1px solid #edf2fa;
+  }
+}
+
+
+/* Улучшенное оформление заметок и уведомлений */
+.utility-panel {
+  border: 1px solid #dbe7f6;
+  border-radius: 26px 0 0 26px;
+  box-shadow: 0 30px 90px rgba(15, 23, 42, .28);
+  background: linear-gradient(180deg, #ffffff, #f8fbff);
+}
+
+.utility-panel-head {
+  background: linear-gradient(135deg, #1f3b63, #426f9f);
+  color: #fff;
+  border-bottom: 0;
+}
+
+.utility-panel-head p {
+  color: rgba(255,255,255,.78);
+}
+
+.notes-tools {
+  background: #f8fbff;
+  border-bottom: 1px solid #dbe7f6;
+  padding: 12px 16px;
+}
+
+.notes-list {
+  background: #f8fbff;
+  border-right: 1px solid #dbe7f6;
+}
+
+.note-list-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #fff;
+  margin-bottom: 8px;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, .04);
+}
+
+.note-list-item.active {
+  border-color: #9db8ff;
+  background: #eef5ff;
+  box-shadow: 0 0 0 3px rgba(31, 94, 255, .09);
+}
+
+.note-editor {
+  background: #fff;
+}
+
+.note-title-input,
+.note-text-input {
+  border: 1px solid #dbe4f0;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.note-title-input:focus,
+.note-text-input:focus {
+  border-color: #9db8ff;
+  box-shadow: 0 0 0 4px rgba(31, 94, 255, .08);
+}
+
+.notification-card {
+  border: 1px solid #dbe7f6;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #fff, #f8fbff);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, .06);
+  padding: 14px;
+}
+
+.notification-card b {
+  display: block;
+  margin-bottom: 6px;
+  color: #0f172a;
+}
+
+.notification-card span {
+  color: #64748b;
+  line-height: 1.45;
+}
+
+
+/* Оформление рабочих заметок как на присланном скриншоте, без изменения логики */
+#notesPanel.utility-panel {
+  left: 50%;
+  top: 50%;
+  bottom: auto;
+  width: min(1120px, calc(100vw - 64px));
+  height: min(900px, calc(100vh - 48px));
+  transform: translate(-50%, -50%);
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  box-shadow: 0 34px 110px rgba(15, 23, 42, .30);
+  grid-template-rows: 132px 96px minmax(0, 1fr);
+}
+
+#notesPanel .utility-panel-head {
+  padding: 25px 30px;
+  background: #2f557f;
+  color: #fff;
+  border-bottom: 0;
+}
+
+#notesPanel .utility-panel-head h3 {
+  font-size: 31px;
+  line-height: 1.08;
+  font-weight: 850;
+  letter-spacing: -.02em;
+}
+
+#notesPanel .utility-panel-head p {
+  margin-top: 14px;
+  font-size: 26px;
+  line-height: 1.2;
+  color: rgba(255,255,255,.78);
+}
+
+#notesPanel .utility-panel-head .icon-button {
+  width: 58px;
+  height: 58px;
+  border-radius: 20px;
+  border: 0;
+  background: #fff;
+  color: #000;
+  font-size: 34px;
+  font-weight: 400;
+}
+
+#notesPanel .notes-tools {
+  padding: 20px;
+  gap: 14px;
+  background: #f8fbff;
+  border-bottom: 1px solid #dbe4f0;
+}
+
+#notesPanel .notes-tools .btn {
+  min-height: 58px;
+  height: 58px;
+  padding: 0 22px;
+  border-radius: 17px;
+  font-size: 20px;
+}
+
+#notesPanel .notes-tools .btn.danger {
+  background: #ffe4e8;
+  border-color: #ffc8d1;
+  color: #912020;
+}
+
+#notesPanel .notes-layout {
+  grid-template-columns: 345px minmax(0, 1fr);
+  min-height: 0;
+}
+
+#notesPanel .notes-list {
+  padding: 14px 10px;
+  background: #f5f8fc;
+  border-right: 1px solid #dbe4f0;
+}
+
+#notesPanel .note-list-item {
+  margin: 0 0 12px;
+  padding: 20px 21px;
+  min-height: 100px;
+  gap: 10px;
+  border-radius: 19px;
+  border: 1px solid #e4ebf7;
+  background: #fff;
+  box-shadow: none;
+}
+
+#notesPanel .note-list-item.active {
+  background: #eef5ff;
+  border-color: #b8cfff;
+  box-shadow: 0 0 0 3px rgba(54, 100, 255, .12);
+}
+
+#notesPanel .note-list-item b {
+  color: #0e1b36;
+  font-size: 24px;
+  line-height: 1.1;
+  font-weight: 850;
+}
+
+#notesPanel .note-list-item span {
+  color: #69768d;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+#notesPanel .note-editor {
+  padding: 25px 24px 18px;
+  gap: 18px;
+  background: #fff;
+}
+
+#notesPanel .note-title-input,
+#notesPanel .note-text-input {
+  border: 1px solid #dbe4f0;
+  border-radius: 20px;
+  background: #fff;
+  font-family: inherit;
+}
+
+#notesPanel .note-title-input {
+  height: 76px;
+  padding: 0 22px;
+  font-size: 26px;
+  font-weight: 850;
+}
+
+#notesPanel .note-text-input {
+  padding: 24px 22px;
+  font-size: 24px;
+  line-height: 1.45;
+  color: #111827;
+}
+
+#notesPanel .note-title-input::placeholder,
+#notesPanel .note-text-input::placeholder {
+  color: #777;
+}
+
+#notesPanel .note-save-state {
+  padding-right: 8px;
+  text-align: right;
+  font-size: 20px;
+  color: #69768d;
+}
+
+@media (max-width: 920px) {
+  #notesPanel.utility-panel {
+    width: calc(100vw - 24px);
+    height: calc(100vh - 24px);
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+
+  #notesPanel .utility-panel-head h3 {
+    font-size: 25px;
+  }
+
+  #notesPanel .utility-panel-head p {
+    font-size: 18px;
+  }
+
+  #notesPanel .notes-layout {
+    grid-template-columns: 1fr;
+  }
+
+  #notesPanel .notes-list {
+    max-height: 190px;
+    border-right: 0;
+    border-bottom: 1px solid #dbe4f0;
+  }
+
+  #notesPanel .note-title-input {
+    font-size: 22px;
+  }
+
+  #notesPanel .note-text-input {
+    font-size: 20px;
+  }
+}
+
+
+/* Панели заметок и уведомлений открываются справа; правый край округлён, левый остаётся прямым */
+#notesPanel.utility-panel,
+#notificationsPanel.utility-panel {
+  left: auto !important;
+  right: 20px !important;
+  top: 20px !important;
+  bottom: 20px !important;
+  transform: none !important;
+  width: min(900px, calc(100vw - 330px)) !important;
+  height: auto !important;
+  border-radius: 0 28px 28px 0 !important;
+}
+
+#notificationsPanel.utility-panel {
+  grid-template-rows: 132px minmax(0, 1fr) !important;
+}
+
+#notificationsPanel .utility-panel-head {
+  padding: 25px 30px;
+  background: #2f557f;
+  color: #fff;
+  border-bottom: 0;
+}
+
+#notificationsPanel .utility-panel-head h3 {
+  font-size: 31px;
+  line-height: 1.08;
+  font-weight: 850;
+  letter-spacing: -.02em;
+}
+
+#notificationsPanel .utility-panel-head p {
+  margin-top: 14px;
+  font-size: 22px;
+  line-height: 1.2;
+  color: rgba(255,255,255,.78);
+}
+
+#notificationsPanel .utility-panel-head .icon-button {
+  width: 58px;
+  height: 58px;
+  border-radius: 20px;
+  border: 0;
+  background: #fff;
+  color: #000;
+  font-size: 34px;
+  font-weight: 400;
+}
+
+#notificationsPanel .notifications-list {
+  background: #f8fbff;
+  padding: 20px;
+}
+
+#notificationsPanel .notification-card {
+  background: #fff;
+  border-radius: 19px;
+  border: 1px solid #e4ebf7;
+  box-shadow: none;
+  padding: 18px 20px;
+}
+
+.topbar-notify-badge[hidden] {
+  display: none !important;
+}
+
+.general-cases-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border: 1px solid #e5ebfb;
+  border-radius: 18px;
+  background: rgba(255,255,255,.86);
+  box-shadow: 0 12px 28px rgba(17, 35, 90, .04);
+}
+
+.general-cases-pagination-info {
+  color: #7281a3;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.general-cases-pagination-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.general-cases-pagination-actions span {
+  min-width: 58px;
+  text-align: center;
+  color: #263b74;
+  font-weight: 700;
+}
+
+.general-cases-pagination-actions .btn[disabled] {
+  opacity: .45;
+  cursor: default;
+}
+
+@media (max-width: 980px) {
+  #notesPanel.utility-panel,
+  #notificationsPanel.utility-panel {
+    left: 12px !important;
+    right: 12px !important;
+    top: 12px !important;
+    bottom: 12px !important;
+    width: auto !important;
+    border-radius: 0 24px 24px 0 !important;
+  }
+
+  .general-cases-pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .general-cases-pagination-actions {
+    justify-content: space-between;
+  }
+}
+
+
+/* Исправление панелей заметок и уведомлений:
+   открываются справа, скругление переносится на левый край; шрифты и кнопки компактнее */
+#notesPanel.utility-panel,
+#notificationsPanel.utility-panel {
+  right: 0 !important;
+  top: 20px !important;
+  bottom: 20px !important;
+  border-radius: 28px 0 0 28px !important;
+  width: min(820px, calc(100vw - 330px)) !important;
+}
+
+#notesPanel.utility-panel {
+  grid-template-rows: 104px 72px minmax(0, 1fr) !important;
+}
+
+#notificationsPanel.utility-panel {
+  grid-template-rows: 104px minmax(0, 1fr) !important;
+}
+
+#notesPanel .utility-panel-head,
+#notificationsPanel .utility-panel-head {
+  padding: 18px 22px !important;
+}
+
+#notesPanel .utility-panel-head h3,
+#notificationsPanel .utility-panel-head h3 {
+  font-size: 24px !important;
+  line-height: 1.08 !important;
+  font-weight: 780 !important;
+}
+
+#notesPanel .utility-panel-head p,
+#notificationsPanel .utility-panel-head p {
+  margin-top: 8px !important;
+  font-size: 17px !important;
+  line-height: 1.2 !important;
+}
+
+#notesPanel .utility-panel-head .icon-button,
+#notificationsPanel .utility-panel-head .icon-button {
+  width: 46px !important;
+  height: 46px !important;
+  border-radius: 16px !important;
+  font-size: 26px !important;
+}
+
+#notesPanel .notes-tools {
+  padding: 13px 16px !important;
+  gap: 10px !important;
+}
+
+#notesPanel .notes-tools .btn {
+  min-height: 44px !important;
+  height: 44px !important;
+  padding: 0 16px !important;
+  border-radius: 14px !important;
+  font-size: 15px !important;
+}
+
+#notesPanel .notes-layout {
+  grid-template-columns: 300px minmax(0, 1fr) !important;
+}
+
+#notesPanel .notes-list {
+  padding: 10px 9px !important;
+}
+
+#notesPanel .note-list-item {
+  min-height: 78px !important;
+  padding: 14px 16px !important;
+  gap: 6px !important;
+  margin-bottom: 9px !important;
+  border-radius: 15px !important;
+}
+
+#notesPanel .note-list-item b {
+  font-size: 17px !important;
+  line-height: 1.15 !important;
+  font-weight: 760 !important;
+}
+
+#notesPanel .note-list-item span {
+  font-size: 14px !important;
+}
+
+#notesPanel .note-editor {
+  padding: 18px 18px 14px !important;
+  gap: 12px !important;
+}
+
+#notesPanel .note-title-input {
+  height: 56px !important;
+  padding: 0 16px !important;
+  border-radius: 16px !important;
+  font-size: 20px !important;
+  font-weight: 760 !important;
+}
+
+#notesPanel .note-text-input {
+  padding: 17px 16px !important;
+  border-radius: 16px !important;
+  font-size: 17px !important;
+  line-height: 1.45 !important;
+}
+
+#notesPanel .note-save-state {
+  font-size: 14px !important;
+}
+
+#notificationsPanel .notifications-list {
+  padding: 14px 16px !important;
+  gap: 10px !important;
+}
+
+#notificationsPanel .notification-card {
+  padding: 14px 16px !important;
+  border-radius: 15px !important;
+}
+
+#notificationsPanel .notification-card b {
+  font-size: 16px !important;
+  font-weight: 760 !important;
+}
+
+#notificationsPanel .notification-card span {
+  font-size: 14px !important;
+  line-height: 1.35 !important;
+}
+
+@media (max-width: 980px) {
+  #notesPanel.utility-panel,
+  #notificationsPanel.utility-panel {
+    left: 12px !important;
+    right: 12px !important;
+    top: 12px !important;
+    bottom: 12px !important;
+    width: auto !important;
+    border-radius: 24px !important;
+  }
+
+  #notesPanel .notes-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Динамические уведомления и просроченные события */
+#notificationsPanel.utility-panel.compact {
+  /* Более раннее правило для #notificationsPanel использует !important и
+     оставляло только две строки grid. Из-за этого панель инструментов,
+     статус и список оказывались в одной области и визуально перекрывались. */
+  grid-template-rows: 104px auto auto minmax(0, 1fr) !important;
+  width: min(620px, calc(100vw - 320px)) !important;
+  overflow: hidden;
+}
+
+.notifications-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5edf8;
+  background: #fff;
+  min-width: 0;
+}
+
+.notifications-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  flex: 1 1 300px;
+  gap: 8px;
+  min-width: 0;
+}
+
+.notifications-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 0;
+  min-height: 38px;
+  border: 1px solid #dbe7f6;
+  border-radius: 12px;
+  background: #f8fbff;
+  color: #52627c;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 850;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.notifications-tab span {
+  display: inline-grid;
+  min-width: 22px;
+  height: 22px;
+  place-items: center;
+  margin-left: 0;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #e7eefb;
+  color: #334155;
+}
+
+#notificationsPanel .notifications-toolbar > .btn {
+  flex: 0 1 auto;
+  max-width: 100%;
+  white-space: normal;
+}
+
+.notifications-tab.is-active {
+  border-color: #1f5eff;
+  background: #1f5eff;
+  color: #fff;
+}
+
+.notifications-tab.is-active span {
+  background: rgba(255,255,255,.2);
+  color: #fff;
+}
+
+.notifications-status {
+  padding: 9px 16px;
+  border-bottom: 1px solid #edf2fa;
+  color: #64748b;
+  background: #f8fbff;
+  font-size: 12px;
+}
+
+.notifications-empty {
+  min-height: 130px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed #cbd5e1;
+  border-radius: 18px;
+  color: #64748b;
+  background: #f8fbff;
+  text-align: center;
+  padding: 18px;
+}
+
+.notification-card {
+  position: relative;
+}
+
+.notification-card.is-unread {
+  border-color: #94b4ff;
+  box-shadow: 0 0 0 3px rgba(31,94,255,.08), 0 12px 24px rgba(15,23,42,.06);
+}
+
+.notification-card.is-unread::before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #1f5eff;
+  box-shadow: 0 0 0 4px rgba(31,94,255,.12);
+}
+
+.notification-card.is-overdue {
+  border-color: #fecaca;
+  background: linear-gradient(180deg, #fff, #fff7f7);
+}
+
+.notification-card.is-overdue.is-unread::before {
+  background: #dc2626;
+  box-shadow: 0 0 0 4px rgba(220,38,38,.12);
+}
+
+.notification-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding-right: 16px;
+}
+
+.notification-card-head b,
+.notification-card-head small {
+  display: block;
+}
+
+.notification-card-head small {
+  margin-top: 3px;
+  color: #7b879c;
+  font-size: 11px;
+}
+
+.notification-severity-icon {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 12px;
+  background: #edf4ff;
+  font-size: 18px;
+}
+
+.notification-deadline .notification-severity-icon {
+  background: #fee2e2;
+}
+
+.notification-hearing .notification-severity-icon {
+  background: #ffedd5;
+}
+
+.notification-stale .notification-severity-icon {
+  background: #fef3c7;
+}
+
+.notification-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+@media (max-width: 720px) {
+  .notifications-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .notifications-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  #notificationsPanel .notifications-toolbar > .btn {
+    width: 100%;
+  }
+}

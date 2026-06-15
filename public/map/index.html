@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+<script>
+(function(){
+  const rules=[
+    ['https://nspd.gov.ru/api/','/nspd-api/'],
+    ['https://nspd.gov.ru/','/nspd/'],
+  ];
+  function proxify(v){
+    const s=String(v||'');
+    for(const [from,to] of rules){ if(s.startsWith(from)) return to+s.slice(from.length); }
+    return v;
+  }
+  const oldFetch=window.fetch;
+  window.fetch=function(input,init){
+    if(typeof input==='string') return oldFetch.call(this,proxify(input),init);
+    if(input && input.url) return oldFetch.call(this,proxify(input.url),init);
+    return oldFetch.call(this,input,init);
+  };
+  const oldOpen=XMLHttpRequest.prototype.open;
+  XMLHttpRequest.prototype.open=function(method,url){ arguments[1]=proxify(url); return oldOpen.apply(this,arguments); };
+  const oldSet=Element.prototype.setAttribute;
+  Element.prototype.setAttribute=function(name,value){ if((name==='src'||name==='href')&&typeof value==='string') value=proxify(value); return oldSet.call(this,name,value); };
+  window.__LEGAL_DASHBOARD_CORPORATE_PROXY__=true;
+})();
+</script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Своя карта + НСПД</title>
+    <script type="module" crossorigin src="../assets/index-CImlz0yQ.js"></script>
+    <link rel="stylesheet" crossorigin href="../assets/index-C9mQ2zc8.css">
+  
+    <style>
+      html, body, #root {
+        width: 100%;
+        height: 100%;
+        min-height: 100%;
+        margin: 0;
+      }
+      body {
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
