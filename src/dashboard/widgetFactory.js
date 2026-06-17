@@ -4,7 +4,7 @@ export function createWidget(id) {
   const widget = widgetRegistry[id];
 
   if (!widget) {
-    return `<div class="widget-shell">Неизвестный виджет</div>`;
+    return '';
   }
 
   const openButton = widget.action === 'notifications'

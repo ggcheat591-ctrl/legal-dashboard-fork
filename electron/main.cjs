@@ -67,8 +67,12 @@ async function prepareDb() {
     const source1 = path.join(process.resourcesPath || '', 'data', 'app.db');
     const source2 = path.join(__dirname, '..', 'data', 'app.db');
     const source = fs.existsSync(source1) ? source1 : source2;
-    writeLog('copyInitialDb', `source="${source}"`);
-    fs.copyFileSync(source, dbPath);
+    if (fs.existsSync(source)) {
+      writeLog('copyInitialDb', `source="${source}"`);
+      fs.copyFileSync(source, dbPath);
+    } else {
+      writeLog('createEmptyDb', 'initial database seed not found; schema will be created');
+    }
   }
   await ensureSchema(dbPath);
 }

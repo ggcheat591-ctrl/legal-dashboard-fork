@@ -91,7 +91,8 @@ function renderAddMenu(grid) {
     Array.from(document.querySelectorAll('.grid-stack-item')).map(item => item.getAttribute('gs-id'))
   );
 
-  const available = Object.entries(widgetRegistry).filter(([id]) => !existing.has(id));
+  const available = Object.entries(widgetRegistry)
+    .filter(([id, config]) => config.selectable !== false && !existing.has(id));
 
   if (!available.length) {
     menu.innerHTML = `<div class="empty">Все доступные виджеты уже добавлены</div>`;

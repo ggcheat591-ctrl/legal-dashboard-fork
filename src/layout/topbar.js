@@ -21,6 +21,11 @@ export function renderTopbar(session = null) {
           ${iconNotes()}
         </button>
 
+        <button class="topbar-theme-toggle" data-theme-toggle type="button" aria-label="Включить тёмную тему" aria-pressed="false" title="Тёмная тема">
+          <span class="topbar-theme-toggle-icon" data-theme-toggle-icon aria-hidden="true">☾</span>
+          <span class="topbar-theme-toggle-label" data-theme-toggle-label>Тёмная</span>
+        </button>
+
         <span class="topbar-divider" aria-hidden="true"></span>
 
         <div class="topbar-profile-card" tabindex="0">

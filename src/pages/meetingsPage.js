@@ -40,15 +40,15 @@ export function renderMeetingsPage() {
 
   return `
     <section class="view meetings-view" id="meetings">
-      <div class="meetings-shell">
-        <header class="meetings-main-head">
+      <div class="meetings-shell" data-meetings-shell data-meetings-flow="landing">
+        <header class="meetings-main-head" data-meetings-main-head>
           <div>
             <h2>Совещания</h2>
             <p>Выберите, что вы хотите сделать</p>
           </div>
         </header>
 
-        <section class="meetings-entry-panel">
+        <section class="meetings-entry-panel" data-meetings-entry-panel>
           <button class="meetings-entry-card" data-meetings-launch-create type="button">
             <span class="meetings-entry-icon">${iconCalendar}</span>
             <strong>Создать новое совещание</strong>
@@ -114,12 +114,12 @@ export function renderMeetingsPage() {
               </div>
             </section>
 
-            <div class="meetings-doc-type-row">
-              <button class="btn small selected" data-meetings-doc-type="participants" type="button">${iconUsers}<span>Список участников</span></button>
-              <button class="btn small" data-meetings-doc-type="agenda" type="button">${iconList}<span>Повестка</span></button>
-              <button class="btn small" data-meetings-doc-type="telegram" type="button">${iconPhone}<span>Телефонограмма</span></button>
-              <button class="btn small" data-meetings-doc-type="protocol" type="button">${iconDocument}<span>Протокол</span></button>
-              <button class="btn small" data-meetings-doc-type="documents" type="button">${iconPin}<span>Документы</span></button>
+            <div class="meetings-doc-type-row" role="tablist" aria-label="Разделы совещания">
+              <button class="btn small selected" data-meetings-doc-type="participants" type="button" role="tab" aria-selected="true" aria-current="page">${iconUsers}<span>Список участников</span></button>
+              <button class="btn small" data-meetings-doc-type="agenda" type="button" role="tab" aria-selected="false">${iconList}<span>Повестка</span></button>
+              <button class="btn small" data-meetings-doc-type="telegram" type="button" role="tab" aria-selected="false">${iconPhone}<span>Телефонограмма</span></button>
+              <button class="btn small" data-meetings-doc-type="protocol" type="button" role="tab" aria-selected="false">${iconDocument}<span>Протокол</span></button>
+              <button class="btn small" data-meetings-doc-type="documents" type="button" role="tab" aria-selected="false">${iconPin}<span>Документы</span></button>
             </div>
 
             <div class="meetings-split">
@@ -268,6 +268,13 @@ export function renderMeetingsPage() {
         </article>
 
         <section class="meetings-archive-zone" data-meetings-archive>
+          <div class="meetings-archive-topline" data-meetings-archive-topline hidden>
+            <nav class="meetings-breadcrumbs" aria-label="Хлебные крошки архива совещаний">
+              <button class="meetings-breadcrumb-link" data-meetings-breadcrumb-action="home" type="button">Совещания</button>
+              <span class="meetings-breadcrumb-separator">/</span>
+              <span class="meetings-breadcrumb-current">Архив совещаний</span>
+            </nav>
+          </div>
           <div class="meetings-archive-head">
             <div>
               <h3>Архив совещаний</h3>

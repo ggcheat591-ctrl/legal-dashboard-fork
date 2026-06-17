@@ -32,7 +32,7 @@ let state = {
   selectedPeople: { msu_ip: new Set(), invited_ip: new Set() },
   expandedPeople: { msu_ip: new Set(), invited_ip: new Set() },
   isFilling: false,
-  flow: 'home'
+  flow: 'landing'
 };
 
 export function initMeetingsPage() {
@@ -53,7 +53,8 @@ export function initMeetingsPage() {
     if (event.target.closest('[data-meetings-launch-create]')) {
       event.preventDefault();
       event.stopPropagation();
-      state.flow = 'new';
+      state.flow = 'new-meeting';
+      syncMeetingsFlowUi();
       setArchiveOpen(false);
       setEditorOpen(false);
       closeMeetingTypeDialog();
@@ -67,6 +68,7 @@ export function initMeetingsPage() {
       event.preventDefault();
       event.stopPropagation();
       state.flow = 'archive';
+      syncMeetingsFlowUi();
       setEditorOpen(false);
       closeMeetingTypeDialog();
       showMeetingsPreloader('Открываю архив совещаний...').then(() => {
@@ -99,7 +101,11 @@ export function initMeetingsPage() {
       return;
     }
 
-    if (event.target.closest('[data-meetings-type-cancel]')) closeMeetingTypeDialog();
+    if (event.target.closest('[data-meetings-type-cancel]')) {
+      const editorOpen = document.querySelector('[data-meetings-editor]')?.classList.contains('is-open');
+      closeMeetingTypeDialog();
+      if (state.flow === 'new-meeting' && !editorOpen) resetMeetingsHome(false);
+    }
 
     const typePick = event.target.closest('[data-meetings-type-pick]');
     if (typePick) chooseMeetingType(typePick.dataset.meetingsTypePick);
@@ -185,6 +191,7 @@ export function initMeetingsPage() {
       event.preventDefault();
       event.stopPropagation();
       state.flow = 'archive';
+      syncMeetingsFlowUi();
       selectRow(openRowBtn.dataset.meetingsOpenRow);
       showMeetingsPreloader('Открываю сохранённое совещание...').then(() => {
         fillSelected('documents');
@@ -209,6 +216,7 @@ export function initMeetingsPage() {
     const row = event.target.closest('[data-meetings-row]');
     if (!row) return;
     state.flow = 'archive';
+    syncMeetingsFlowUi();
     selectRow(row.dataset.meetingsRow);
     showMeetingsPreloader('Открываю сохранённое совещание...').then(() => {
       fillSelected();
@@ -302,7 +310,8 @@ function openEditor() { setEditorOpen(true); }
 
 function resetMeetingsHome(withPreloader = false) {
   const run = () => {
-    state.flow = 'home';
+    state.flow = 'landing';
+    syncMeetingsFlowUi();
     closeMeetingTypeDialog();
     clearForm(false);
     state.selectedId = null;
@@ -365,7 +374,8 @@ function closeMeetingTypeDialog() {
 }
 
 function chooseMeetingType(type) {
-  state.flow = 'new';
+  state.flow = 'new-meeting';
+  syncMeetingsFlowUi();
   closeMeetingTypeDialog();
   clearForm(false);
   if (type === 'protocol') {
@@ -420,7 +430,8 @@ function handleMeetingBreadcrumbAction(action) {
       return;
     }
 
-    state.flow = 'new';
+    state.flow = 'new-meeting';
+    syncMeetingsFlowUi();
     setArchiveOpen(false);
     showMeetingsPreloader('Открываю выбор типа документа...').then(() => showMeetingTypeDialog());
   }
@@ -512,6 +523,21 @@ function setArchiveOpen(open) {
 }
 
 
+function syncMeetingsFlowUi() {
+  const flow = state.flow || 'landing';
+  const landing = flow === 'landing';
+  const archive = flow === 'archive';
+  const shell = document.querySelector('[data-meetings-shell]');
+  const head = document.querySelector('[data-meetings-main-head]');
+  const entry = document.querySelector('[data-meetings-entry-panel]');
+  const archiveTopline = document.querySelector('[data-meetings-archive-topline]');
+
+  if (shell) shell.dataset.meetingsFlow = flow;
+  if (head) head.hidden = !landing;
+  if (entry) entry.hidden = !landing;
+  if (archiveTopline) archiveTopline.hidden = !archive;
+}
+
 function scrollOpenedEditorIntoView() {
   requestAnimationFrame(() => {
     document.querySelector('[data-meetings-editor]')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -539,6 +565,9 @@ async function loadMeetings() {
 }
 
 async function openMeetingById(id) {
+  state.flow = 'archive';
+  syncMeetingsFlowUi();
+
   if (!state.rows.length) {
     try {
       state.rows = await dbApi.getMeetings();
@@ -846,7 +875,11 @@ function setDocType(type) {
   if (editor) editor.dataset.docType = state.docType;
 
   document.querySelectorAll('[data-meetings-doc-type]').forEach(button => {
-    button.classList.toggle('selected', button.dataset.meetingsDocType === state.docType);
+    const selected = button.dataset.meetingsDocType === state.docType;
+    button.classList.toggle('selected', selected);
+    button.setAttribute('aria-selected', selected ? 'true' : 'false');
+    if (selected) button.setAttribute('aria-current', 'page');
+    else button.removeAttribute('aria-current');
   });
 
   const participants = state.docType === 'participants';
@@ -935,7 +968,7 @@ function updateMeetingsBreadcrumb(forcedText = '') {
 
   const form = document.querySelector('[data-meetings-form]');
   const isEditing = Boolean(form?.elements.id?.value);
-  if (!isEditing && state.flow === 'new') {
+  if (!isEditing && state.flow === 'new-meeting') {
     current.textContent = getDocTypeTitle(state.docType);
     return;
   }
@@ -1687,76 +1720,319 @@ function exportTelegramDoc(data) {
   const invited = getPersonRecordsByNames('invited_ip', splitLines(data.invited_participants));
   const local = getPersonRecordsByNames('msu_ip', splitLines(data.participants));
   const groups = buildTelegramGroups(local, invited);
-  const telegramGroups = groups.length ? groups : [{ recipient: { full_name: '', position: '' }, invitees: [] }];
+  const telegramGroups = groups.length ? groups : [];
+  if (!telegramGroups.length) {
+    alert('Выберите хотя бы одного участника для телефонограммы.');
+    return;
+  }
   const blocks = telegramGroups.map((group, index) => ooxmlTelegramPage(data, group, index > 0)).join('');
   downloadDocxXml(ooxmlDocument(blocks, 'telegram'), `Телефонограммы_${fileDate(data.date_val)}.docx`);
 }
 
 function buildTelegramGroups(local, invited) {
-  const all = local.concat(invited);
+  const all = dedupeTelegramPeople(local.concat(invited));
   const groups = new Map();
 
   for (const person of all) {
-    const leader = findTelegramLeader(person, all);
-    const recipient = leader || person;
-    const key = recipient.full_name || recipient.position || Math.random();
-    if (!groups.has(key)) groups.set(key, { recipient, invitees: [] });
-    if (leader && leader.full_name !== person.full_name) groups.get(key).invitees.push(person);
+    const resolution = resolveTelegramRecipient(person, all);
+    const baseKey = telegramPersonKey(resolution.recipient);
+    const key = resolution.kind === 'deputy'
+      ? `${baseKey}|deputy:${telegramPersonKey(person)}`
+      : baseKey;
+    if (!key) {
+      throw new Error(`Не удалось определить адресата телефонограммы для участника: ${person.full_name || person.position || 'без имени'}.`);
+    }
+    if (!groups.has(key)) {
+      groups.set(key, {
+        recipient: resolution.recipient,
+        recipientSelected: false,
+        kind: resolution.kind || 'standard',
+        invitees: [],
+      });
+    }
+
+    const group = groups.get(key);
+    if (resolution.recipientIsSelectedPerson) {
+      group.recipientSelected = true;
+      continue;
+    }
+
+    if (!group.invitees.some(item => isSameTelegramPerson(item, person))) {
+      group.invitees.push(person);
+    }
   }
 
-  return [...groups.values()];
+  return [...groups.values()].sort((a, b) =>
+    telegramPersonSortText(a.recipient).localeCompare(telegramPersonSortText(b.recipient), 'ru')
+  );
 }
 
-function findTelegramLeader(person = {}, selectedPeople = []) {
+function resolveTelegramRecipient(person = {}, selectedPeople = []) {
+  if (isMsuParticipant(person) && isDistrictHeadPosition(person.position)) {
+    return {
+      recipient: person,
+      recipientIsSelectedPerson: true,
+      kind: 'standard',
+    };
+  }
+
+  if (isMsuParticipant(person) && isDistrictDeputyHeadPosition(person.position)) {
+    return {
+      recipient: findDistrictHeadForDeputy(person, selectedPeople),
+      recipientIsSelectedPerson: false,
+      kind: 'standard',
+    };
+  }
+
+  if (isDeputyHeadPosition(person.position)) {
+    return {
+      recipient: person,
+      recipientIsSelectedPerson: true,
+      kind: 'standard',
+    };
+  }
+
+  if (isDeputyPosition(person.position)) {
+    const leader = findTelegramLeader(person, selectedPeople, { throwOnMissing: true });
+    return {
+      recipient: leader,
+      recipientIsSelectedPerson: false,
+      kind: 'deputy',
+    };
+  }
+
+  const leader = findTelegramLeader(person, selectedPeople);
+  return {
+    recipient: leader || person,
+    recipientIsSelectedPerson: !leader || isSameTelegramPerson(leader, person),
+    kind: 'standard',
+  };
+}
+
+function findTelegramLeader(person = {}, selectedPeople = [], options = {}) {
   const leadership = normalizeText(person.leadership);
   if (!leadership) return null;
 
-  const people = selectedPeople
+  const people = dedupeTelegramPeople(selectedPeople
     .concat(state.people.msu_ip || [])
-    .concat(state.people.invited_ip || []);
-  const candidates = [];
-  const seen = new Set();
+    .concat(state.people.invited_ip || []));
+  const candidates = people.filter(candidate =>
+    candidate.full_name &&
+    !isSameTelegramPerson(candidate, person)
+  );
 
-  for (const candidate of people) {
-    const key = candidate.id || `${candidate.full_name}|${candidate.position}`;
-    if (!candidate.full_name || seen.has(key)) continue;
-    seen.add(key);
-    if (candidate.full_name === person.full_name && candidate.position === person.position) continue;
-    candidates.push(candidate);
+  const matchers = [
+    candidate => normalizeText(candidate.position) === leadership,
+    candidate => normalizeText(candidate.full_name) === leadership,
+    candidate => normalizeText(`${candidate.position} ${candidate.full_name}`) === leadership,
+    candidate => normalizeText(`${candidate.full_name} ${candidate.position}`) === leadership,
+  ];
+
+  for (const matcher of matchers) {
+    const matches = candidates.filter(matcher);
+    if (matches.length === 1) return matches[0];
+    if (matches.length > 1) {
+      throw new Error(`Неоднозначный руководитель для участника ${person.full_name || person.position}: ${person.leadership}.`);
+    }
   }
 
-  return candidates.find(candidate => normalizeText(candidate.position) === leadership)
-    || candidates.find(candidate => normalizeText(candidate.full_name) === leadership)
-    || candidates.find(candidate => normalizeText(`${candidate.position} ${candidate.full_name}`) === leadership)
-    || candidates.find(candidate => normalizeText(`${candidate.full_name} ${candidate.position}`) === leadership)
-    || candidates.find(candidate => leadership.includes(normalizeText(candidate.full_name)))
-    || candidates.find(candidate => normalizeText(candidate.position) && leadership.includes(normalizeText(candidate.position)))
-    || null;
+  if (options.throwOnMissing) {
+    throw new Error(`Не найден руководитель для участника ${person.full_name || person.position}: ${person.leadership}.`);
+  }
+  return null;
+}
+
+function dedupeTelegramPeople(people = []) {
+  const result = [];
+  const seen = new Set();
+  for (const person of people) {
+    const key = telegramPersonKey(person);
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    result.push(person);
+  }
+  return result;
+}
+
+function telegramPersonKey(person = {}) {
+  const id = String(person.id || '').trim();
+  if (id) return `id:${id}`;
+  const name = normalizeText(person.full_name);
+  const position = normalizeText(person.position);
+  return name || position ? `${name}|${position}` : '';
+}
+
+function telegramPersonSortText(person = {}) {
+  return `${normalizeText(person.full_name)} ${normalizeText(person.position)}`.trim();
+}
+
+function isSameTelegramPerson(a = {}, b = {}) {
+  const aId = String(a.id || '').trim();
+  const bId = String(b.id || '').trim();
+  if (aId && bId) return aId === bId;
+  return normalizeText(a.full_name) === normalizeText(b.full_name)
+    && normalizeText(a.position) === normalizeText(b.position);
+}
+
+function isDeputyHeadPosition(position = '') {
+  const text = normalizeText(position);
+  return /(^|[^а-яе])(?:перв(?:ый|ого)\s+)?заместител[ьяюем]*\s+глав/.test(text);
+}
+
+function isDistrictHeadPosition(position = '') {
+  const text = normalizeText(position);
+  if (!text.includes('район')) return false;
+  if (/(^|[^а-яе])(заместител|помощник|советник)([^а-яе]|$)/.test(text)) return false;
+  return /(^|[^а-яе])глава\s+(?:администрации\s+)?[а-яе\s-]+район[а-яе]*([^а-яе]|$)/.test(text);
+}
+
+function isDistrictDeputyHeadPosition(position = '') {
+  const text = normalizeText(position);
+  return text.includes('район')
+    && /(^|[^а-яе])заместител[ьяюем]*\s+глав[а-яе]*\s+(?:администрации\s+)?[а-яе\s-]+район[а-яе]*([^а-яе]|$)/.test(text);
+}
+
+function extractDistrictKey(personOrPosition = '') {
+  const position = typeof personOrPosition === 'string'
+    ? personOrPosition
+    : personOrPosition.position || '';
+  const text = normalizeText(position);
+  const match = text.match(/глав[а-яе]*\s+(?:администрации\s+)?([а-яе\s-]+?район[а-яе]*)(?:[^а-яе]|$)/);
+  if (!match) return '';
+  return normalizeText(match[1])
+    .replace(/район[а-яе]*/g, 'район')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function findDistrictHeadForDeputy(person = {}, selectedPeople = []) {
+  const explicitLeader = findTelegramLeader(person, selectedPeople);
+  if (explicitLeader && isDistrictHeadPosition(explicitLeader.position)) return explicitLeader;
+
+  const districtKey = extractDistrictKey(person);
+  if (!districtKey) {
+    throw new Error(`Не удалось определить район для заместителя главы: ${person.full_name || person.position || 'без имени'}.`);
+  }
+
+  const people = dedupeTelegramPeople(selectedPeople
+    .concat(state.people.msu_ip || [])
+    .concat(state.people.invited_ip || []));
+  const matches = people.filter(candidate =>
+    candidate.full_name
+    && !isSameTelegramPerson(candidate, person)
+    && isDistrictHeadPosition(candidate.position)
+    && extractDistrictKey(candidate) === districtKey
+  );
+
+  if (matches.length === 1) return matches[0];
+  if (matches.length > 1) {
+    throw new Error(`Неоднозначный глава района для участника ${person.full_name || person.position}: ${districtKey}.`);
+  }
+  throw new Error(`Не найден глава района для участника ${person.full_name || person.position}: ${districtKey}.`);
+}
+
+function isDeputyPosition(position = '') {
+  return /(^|[^а-яе])депутат([^а-яе]|$)/.test(normalizeText(position));
+}
+
+function isMsuParticipant(person = {}) {
+  if (normalizeText(person.category) === 'msu_ip') return true;
+  return (state.people.msu_ip || []).some(item => isSameTelegramPerson(item, person));
+}
+
+function buildTelegramAddressBlock(person = {}) {
+  const position = String(person.position || '').trim();
+  const fullName = String(person.full_name || '').trim();
+  if (!position || !fullName) {
+    throw new Error(`Неполные данные адресата телефонограммы: ${fullName || position || 'без данных'}.`);
+  }
+
+  return {
+    position: upperFirstLetter(declinePositionDative(position)),
+    name: toInitialsFirstDativeSurname(fullName),
+    greetingName: toNamePatronymic(fullName) || toInitialsFirst(fullName),
+    greetingWord: isFemalePerson(fullName) ? 'Уважаемая' : 'Уважаемый',
+  };
+}
+
+function buildTelegramBodyParagraphs(data, group = {}) {
+  const recipient = group.recipient || {};
+  if (group.kind === 'deputy') {
+    const deputy = normalizeTelegramInvitees(group.invitees, recipient).find(person => isDeputyPosition(person.position));
+    if (!deputy) {
+      throw new Error(`Не найден депутат для специальной телефонограммы адресату ${recipient.full_name || recipient.position || 'без имени'}.`);
+    }
+    return buildTelegramDeputyBodyParagraphs(data, deputy);
+  }
+
+  const invitees = normalizeTelegramInvitees(group.invitees, recipient);
+  const meetingInfo = `совещании по вопросу ${data.title || ''}, которое состоится ${data.date_val || ''} в ${data.time_val || ''} час. по адресу: ул. Гоголя, 48, каб. ${data.cabinet_number || '213'}`;
+  const firstParagraph = group.recipientSelected
+    ? `Приглашаем Вас${invitees.length ? `, а также ${formatTelegramInviteesAccusative(invitees)},` : ''} принять участие в ${meetingInfo}.`
+    : `Просим Вас направить ${formatTelegramInviteesAccusative(invitees)} принять участие в ${meetingInfo}.`;
+
+  if (!group.recipientSelected && !invitees.length) {
+    throw new Error(`Для адресата ${recipient.full_name || recipient.position || 'без имени'} не найдены направляемые участники.`);
+  }
+
+  const paragraphs = [
+    firstParagraph,
+    'В целях конструктивной работы просим быть готовыми к докладу согласно повестке.',
+  ];
+  if (!(group.recipientSelected && isMsuParticipant(recipient) && isDistrictHeadPosition(recipient.position))) {
+    paragraphs.push(`Доклады просим направить на адрес электронной почты: ${data.transfer_email || DEFAULTS.transfer_email} в срок до ${previousDay(data.date_val)}.`);
+  }
+  return paragraphs;
+}
+
+function buildTelegramDeputyBodyParagraphs(data, recipient = {}) {
+  const position = String(recipient.position || '').trim();
+  const fullName = String(recipient.full_name || '').trim();
+  validateTelegramDeputyData(data, recipient);
+
+  return [
+    `${data.date_val || ''} в ${data.time_val || ''} час. по адресу: ул. Гоголя, 48, кабинет ${data.cabinet_number || ''} состоится совещание по вопросу ${data.title || ''}.`,
+    `Просим направить для участия ${lowerFirstLetter(declinePositionAccusative(position))} ${declineFioAccusative(fullName)}.`,
+  ];
+}
+
+function validateTelegramDeputyData(data = {}, recipient = {}) {
+  const missing = [];
+  if (!String(data.date_val || '').trim()) missing.push('дата');
+  if (!String(data.time_val || '').trim()) missing.push('время');
+  if (!String(data.cabinet_number || '').trim()) missing.push('кабинет');
+  if (!String(data.title || '').trim()) missing.push('вопрос совещания');
+  if (!String(recipient.position || '').trim()) missing.push('должность депутата');
+  if (!String(recipient.full_name || '').trim()) missing.push('ФИО депутата');
+  if (missing.length) {
+    throw new Error(`Нельзя сформировать депутатскую телефонограмму: не заполнены ${missing.join(', ')}.`);
+  }
+}
+
+function normalizeTelegramInvitees(invitees = [], recipient = {}) {
+  return dedupeTelegramPeople(invitees)
+    .filter(person => !isSameTelegramPerson(person, recipient))
+    .sort((a, b) => telegramPersonSortText(a).localeCompare(telegramPersonSortText(b), 'ru'));
+}
+
+function formatTelegramInviteesAccusative(invitees = []) {
+  return invitees
+    .map(person => {
+      const position = person.position ? `${lowerFirstLetter(declinePositionAccusative(person.position))} ` : '';
+      const fio = isMsuParticipant(person) && !isDeputyPosition(person.position)
+        ? toAccusativeSurnameInitials(person.full_name)
+        : declineFioAccusative(person.full_name);
+      return `${position}${fio}`.trim();
+    })
+    .filter(Boolean)
+    .join(', ');
 }
 
 function telegramPage(data, group, index, total, hasNext = false) {
   const person = group.recipient || { full_name: '', position: '' };
-  const invitees = group.invitees || [];
-  const isDeputy = /депутат|дум/i.test(person.position || '');
-  const inviteesText = invitees
-    .map(item => `${item.position ? lowerFirstLetter(declinePositionGenitive(item.position)) + ' ' : ''}${declineFioGenitive(item.full_name)}`)
-    .filter(Boolean)
-    .join(', ');
-  const recipientPositionDative = upperFirstLetter(declinePositionDative(person.position) || person.position);
-  const recipientNameDative = toInitialsFirstDativeSurname(person.full_name);
+  const address = buildTelegramAddressBlock(person);
   const telegramNumber = formatTelegramNumber(data.telegram_number || DEFAULTS.telegram_number);
-  const greeting = toNamePatronymic(person.full_name);
-  const greetingWord = isFemalePerson(person.full_name) ? 'Уважаемая' : 'Уважаемый';
-  const bodyParagraphs = isDeputy
-    ? [
-        `${typography(data.date_val)} в ${typography(data.time_val)} час. по адресу: ул.&nbsp;Гоголя, 48, кабинет ${typography(data.cabinet_number || '213')} состоится совещание по вопросу ${typography(data.title)}.`,
-        `Просим Вас направить ${typography(lowerFirstLetter(declinePositionGenitive(person.position) || person.position))} ${typography(declineFioGenitive(person.full_name))} принять участие в совещании по вопросу ${typography(data.title)}.`,
-      ]
-    : [
-        `Приглашаем Вас${inviteesText ? `, а также ${typography(inviteesText)},` : ''} принять участие в совещании по вопросу ${typography(data.title)}, которое состоится ${typography(data.date_val)} в ${typography(data.time_val)} час. по адресу: ул.&nbsp;Гоголя, 48, кабинет ${typography(data.cabinet_number || '213')}.`,
-        'В целях конструктивной работы просим быть готовыми к докладу согласно повестке.',
-        `Доклады просим направить на адрес электронной почты: ${typography(data.transfer_email || DEFAULTS.transfer_email)} в срок до ${typography(previousDay(data.date_val))}.`,
-      ];
+  const bodyParagraphs = buildTelegramBodyParagraphs(data, group).map(typography);
 
   const pageBreak = hasNext
     ? `<p class="word-page-break" style="page-break-before:always;mso-page-break-before:always;">&nbsp;</p>`
@@ -1773,12 +2049,12 @@ function telegramPage(data, group, index, total, hasNext = false) {
       </tr>
       <tr>
         <td class="telegram-recipient-cell">
-          <div class="telegram-recipient">${typography(recipientPositionDative)}<br>${typography(recipientNameDative)}</div>
+          <div class="telegram-recipient">${typography(address.position)}<br>${typography(address.name)}</div>
         </td>
       </tr>
       <tr>
         <td class="telegram-content-cell">
-          <p class="telegram-greeting">${greetingWord} ${typography(greeting)}!</p>
+          <p class="telegram-greeting">${address.greetingWord} ${typography(address.greetingName)}!</p>
           <div class="telegram-body">${bodyParagraphs.map(paragraph => `<p>${paragraph}</p>`).join('')}</div>
           <div class="telegram-sign">${typography(data.telegram_sign_fio || DEFAULTS.telegram_sign_fio)}</div>
         </td>
@@ -1982,12 +2258,42 @@ function ooxmlP(text = '', options = {}) {
   const left = options.indentLeftCm ? ` w:left="${cmToTwips(options.indentLeftCm)}"` : '';
   const firstLine = options.firstLineCm ? ` w:firstLine="${cmToTwips(options.firstLineCm)}"` : '';
   const indent = left || firstLine ? `<w:ind${left}${firstLine}/>` : '';
+  const keep = `${options.keepNext ? '<w:keepNext/>' : ''}${options.keepLines ? '<w:keepLines/>' : ''}`;
+  const frame = options.framePr || '';
   const spacing = '<w:spacing w:before="0" w:after="0" w:line="240" w:lineRule="auto"/>';
-  return `<w:p><w:pPr>${spacing}${indent}${align}</w:pPr>${ooxmlRunLines(parts, options)}</w:p>`;
+  return `<w:p><w:pPr>${keep}${spacing}${indent}${align}${frame}</w:pPr>${ooxmlRunLines(parts, options)}</w:p>`;
+}
+
+function ooxmlTelegramP(text = '', options = {}) {
+  const parts = Array.isArray(text)
+    ? text.map(part => telegramDocText(part))
+    : telegramDocText(text).split('\n');
+  return ooxmlP(parts, options);
 }
 
 function ooxmlBlankP(count = 1, size = 14) {
   return Array.from({ length: count }, () => ooxmlP('', { size })).join('');
+}
+
+function ooxmlTelegramDoubleLine() {
+  return [
+    ooxmlParagraphBottomBorder(18),
+    ooxmlParagraphBottomBorder(6),
+  ].join('');
+}
+
+function ooxmlParagraphBottomBorder(size) {
+  return `<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="24" w:lineRule="auto"/><w:pBdr><w:bottom w:val="single" w:sz="${size}" w:space="0" w:color="000000"/></w:pBdr></w:pPr></w:p>`;
+}
+
+function ooxmlTelegramTransferFrame(data = {}) {
+  const lines = ['Передала:', data.transfer_fio || DEFAULTS.transfer_fio, data.transfer_phone || ''].filter(Boolean);
+  return ooxmlTelegramP(lines, {
+    size: 10,
+    align: 'left',
+    keepLines: true,
+    framePr: '<w:framePr w:w="9000" w:h="900" w:x="1134" w:y="14350" w:hAnchor="page" w:vAnchor="page" w:wrap="none" w:hRule="atLeast"/>',
+  });
 }
 
 function ooxmlRunLines(lines, options = {}) {
@@ -2097,46 +2403,60 @@ function ooxmlSignatureTable(label, value) {
 
 function ooxmlTelegramPage(data, group, pageBreak = false) {
   const person = group.recipient || { full_name: '', position: '' };
-  const invitees = group.invitees || [];
-  const recipientPositionDative = upperFirstLetter(declinePositionDative(person.position) || person.position);
-  const recipientNameDative = toInitialsFirstDativeSurname(person.full_name);
-  const greeting = toNamePatronymic(person.full_name) || 'Уважаемый(ая)';
+  const address = buildTelegramAddressBlock(person);
   const telegramNumber = formatTelegramNumber(data.telegram_number || DEFAULTS.telegram_number);
-  const inviteesText = invitees
-    .map(item => `${item.position ? lowerFirstLetter(declinePositionGenitive(item.position)) + ' ' : ''}${declineFioGenitive(item.full_name)}`)
-    .filter(Boolean)
-    .join(', ');
-  const body = [
-    `Приглашаем Вас${inviteesText ? `, а также ${inviteesText},` : ''} принять участие в совещании по вопросу ${data.title || ''}, которое состоится ${data.date_val || ''} в ${data.time_val || ''} час. по адресу: ул. Гоголя, 48, кабинет ${data.cabinet_number || '213'}.`,
-    'В целях конструктивной работы просим быть готовыми к докладу согласно повестке.',
-    `Доклады просим направить на адрес электронной почты: ${data.transfer_email || DEFAULTS.transfer_email} в срок до ${previousDay(data.date_val)}.`,
-  ];
+  const body = buildTelegramBodyParagraphs(data, group);
   return [
     pageBreak ? '<w:p><w:r><w:br w:type="page"/></w:r></w:p>' : '',
-    ooxmlTable([[{ widthCm: 16.8, paragraphs: [ooxmlP(['Заместитель главы администрации города, руководитель', 'аппарата'], { size: 14, bold: true, align: 'center' })] }]], { widthCm: 16.8, colsCm: [16.8], align: 'center', borders: false }),
-    ooxmlP('', { size: 1 }),
-    ooxmlP(`ТЕЛЕФОНОГРАММА ${telegramNumber} от __________`, { size: 14, bold: true, align: 'center' }),
+    ooxmlTable([[{ widthCm: 16.8, paragraphs: [ooxmlTelegramP(['Заместитель главы администрации города, руководитель', 'аппарата'], { size: 14, bold: true, align: 'center' })] }]], { widthCm: 16.8, colsCm: [16.8], align: 'center', borders: false }),
+    ooxmlTelegramDoubleLine(),
+    ooxmlBlankP(1, 14),
+    ooxmlTelegramP(`ТЕЛЕФОНОГРАММА ${telegramNumber} от __________`, { size: 14, bold: true, align: 'center' }),
     ooxmlBlankP(1, 14),
     ooxmlTable([
       [
         { widthCm: 10.5, paragraphs: [ooxmlP('', { size: 14 })] },
         { widthCm: 0.5, paragraphs: [ooxmlP('', { size: 14 })] },
-        { widthCm: 6.2, paragraphs: [ooxmlP('', { size: 14 }), ooxmlP([recipientPositionDative, recipientNameDative], { size: 14, align: 'left' }), ooxmlP('', { size: 14 }), ooxmlP('', { size: 14 })] },
+        { widthCm: 6.2, paragraphs: [ooxmlP('', { size: 14 }), ooxmlTelegramP([address.position, address.name], { size: 14, align: 'left' }), ooxmlP('', { size: 14 }), ooxmlP('', { size: 14 })] },
       ],
       [
-        { widthCm: 17.2, gridSpan: 3, paragraphs: [ooxmlP(`Уважаемый ${greeting}!`, { size: 14, align: 'center' }), ooxmlP('', { size: 14 })] },
+        { widthCm: 17.2, gridSpan: 3, paragraphs: [ooxmlTelegramP(`${address.greetingWord} ${address.greetingName}!`, { size: 14, align: 'center' }), ooxmlP('', { size: 14 })] },
       ],
     ], { widthCm: 17.2, colsCm: [10.5, 0.5, 6.2], align: 'center', borders: false }),
-    body.map(text => ooxmlP(text, { size: 14, align: 'both', firstLineCm: 1.25 })).join(''),
+    body.map(text => ooxmlTelegramP(text, { size: 14, align: 'both', firstLineCm: 1.25 })).join(''),
     ooxmlBlankP(2, 14),
-    ooxmlP(data.telegram_sign_fio || DEFAULTS.telegram_sign_fio, { size: 14, align: 'right' }),
-    ooxmlBlankP(8, 10),
-    ooxmlP(['Передала:', data.transfer_fio || DEFAULTS.transfer_fio, data.transfer_phone || ''].filter(Boolean), { size: 10, align: 'left' }),
+    ooxmlTelegramP(data.telegram_sign_fio || DEFAULTS.telegram_sign_fio, { size: 14, align: 'right' }),
+    ooxmlTelegramTransferFrame(data),
   ].join('');
 }
 
 function stripHtml(value) {
   return String(value || '').replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+}
+
+function telegramDocText(value) {
+  return protectTelegramEmails(String(value ?? '').replace(/\s+/g, ' ').trim())
+    .replace(/(^|[\s(«"„])((?:в|во|на|по|к|ко|с|со|о|об|от|до|для|при|из|за|у|и|а|но|же|ли|бы|или))\s+/gi, `$1$2\u00A0`)
+    .replace(/(^|[\s(«"„])(а)\s+(также)(?=$|[\s,.!?;:])/gi, `$1$2\u00A0$3`)
+    .replace(/(^|[\s(«"„])(по)\s+(вопросу)(?=$|[\s,.!?;:])/gi, `$1$2\u00A0$3`)
+    .replace(/(^|[\s(«"„])(в)\s+(срок)(?=$|[\s,.!?;:])/gi, `$1$2\u00A0$3`)
+    .replace(/(^|[\s(«"„])(до)\s+(\d{1,2}\.\d{1,2}\.\d{4})/gi, `$1$2\u00A0$3`)
+    .replace(/(^|[\s(«"„])(ул\.)\s+([А-ЯЁA-Z0-9][^\s,]*)/gi, `$1$2\u00A0$3`)
+    .replace(/(^|[\s(«"„])(каб\.)\s+([0-9А-ЯЁA-Z-]+)/gi, `$1$2\u00A0$3`)
+    .replace(/(^|[\s(«"„])(кабинет)\s+([0-9А-ЯЁA-Z-]+)/gi, `$1$2\u00A0$3`)
+    .replace(/№\s+([0-9А-ЯЁA-Z/_-]+)/gi, `№\u00A0$1`)
+    .replace(/([А-ЯЁ]\.)\s*([А-ЯЁ]\.)\s+([А-ЯЁ][а-яё-]+)/g, `$1$2\u00A0$3`)
+    .replace(/([А-ЯЁ][а-яё-]+)\s+([А-ЯЁ]\.)\s*([А-ЯЁ]\.)/g, `$1\u00A0$2\u00A0$3`)
+    .replace(/(\d{1,2}:\d{2})\s+(час\.?)/gi, `$1\u00A0$2`)
+    .replace(/:\s+([^\s<]+)/g, `:\u00A0$1`);
+}
+
+function protectTelegramEmails(value) {
+  return String(value || '').replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, email =>
+    email
+      .replace(/-/g, '\u2011')
+      .replace(/([.@])/g, `$1\u2060`)
+  );
 }
 
 function cmToTwips(value) {
@@ -2429,6 +2749,7 @@ function isFemalePerson(fullName) {
   const p = String(fullName || '').trim().split(/\s+/);
   const first = normalizeText(p[1] || p[0] || '');
   const patronymic = normalizeText(p[2] || '');
+  if (patronymic.endsWith('ич')) return false;
   return patronymic.endsWith('вна') || patronymic.endsWith('чна') || /[ая]$/.test(first);
 }
 
@@ -2444,7 +2765,11 @@ function declinePositionGenitive(position) {
     .replace(/^заместитель/i, cap('заместителя'))
     .replace(/^глава администрации/i, cap('главу администрации'))
     .replace(/^глава города/i, cap('главу города'))
+    .replace(/^глава(?=\s|$)/i, cap('главу'))
     .replace(/^председатель/i, cap('председателя'))
+    .replace(/^управляющий делами/i, cap('управляющего делами'))
+    .replace(/^руководитель аппарата/i, cap('руководителя аппарата'))
+    .replace(/^руководитель/i, cap('руководителя'))
     .replace(/^директор/i, cap('директора'))
     .replace(/^депутат/i, cap('депутата'))
     .replace(/^начальник/i, cap('начальника'));
@@ -2459,9 +2784,23 @@ function declinePositionGenitive(position) {
   return text;
 }
 
+function declinePositionAccusative(position) {
+  return declinePositionGenitive(position);
+}
+
 
 function declineFioGenitive(fullName) {
   const p = String(fullName || '').trim().split(/\s+/).filter(Boolean);
+  if (p.length === 2 && /^[А-ЯЁ]\.[А-ЯЁ]\.$/i.test(p[0])) {
+    return `${declineSurnameGenitive(p[1], fullName)} ${p[0]}`;
+  }
+  if (p.length === 2 && /^[А-ЯЁ]\.[А-ЯЁ]\.$/i.test(p[1])) {
+    return `${declineSurnameGenitive(p[0], fullName)} ${p[1]}`;
+  }
+  if (p.length === 2) {
+    return `${declineSurnameGenitive(p[0], fullName)} ${p[1][0]}.`;
+  }
+  if (p.length === 1) return declineSurnameGenitive(p[0], fullName);
   if (p.length < 3) return String(fullName || '').trim();
   let [surname, name, patronymic] = p;
 
@@ -2478,9 +2817,106 @@ function declineFioGenitive(fullName) {
   return `${surname} ${name[0]}.${patronymic[0]}.`;
 }
 
+function declineFioAccusative(fullName) {
+  const p = String(fullName || '').trim().split(/\s+/).filter(Boolean);
+  if (p.length === 2 && /^[А-ЯЁ]\.[А-ЯЁ]\.$/i.test(p[0])) {
+    return `${declineSurnameAccusative(p[1], fullName)} ${p[0]}`;
+  }
+  if (p.length === 2 && /^[А-ЯЁ]\.[А-ЯЁ]\.$/i.test(p[1])) {
+    return `${declineSurnameAccusative(p[0], fullName)} ${p[1]}`;
+  }
+  if (p.length === 2) {
+    return `${declineSurnameAccusative(p[0], fullName)} ${declineNameAccusative(p[1], fullName)}`;
+  }
+  if (p.length === 1) return declineSurnameAccusative(p[0], fullName);
+  if (p.length < 3) return String(fullName || '').trim();
+
+  const [surname, name, patronymic] = p;
+  if (isLikelyAccusativeMaleFullName(p)) return p.join(' ');
+
+  if (isFemalePerson(fullName)) {
+    return [
+      declineFemaleNameAccusative(surname),
+      declineFemaleNameAccusative(name),
+      declineFemaleNameAccusative(patronymic),
+    ].join(' ');
+  }
+
+  return [
+    declineSurnameAccusative(surname, fullName),
+    declineMaleFirstNameAccusative(name),
+    declineMalePatronymicGenitive(patronymic),
+  ].join(' ');
+}
+
+function isLikelyAccusativeMaleFullName(parts = []) {
+  const patronymic = String(parts[2] || '').trim();
+  return /ича$/i.test(patronymic);
+}
+
+function toAccusativeSurnameInitials(fullName) {
+  const parts = String(fullName || '').trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return '';
+
+  if (parts.length === 2 && /^[А-ЯЁ]\.$/i.test(parts[1])) {
+    return `${declineSurnameAccusative(parts[0], fullName)} ${parts[1]}`;
+  }
+
+  if (parts.length >= 2 && /^[А-ЯЁ]\.$/i.test(parts[1])) {
+    const initials = parts.slice(1).filter(part => /^[А-ЯЁ]\.$/i.test(part)).join(' ');
+    return `${declineSurnameAccusative(parts[0], fullName)} ${initials}`.trim();
+  }
+
+  const [surname, name, patronymic] = parts;
+  const initials = [name, patronymic]
+    .filter(Boolean)
+    .map(part => `${part[0].toUpperCase()}.`)
+    .join(' ');
+  return `${declineSurnameAccusative(surname, fullName)} ${initials}`.trim();
+}
+
+function declineSurnameGenitive(surname, fullName = '') {
+  return isFemalePerson(fullName) || /(ова|ева|ёва|ина|ына|ая|яя|а|я)$/i.test(String(surname || '').trim())
+    ? declineFemaleNameGenitive(surname)
+    : declineMaleSurnameGenitive(surname);
+}
+
+function declineSurnameAccusative(surname, fullName = '') {
+  return isFemalePerson(fullName) || /(ова|ева|ёва|ина|ына|ая|яя|а|я)$/i.test(String(surname || '').trim())
+    ? declineFemaleNameAccusative(surname)
+    : declineMaleSurnameGenitive(surname);
+}
+
+function declineNameAccusative(name, fullName = '') {
+  return isFemalePerson(fullName)
+    ? declineFemaleNameAccusative(name)
+    : declineMaleFirstNameAccusative(name);
+}
+
+function declineMaleFirstNameAccusative(value) {
+  const text = String(value || '').trim();
+  if (!text) return text;
+  if (text.includes('-')) return text.split('-').map(part => declineMaleFirstNameAccusative(part)).join('-');
+
+  const lower = text.toLowerCase();
+  const irregular = new Map([
+    ['павел', 'павла'],
+    ['лев', 'льва'],
+    ['пётр', 'петра'],
+    ['петр', 'петра'],
+  ]);
+  const irregularValue = irregular.get(lower);
+  if (irregularValue) return matchWordCase(text, irregularValue);
+
+  if (/а$/i.test(text)) return text.slice(0, -1) + matchLastLetterCase(text, 'у');
+  if (/я$/i.test(text)) return text.slice(0, -1) + matchLastLetterCase(text, 'ю');
+  return declineMaleNameGenitive(text);
+}
+
 function declineMaleNameGenitive(value) {
   const text = String(value || '').trim();
   if (!text) return text;
+  if (text.includes('-')) return text.split('-').map(part => declineMaleNameGenitive(part)).join('-');
   if (/[бвгджзклмнпрстфхцчшщ]$/i.test(text)) return text + 'а';
   if (/(ов|ев|ёв|ин|ын)$/i.test(text)) return text + 'а';
   if (/ий$/i.test(text)) return text.slice(0, -2) + 'ия';
@@ -2488,6 +2924,15 @@ function declineMaleNameGenitive(value) {
   if (/ь$/i.test(text)) return text.slice(0, -1) + 'я';
   if (/й$/i.test(text)) return text.slice(0, -1) + 'я';
   return text;
+}
+
+function declineMaleSurnameGenitive(value) {
+  const text = String(value || '').trim();
+  if (!text) return text;
+  if (text.includes('-')) return text.split('-').map(part => declineMaleSurnameGenitive(part)).join('-');
+  if (/(ский|цкий)$/i.test(text)) return text.slice(0, -2) + 'ого';
+  if (/ий$/i.test(text) && /(н|в|л|р|т|д|з|с)ий$/i.test(text)) return text.slice(0, -2) + 'ого';
+  return declineMaleNameGenitive(text);
 }
 
 function declineMalePatronymicGenitive(value) {
@@ -2500,6 +2945,7 @@ function declineMalePatronymicGenitive(value) {
 function declineFemaleNameGenitive(value) {
   const text = String(value || '').trim();
   if (!text) return text;
+  if (text.includes('-')) return text.split('-').map(part => declineFemaleNameGenitive(part)).join('-');
   if (/(ова|ева|ёва|ина|ына)$/i.test(text)) return text.slice(0, -1) + 'ой';
   if (/ая$/i.test(text)) return text.slice(0, -2) + 'ой';
   if (/яя$/i.test(text)) return text.slice(0, -2) + 'ей';
@@ -2508,16 +2954,34 @@ function declineFemaleNameGenitive(value) {
   return text;
 }
 
+function declineFemaleNameAccusative(value) {
+  const text = String(value || '').trim();
+  if (!text) return text;
+  if (text.includes('-')) return text.split('-').map(part => declineFemaleNameAccusative(part)).join('-');
+  if (/(ова|ева|ёва|ина|ына)$/i.test(text)) return text.slice(0, -1) + 'у';
+  if (/ая$/i.test(text)) return text.slice(0, -2) + 'ую';
+  if (/яя$/i.test(text)) return text.slice(0, -2) + 'юю';
+  if (/на$/i.test(text)) return text.slice(0, -1) + 'у';
+  if (/а$/i.test(text)) return text.slice(0, -1) + 'у';
+  if (/я$/i.test(text)) return text.slice(0, -1) + 'ю';
+  return text;
+}
+
 function toInitialsFirstDativeSurname(fullName) {
   const p = String(fullName || '').trim().split(/\s+/).filter(Boolean);
   if (p.length >= 3) return `${p[1][0]}.${p[2][0]}. ${declineSurnameDative(p[0], fullName)}`;
+  if (p.length === 2 && /^[А-ЯЁ]\.[А-ЯЁ]\.$/i.test(p[0])) return `${p[0]} ${declineSurnameDative(p[1], fullName)}`;
+  if (p.length === 2 && /^[А-ЯЁ]\.[А-ЯЁ]\.$/i.test(p[1])) return `${p[1]} ${declineSurnameDative(p[0], fullName)}`;
+  if (p.length === 2) return `${p[1][0]}. ${declineSurnameDative(p[0], fullName)}`;
+  if (p.length === 1) return declineSurnameDative(p[0], fullName);
   return fullName || '';
 }
 
 function declineSurnameDative(surname, fullName = '') {
   const text = String(surname || '').trim();
   if (!text) return text;
-  if (isFemalePerson(fullName)) {
+  if (text.includes('-')) return text.split('-').map(part => declineSurnameDative(part, fullName)).join('-');
+  if (isFemalePerson(fullName) || /(ова|ева|ёва|ина|ына|ая|яя|а|я)$/i.test(text)) {
     if (/(ова|ева|ёва|ина|ына)$/i.test(text)) return text.slice(0, -1) + 'ой';
     if (/ая$/i.test(text)) return text.slice(0, -2) + 'ой';
     if (/яя$/i.test(text)) return text.slice(0, -2) + 'ей';
@@ -2540,6 +3004,18 @@ function lowerFirstLetter(value) {
 
 function upperFirstLetter(value) {
   return String(value || '').replace(/^(\s*)([а-яёa-z])/, (_, space, letter) => space + letter.toUpperCase());
+}
+
+function matchWordCase(source, value) {
+  const text = String(source || '');
+  if (text && text === text.toUpperCase()) return value.toUpperCase();
+  if (/^[А-ЯЁA-Z]/.test(text)) return upperFirstLetter(value);
+  return value;
+}
+
+function matchLastLetterCase(source, letter) {
+  const last = String(source || '').slice(-1);
+  return last && last === last.toUpperCase() ? letter.toUpperCase() : letter;
 }
 
 function typographyRaw(value) {

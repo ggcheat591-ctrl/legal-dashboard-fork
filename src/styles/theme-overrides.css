@@ -340,8 +340,48 @@ tr:hover,
 
 .login-screen {
   background:
-    radial-gradient(circle at top left, rgba(37, 87, 214, .14), transparent 34%),
-    linear-gradient(135deg, #f4f6fb, #ffffff 52%, #f8f9fc) !important;
+    linear-gradient(rgba(255, 255, 255, .024) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, .024) 1px, transparent 1px),
+    linear-gradient(145deg, #030a11, #06111b 48%, #061621) !important;
+  background-size: 40px 40px, 40px 40px, auto !important;
+}
+
+.login-card {
+  color: #f5f9fd !important;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .06), transparent 44%),
+    rgba(10, 28, 43, .82) !important;
+  border-color: rgba(157, 198, 228, .2) !important;
+  box-shadow:
+    0 38px 110px rgba(0, 0, 0, .48),
+    inset 0 1px 0 rgba(255, 255, 255, .11) !important;
+}
+
+.login-card h1 {
+  color: #f5f9fd !important;
+}
+
+.login-card p,
+.login-form span {
+  color: #8fa6b8 !important;
+}
+
+.login-form input {
+  color: #f5f9fd !important;
+  background: rgba(255, 255, 255, .08) !important;
+  border-color: rgba(157, 198, 228, .18) !important;
+  caret-color: #4388ff !important;
+}
+
+.login-form input:focus {
+  border-color: rgba(67, 136, 255, .7) !important;
+  box-shadow: 0 0 0 4px rgba(67, 136, 255, .16) !important;
+}
+
+.login-error {
+  color: #ffd9de !important;
+  background: rgba(255, 113, 130, .11) !important;
+  border-color: rgba(255, 113, 130, .35) !important;
 }
 
 .modal::backdrop,
@@ -352,4 +392,416 @@ tr:hover,
 .calendar-move-time-dialog::backdrop,
 .calendar-dependent-dialog::backdrop {
   background: rgba(16, 24, 44, .55) !important;
+}
+
+:root[data-theme="dark"] body {
+  color: var(--text) !important;
+  background:
+    radial-gradient(circle at 18% -8%, rgba(127, 164, 255, .13), transparent 340px),
+    radial-gradient(circle at 88% 16%, rgba(92, 200, 158, .07), transparent 290px),
+    linear-gradient(180deg, #202731, var(--bg)) !important;
+}
+
+:root[data-theme="dark"] ::selection {
+  color: #f2f6fa !important;
+  background: rgba(127, 164, 255, .32) !important;
+}
+
+:root[data-theme="dark"] .main,
+:root[data-theme="dark"] .content,
+:root[data-theme="dark"] .view {
+  color: var(--text) !important;
+}
+
+:root[data-theme="dark"] .topbar,
+:root[data-theme="dark"] .topbar-modern,
+:root[data-theme="dark"] .panel,
+:root[data-theme="dark"] .case-card,
+:root[data-theme="dark"] .widget-shell,
+:root[data-theme="dark"] .calendar-main-card,
+:root[data-theme="dark"] .calendar-week-card,
+:root[data-theme="dark"] #calendar > .calendar-side-card,
+:root[data-theme="dark"] .calendar-month-panel,
+:root[data-theme="dark"] .calendar-mode-card,
+:root[data-theme="dark"] .modal,
+:root[data-theme="dark"] .calendar-task-dialog,
+:root[data-theme="dark"] .calendar-detail-dialog,
+:root[data-theme="dark"] .calendar-plan-dialog,
+:root[data-theme="dark"] .calendar-case-link-dialog,
+:root[data-theme="dark"] .calendar-case-question-dialog,
+:root[data-theme="dark"] .calendar-confirm-dialog,
+:root[data-theme="dark"] .calendar-conflict-dialog,
+:root[data-theme="dark"] .calendar-dependent-dialog,
+:root[data-theme="dark"] .calendar-move-dialog,
+:root[data-theme="dark"] .calendar-move-time-dialog,
+:root[data-theme="dark"] .meetings-card,
+:root[data-theme="dark"] .meeting-card,
+:root[data-theme="dark"] .meeting-section,
+:root[data-theme="dark"] .meeting-panel,
+:root[data-theme="dark"] .map-panel,
+:root[data-theme="dark"] .map-shell,
+:root[data-theme="dark"] .registry-card,
+:root[data-theme="dark"] .utility-panel,
+:root[data-theme="dark"] .emergency-card,
+:root[data-theme="dark"] .controlled-case-card,
+:root[data-theme="dark"] .enforcement-card {
+  color: var(--text) !important;
+  background: var(--panel) !important;
+  border-color: var(--line) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+:root[data-theme="dark"] .page-head h2,
+:root[data-theme="dark"] .topbar-title-text h1,
+:root[data-theme="dark"] .topbar h1,
+:root[data-theme="dark"] .panel h3,
+:root[data-theme="dark"] .case-card b,
+:root[data-theme="dark"] .widget-head h3,
+:root[data-theme="dark"] .calendar-week-card-head h3,
+:root[data-theme="dark"] .calendar-task-card b,
+:root[data-theme="dark"] .calendar-week-task b,
+:root[data-theme="dark"] .topbar-profile-text b,
+:root[data-theme="dark"] .meeting-title,
+:root[data-theme="dark"] .meeting-card-title,
+:root[data-theme="dark"] h1,
+:root[data-theme="dark"] h2,
+:root[data-theme="dark"] h3,
+:root[data-theme="dark"] h4 {
+  color: var(--text) !important;
+}
+
+:root[data-theme="dark"] .page-head p,
+:root[data-theme="dark"] .topbar p,
+:root[data-theme="dark"] .topbar-profile-text small,
+:root[data-theme="dark"] .case-card p,
+:root[data-theme="dark"] .calendar-week-card-head p,
+:root[data-theme="dark"] .calendar-task-card span,
+:root[data-theme="dark"] .calendar-task-card p,
+:root[data-theme="dark"] .calendar-week-task small,
+:root[data-theme="dark"] .calendar-empty-task,
+:root[data-theme="dark"] .widget-dragbar small,
+:root[data-theme="dark"] .calendar-unified-list-main span,
+:root[data-theme="dark"] .calendar-unified-list-main small,
+:root[data-theme="dark"] .meeting-muted,
+:root[data-theme="dark"] .muted,
+:root[data-theme="dark"] .meetings-breadcrumb-link,
+:root[data-theme="dark"] .meetings-breadcrumb-separator,
+:root[data-theme="dark"] small {
+  color: var(--text-secondary) !important;
+}
+
+:root[data-theme="dark"] .btn,
+:root[data-theme="dark"] .topbar-note-btn,
+:root[data-theme="dark"] .topbar-notify-btn,
+:root[data-theme="dark"] .topbar-theme-toggle,
+:root[data-theme="dark"] .profile-action-btn,
+:root[data-theme="dark"] .avatar,
+:root[data-theme="dark"] .notify,
+:root[data-theme="dark"] .calendar-week-date,
+:root[data-theme="dark"] .calendar-other-toggle,
+:root[data-theme="dark"] .panel-tabs button,
+:root[data-theme="dark"] .event-type-row button,
+:root[data-theme="dark"] .calendar-event-scope span,
+:root[data-theme="dark"] .calendar-task-types label {
+  color: var(--text) !important;
+  background: var(--elevated-bg) !important;
+  border-color: var(--line) !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="dark"] .btn:hover,
+:root[data-theme="dark"] .topbar-note-btn:hover,
+:root[data-theme="dark"] .topbar-notify-btn:hover,
+:root[data-theme="dark"] .topbar-theme-toggle:hover,
+:root[data-theme="dark"] .profile-action-btn:hover,
+:root[data-theme="dark"] .calendar-case-link-choice:hover,
+:root[data-theme="dark"] .calendar-case-link-choice:focus {
+  color: var(--text) !important;
+  background: var(--hover-bg) !important;
+  border-color: var(--line-strong) !important;
+  box-shadow: 0 0 0 3px rgba(127, 164, 255, .14) !important;
+}
+
+:root[data-theme="dark"] .btn.primary,
+:root[data-theme="dark"] .record-create-plus,
+:root[data-theme="dark"] .topbar-notify-badge,
+:root[data-theme="dark"] .calendar-widget-plan-head strong {
+  color: #101722 !important;
+  background: linear-gradient(135deg, var(--blue), #a8c1ff) !important;
+  border-color: var(--blue) !important;
+  box-shadow: 0 12px 28px rgba(127, 164, 255, .2) !important;
+}
+
+:root[data-theme="dark"] input,
+:root[data-theme="dark"] select,
+:root[data-theme="dark"] textarea,
+:root[data-theme="dark"] .search-input,
+:root[data-theme="dark"] .date-picker,
+:root[data-theme="dark"] .calendar-dialog-body input,
+:root[data-theme="dark"] .calendar-dialog-body select,
+:root[data-theme="dark"] .calendar-dialog-body textarea {
+  color: var(--text) !important;
+  background: var(--input-bg) !important;
+  border-color: var(--line) !important;
+  caret-color: var(--blue) !important;
+}
+
+:root[data-theme="dark"] input::placeholder,
+:root[data-theme="dark"] textarea::placeholder {
+  color: var(--text-placeholder) !important;
+}
+
+:root[data-theme="dark"] input:disabled,
+:root[data-theme="dark"] select:disabled,
+:root[data-theme="dark"] textarea:disabled,
+:root[data-theme="dark"] button:disabled,
+:root[data-theme="dark"] .disabled,
+:root[data-theme="dark"] [aria-disabled="true"] {
+  color: var(--text-disabled) !important;
+}
+
+:root[data-theme="dark"] input:focus,
+:root[data-theme="dark"] select:focus,
+:root[data-theme="dark"] textarea:focus,
+:root[data-theme="dark"] .search-input:focus,
+:root[data-theme="dark"] .date-picker:focus,
+:root[data-theme="dark"] .calendar-dialog-body input:focus,
+:root[data-theme="dark"] .calendar-dialog-body select:focus,
+:root[data-theme="dark"] .calendar-dialog-body textarea:focus {
+  border-color: var(--blue) !important;
+  outline-color: var(--blue) !important;
+  box-shadow: 0 0 0 3px rgba(127, 164, 255, .16) !important;
+}
+
+:root[data-theme="dark"] th,
+:root[data-theme="dark"] .calendar-dialog-body,
+:root[data-theme="dark"] .calendar-detail-body,
+:root[data-theme="dark"] .calendar-move-body,
+:root[data-theme="dark"] .calendar-case-link-body,
+:root[data-theme="dark"] .calendar-conflict-body,
+:root[data-theme="dark"] .calendar-dependent-body,
+:root[data-theme="dark"] .calendar-dialog-actions {
+  color: var(--text-secondary) !important;
+  background: var(--surface-soft) !important;
+}
+
+:root[data-theme="dark"] td,
+:root[data-theme="dark"] th,
+:root[data-theme="dark"] .control-page-row,
+:root[data-theme="dark"] .widget-head,
+:root[data-theme="dark"] .widget-dragbar,
+:root[data-theme="dark"] .calendar-week-tools,
+:root[data-theme="dark"] .calendar-week-day-head,
+:root[data-theme="dark"] .calendar-dialog-actions,
+:root[data-theme="dark"] .modal-footer,
+:root[data-theme="dark"] table {
+  border-color: var(--line) !important;
+}
+
+:root[data-theme="dark"] tr:hover,
+:root[data-theme="dark"] .case-preview-row:hover,
+:root[data-theme="dark"] .control-row:hover,
+:root[data-theme="dark"] .calendar-week-day.selected,
+:root[data-theme="dark"] .calendar-week-day-head,
+:root[data-theme="dark"] .widget-dragbar,
+:root[data-theme="dark"] .calendar-toolbar,
+:root[data-theme="dark"] .calendar-week-tools,
+:root[data-theme="dark"] .calendar-mode-card,
+:root[data-theme="dark"] .calendar-day-cell.selected,
+:root[data-theme="dark"] .topbar-notify-btn.has-unread {
+  background: var(--surface-blue) !important;
+}
+
+:root[data-theme="dark"] .case-preview-row,
+:root[data-theme="dark"] .control-row,
+:root[data-theme="dark"] .widget-stat-row > div,
+:root[data-theme="dark"] .cases-widget-card,
+:root[data-theme="dark"] .calendar-mini-widget,
+:root[data-theme="dark"] .calendar-mini-widget-head,
+:root[data-theme="dark"] .calendar-mini-widget-day,
+:root[data-theme="dark"] .calendar-widget-kanban-head,
+:root[data-theme="dark"] .calendar-widget-kanban-column,
+:root[data-theme="dark"] .calendar-widget-kanban-column-head span,
+:root[data-theme="dark"] .calendar-widget-kanban-task,
+:root[data-theme="dark"] .calendar-today-only-head,
+:root[data-theme="dark"] .calendar-today-only-task,
+:root[data-theme="dark"] .calendar-today-only-task > b,
+:root[data-theme="dark"] .calendar-week-day,
+:root[data-theme="dark"] .calendar-week-day-body,
+:root[data-theme="dark"] .calendar-day-cell,
+:root[data-theme="dark"] .calendar-task-card,
+:root[data-theme="dark"] .calendar-week-task,
+:root[data-theme="dark"] .calendar-unified-list-item,
+:root[data-theme="dark"] .calendar-case-link-choice,
+:root[data-theme="dark"] .detail-item,
+:root[data-theme="dark"] .modal-metrics div,
+:root[data-theme="dark"] .owner-card,
+:root[data-theme="dark"] .quick-tip,
+:root[data-theme="dark"] .calendar-empty-task,
+:root[data-theme="dark"] .table-wrap,
+:root[data-theme="dark"] .meeting-table-wrap {
+  color: var(--text) !important;
+  background: var(--elevated-bg) !important;
+  border-color: var(--line) !important;
+}
+
+:root[data-theme="dark"] .cases-widget-card-line p,
+:root[data-theme="dark"] .calendar-widget-kanban-task strong,
+:root[data-theme="dark"] .calendar-today-only-task strong,
+:root[data-theme="dark"] .calendar-mini-widget-day,
+:root[data-theme="dark"] .widget-stat-row b {
+  color: var(--text) !important;
+}
+
+:root[data-theme="dark"] .stat-label,
+:root[data-theme="dark"] .cases-widget-card-line span,
+:root[data-theme="dark"] .calendar-mini-widget-weekdays span,
+:root[data-theme="dark"] .calendar-widget-kanban-task-top span,
+:root[data-theme="dark"] .calendar-widget-kanban-task p,
+:root[data-theme="dark"] .calendar-today-only-head span,
+:root[data-theme="dark"] .calendar-today-only-task span {
+  color: var(--text-secondary) !important;
+}
+
+:root[data-theme="dark"] .calendar-mini-widget-day.empty {
+  background: transparent !important;
+  border-color: transparent !important;
+}
+
+:root[data-theme="dark"] .calendar-mini-widget-day.has-tasks,
+:root[data-theme="dark"] .calendar-mini-widget-head button {
+  color: var(--text) !important;
+  background: var(--surface-blue) !important;
+  border-color: var(--line) !important;
+}
+
+:root[data-theme="dark"] .calendar-week-task,
+:root[data-theme="dark"] .calendar-task-card,
+:root[data-theme="dark"] .calendar-unified-list-item {
+  background: var(--week-task-bg, var(--task-bg, var(--elevated-bg))) !important;
+  border-color: var(--line) !important;
+}
+
+:root[data-theme="dark"] .calendar-side-head,
+:root[data-theme="dark"] .calendar-dialog-head,
+:root[data-theme="dark"] .calendar-dialog-head.compact {
+  color: #edf4fb !important;
+  background: linear-gradient(180deg, #252e3b 0%, #202732 100%) !important;
+}
+
+:root[data-theme="dark"] .calendar-weekdays span,
+:root[data-theme="dark"] .calendar-week-empty,
+:root[data-theme="dark"] .map-widget-disabled {
+  color: var(--text-muted) !important;
+  background: var(--surface-soft) !important;
+  border-color: var(--line) !important;
+}
+
+:root[data-theme="dark"] .meetings-view {
+  background:
+    radial-gradient(circle at top left, rgba(127, 164, 255, .08), transparent 24%),
+    linear-gradient(180deg, var(--bg) 0%, #181e27 100%) !important;
+}
+
+:root[data-theme="dark"] .meetings-shell {
+  color: var(--text) !important;
+  background: transparent !important;
+}
+
+:root[data-theme="dark"] .meetings-main-head h2,
+:root[data-theme="dark"] .meetings-archive-head h3,
+:root[data-theme="dark"] .meetings-table-title h3,
+:root[data-theme="dark"] .meetings-editor-head h3,
+:root[data-theme="dark"] .meetings-type-dialog-body h3,
+:root[data-theme="dark"] .meetings-block-head h4,
+:root[data-theme="dark"] .meetings-panel-head h4,
+:root[data-theme="dark"] .meetings-people-panel-head strong {
+  color: var(--text) !important;
+}
+
+:root[data-theme="dark"] .meetings-main-head p,
+:root[data-theme="dark"] .meetings-archive-head p,
+:root[data-theme="dark"] .meetings-table-title p,
+:root[data-theme="dark"] .meetings-editor-head p,
+:root[data-theme="dark"] .meetings-entry-hint,
+:root[data-theme="dark"] .meetings-type-dialog-body > p,
+:root[data-theme="dark"] .meetings-block-head p,
+:root[data-theme="dark"] .meetings-panel-head p,
+:root[data-theme="dark"] .meetings-entry-card span:last-child,
+:root[data-theme="dark"] .meetings-person-label em,
+:root[data-theme="dark"] .meetings-selected-summary,
+:root[data-theme="dark"] .meetings-archive-status span {
+  color: var(--text-secondary) !important;
+}
+
+:root[data-theme="dark"] .meetings-entry-panel {
+  background: transparent !important;
+}
+
+:root[data-theme="dark"] .meetings-entry-card {
+  color: #17345f !important;
+  background: #f7f9fd !important;
+  border-color: #dbe7f6 !important;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, .22) !important;
+}
+
+:root[data-theme="dark"] .meetings-entry-card strong {
+  color: #17345f !important;
+}
+
+:root[data-theme="dark"] .meetings-entry-card span:last-child {
+  color: #526989 !important;
+}
+
+:root[data-theme="dark"] .meetings-entry-card:hover,
+:root[data-theme="dark"] .meetings-entry-card:focus-visible {
+  border-color: #8bb2ff !important;
+  box-shadow: 0 0 0 4px rgba(127, 164, 255, .18), 0 22px 48px rgba(0, 0, 0, .28) !important;
+  outline: none !important;
+}
+
+:root[data-theme="dark"] .meetings-breadcrumb-current {
+  color: var(--blue) !important;
+}
+
+:root[data-theme="dark"] .calendar-day-cell.today .calendar-day-number,
+:root[data-theme="dark"] .time-pill,
+:root[data-theme="dark"] .calendar-event-scope input:checked + span,
+:root[data-theme="dark"] .event-type-row button.active,
+:root[data-theme="dark"] .panel-tabs button.active {
+  color: var(--blue) !important;
+  background: rgba(127, 164, 255, .13) !important;
+  border-color: rgba(127, 164, 255, .32) !important;
+}
+
+:root[data-theme="dark"] .calendar-form-error,
+:root[data-theme="dark"] .login-error[data-type="error"] {
+  color: #ffb6bf !important;
+  background: rgba(238, 123, 137, .11) !important;
+  border-color: rgba(238, 123, 137, .34) !important;
+}
+
+:root[data-theme="dark"] .calendar-privacy-hint {
+  color: #9ee2c5 !important;
+  background: rgba(92, 200, 158, .11) !important;
+}
+
+:root[data-theme="dark"] .status-tag.orange { background: rgba(227, 167, 93, .14) !important; color: #ffd19a !important; }
+:root[data-theme="dark"] .status-tag.purple { background: rgba(164, 140, 230, .14) !important; color: #c8b8ff !important; }
+:root[data-theme="dark"] .status-tag.red { background: rgba(238, 123, 137, .14) !important; color: #ffb6bf !important; }
+:root[data-theme="dark"] .status-tag.green { background: rgba(92, 200, 158, .14) !important; color: #9ee2c5 !important; }
+
+:root[data-theme="dark"] .schedule-date-band {
+  color: #edf4fb !important;
+  background: linear-gradient(90deg, #37465b, #4f6380) !important;
+}
+
+:root[data-theme="dark"] .modal::backdrop,
+:root[data-theme="dark"] .calendar-task-dialog::backdrop,
+:root[data-theme="dark"] .calendar-detail-dialog::backdrop,
+:root[data-theme="dark"] .calendar-plan-dialog::backdrop,
+:root[data-theme="dark"] .calendar-move-dialog::backdrop,
+:root[data-theme="dark"] .calendar-move-time-dialog::backdrop,
+:root[data-theme="dark"] .calendar-dependent-dialog::backdrop {
+  background: rgba(7, 11, 17, .7) !important;
 }

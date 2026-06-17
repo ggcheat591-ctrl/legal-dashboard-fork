@@ -1,6 +1,6 @@
 {
   "name": "legal-dashboard",
-  "version": "1.0.0",
+  "version": "1.0.11",
   "private": true,
   "type": "module",
   "scripts": {
@@ -40,17 +40,9 @@
       "dist/**/*",
       "electron/**/*",
       "server/**/*",
-      "data/**/*",
       "package.json"
     ],
     "extraResources": [
-      {
-        "from": "data",
-        "to": "data",
-        "filter": [
-          "**/*"
-        ]
-      },
       {
         "from": "public",
         "to": "public",

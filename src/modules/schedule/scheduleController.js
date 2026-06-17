@@ -355,12 +355,14 @@ function renderScheduleTable() {
     `;
   }).join('');
 
+  const selectedDateToolbar = renderSelectedDateToolbar(visibleGroups);
+
   if (!visibleGroups.length) {
-    groupsNode.innerHTML = '<div class="schedule-empty-line">Записей на выбранную дату не найдено</div>';
+    groupsNode.innerHTML = `${selectedDateToolbar}<div class="schedule-empty-line">Записей на выбранную дату не найдено</div>`;
     return;
   }
 
-  groupsNode.innerHTML = visibleGroups.map(group => renderGroup(group)).join('');
+  groupsNode.innerHTML = `${selectedDateToolbar}${visibleGroups.map(group => renderGroup(group)).join('')}`;
 }
 
 function getVisibleGroups(grouped) {
@@ -371,6 +373,24 @@ function getVisibleGroups(grouped) {
 function getVisibleRows() {
   if (!state.dateFilter) return state.filteredRows;
   return state.filteredRows.filter(row => normalizeRuDate(row.session_date) === state.dateFilter);
+}
+
+function renderSelectedDateToolbar(visibleGroups = []) {
+  const selectedDate = normalizeRuDate(state.selectedSessionDate) || normalizeRuDate(state.dateFilter) || state.dateFilter;
+  if (!selectedDate) return '';
+
+  const currentGroup = visibleGroups.find(group => normalizeRuDate(group.sessionDate) === selectedDate);
+  const dateId = currentGroup?.dateId || '';
+
+  return `
+    <div class="schedule-selected-date-toolbar">
+      <div>
+        <span>Выбранная дата</span>
+        <strong>${escapeHtml(selectedDate)}</strong>
+      </div>
+      <button class="btn primary schedule-add-case-action" data-schedule-add-case-date="${escapeAttr(selectedDate)}" data-schedule-date-id="${dateId}" type="button">Добавить запись</button>
+    </div>
+  `;
 }
 
 function renderGroup(group) {

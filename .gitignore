@@ -53,18 +53,22 @@ backup/
 
 # Nested duplicate project
 legal-dashboard/
+/legal-dashboard-1.006-menu-widgets-themes/
+/legal-dashboard-login-animated-v1.003 (3).html
 
-# User-generated data
-data/**
-!data/.gitkeep
-uploads/
+# Runtime user data
+/data/preview-cache/
+/data/uploads/
 
-# Design reference prototype
-src/Legal-Dashboard-Static-Prototype/
+# Local development artifacts
+/current-changes.diff
+/legal-dashboard-for-chatgpt.zip
+/*.zip
 
-# Temporary project archives and reports
-*.zip
-current-changes.diff
+# Static design prototype
+/src/Legal-Dashboard-Static-Prototype/
 
-# Accidentally created file
-/npm
+# Test artifacts
+/coverage/
+/test-results/
+/playwright-report/

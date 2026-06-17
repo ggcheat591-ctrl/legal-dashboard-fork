@@ -75,6 +75,40 @@
   margin-bottom: 18px;
 }
 
+.schedule-selected-date-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--schedule-border);
+  border-radius: 18px;
+  background: linear-gradient(135deg, #ffffff, #f5f8ff);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, .055);
+}
+
+.schedule-selected-date-toolbar span {
+  display: block;
+  margin-bottom: 3px;
+  color: #70809c;
+  font-size: 12px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.schedule-selected-date-toolbar strong {
+  color: var(--schedule-dark);
+  font-size: 19px;
+  font-weight: 950;
+}
+
+.schedule-add-case-action {
+  flex: 0 0 auto;
+  border-radius: 15px;
+  font-weight: 950;
+}
+
 .schedule-board {
   display: grid;
   grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
@@ -810,6 +844,16 @@
 
   .schedule-actions {
     margin-left: 0;
+  }
+
+  .schedule-selected-date-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .schedule-add-case-action {
+    width: 100%;
+    justify-content: center;
   }
 
   .schedule-form-grid,

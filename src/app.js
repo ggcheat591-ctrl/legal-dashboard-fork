@@ -13,12 +13,14 @@ import { initMapFullscreenButton } from './modules/map/mapFullscreen.js';
 import { initUtilityPanels } from './modules/utility/utilityPanelsController.js';
 import { initAuthGate, initAuthUi } from './auth/authController.js';
 import { initSidebarCollapse } from './layout/sidebarCollapse.js';
+import { initThemeUi } from './core/theme.js';
 
 export function initApp() {
   initAuthGate(session => {
     document.querySelector('#app').innerHTML = renderAppLayout(session);
 
     initAuthUi();
+    initThemeUi();
     initSidebarCollapse();
     initRouter();
     initDashboard();
@@ -51,4 +53,3 @@ function initCaseNumberAutoYear() {
     input.value = `${value}${new Date().getFullYear()}`;
   });
 }
-

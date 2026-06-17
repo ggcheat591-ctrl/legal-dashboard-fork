@@ -13,8 +13,7 @@ export function renderCalendarKanbanWidget() {
   return `
     <div class="calendar-widget-kanban-plan" data-calendar-kanban-widget>
       <div class="calendar-widget-kanban-head">
-        <b>План</b>
-        <button class="btn small" data-calendar-kanban-refresh type="button">Обновить</button>
+        <b>Ближайшие события</b>
       </div>
       <div class="calendar-widget-kanban-board" data-calendar-kanban-board>
         <div class="muted">Загрузка плана...</div>
@@ -35,8 +34,6 @@ export function renderCalendarKanbanWidget() {
 }
 
 document.addEventListener('click', event => {
-  if (event.target.closest('[data-calendar-kanban-refresh]')) loadKanbanWidget();
-
   const card = event.target.closest('[data-calendar-widget-kanban-task]');
   if (card) {
     const id = Number(card.dataset.calendarWidgetKanbanTask);
@@ -65,6 +62,13 @@ window.addEventListener('calendar:updated', event => {
   } else {
     loadKanbanWidget();
   }
+});
+
+window.addEventListener('calendar:reload', loadKanbanWidget);
+
+window.addEventListener('app:view-changed', event => {
+  const viewId = event.detail?.viewId || '';
+  if (viewId === 'dashboard') loadKanbanWidget();
 });
 
 async function loadKanbanWidget() {

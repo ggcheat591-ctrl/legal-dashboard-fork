@@ -288,6 +288,47 @@
   box-shadow: 0 10px 24px rgba(17, 35, 90, .04);
 }
 
+.topbar-theme-toggle {
+  min-width: 112px;
+  height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 1px solid #e5ebfb;
+  border-radius: 16px;
+  background: #fff;
+  color: #12275e;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(17, 35, 90, .04);
+  font-weight: 720;
+  transition: background .16s ease, border-color .16s ease, color .16s ease, transform .16s ease;
+}
+
+.topbar-theme-toggle:hover,
+.topbar-theme-toggle:focus-visible {
+  background: #f8fbff;
+  border-color: #b8cbff;
+  color: #1f5eff;
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.topbar-theme-toggle-icon {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.topbar-theme-toggle-label {
+  font-size: 13px;
+  line-height: 1;
+}
+
 .topbar-note-btn svg,
 .topbar-notify-btn svg {
   width: 22px;
@@ -311,4 +352,16 @@
   border-radius: 14px;
   background: #eff5ff;
   box-shadow: 0 0 0 4px rgba(31,94,255,.08);
+}
+
+@media (max-width: 780px) {
+  .topbar-theme-toggle {
+    min-width: 46px;
+    width: 46px;
+    padding: 0;
+  }
+
+  .topbar-theme-toggle-label {
+    display: none;
+  }
 }
