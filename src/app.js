@@ -1,6 +1,7 @@
 import { renderAppLayout } from './layout/appLayout.js';
 import { initRouter } from './core/router.js';
 import { initDashboard } from './dashboard/dashboard.js';
+import { initDashboardOverview } from './dashboard/dashboardOverview.js';
 import { initGeneralCasesPage } from './modules/cases/generalCasesController.js';
 import { initControlledCasesPage } from './modules/controlledCases/controlledCasesController.js';
 import { initEnforcementPage } from './modules/enforcement/enforcementController.js';
@@ -24,6 +25,7 @@ export function initApp() {
     initSidebarCollapse();
     initRouter();
     initDashboard();
+    initDashboardOverview();
     initGeneralCasesPage();
     initControlledCasesPage();
     initEnforcementPage();
