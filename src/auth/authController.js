@@ -21,6 +21,8 @@ export function initAuthGate(onAuthenticated) {
 
 function renderLoginScreen(onAuthenticated) {
   const root = document.querySelector('#app');
+  document.title = APP_DISPLAY_NAME;
+
   root.innerHTML = `
     <main class="login-screen">
       <section
@@ -43,7 +45,7 @@ function renderLoginScreen(onAuthenticated) {
           ${APP_SYSTEM_LABEL}
         </div>
 
-        <div class="login-logo" data-login-lock data-state="idle" aria-hidden="true">
+        <div class="login-logo" data-login-lock aria-hidden="true">
           <svg class="login-lock-icon" viewBox="0 0 64 64" focusable="false" aria-hidden="true">
             <path class="login-lock-shield" d="M32 5.5 52 13.8v15.5c0 13.1-8.2 24.2-20 29.2-11.8-5-20-16.1-20-29.2V13.8L32 5.5Z" />
             <path class="login-lock-shackle" d="M23.5 29v-5.2a8.5 8.5 0 0 1 17 0V29" />
@@ -61,7 +63,12 @@ function renderLoginScreen(onAuthenticated) {
             <span>Пароль</span>
             <span class="login-input-wrap">
               <input type="password" name="password" autocomplete="current-password" autofocus aria-describedby="loginStatus">
-              <button class="login-password-toggle" data-login-password-toggle type="button" aria-label="Показать пароль" aria-pressed="false">👁</button>
+              <button class="login-password-toggle" data-login-password-toggle type="button" aria-label="Показать пароль" aria-pressed="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                  <circle cx="12" cy="12" r="2.7" />
+                </svg>
+              </button>
             </span>
           </label>
 
@@ -99,7 +106,7 @@ function renderLoginScreen(onAuthenticated) {
     input.type = visible ? 'password' : 'text';
     passwordToggle.setAttribute('aria-pressed', String(!visible));
     passwordToggle.setAttribute('aria-label', visible ? 'Показать пароль' : 'Скрыть пароль');
-    passwordToggle.textContent = visible ? '👁' : '●';
+    passwordToggle.classList.toggle('is-visible', !visible);
     input.focus();
   });
 
@@ -148,10 +155,7 @@ export function initAuthUi() {
 
 function setLoginState(card, errorNode, lock, visual, state, message = '') {
   if (card) card.dataset.state = state;
-  if (lock) {
-    lock.hidden = state === 'success';
-    lock.dataset.state = state;
-  }
+  if (lock) lock.hidden = state === 'success';
 
   if (errorNode) {
     errorNode.textContent = message;
@@ -159,9 +163,7 @@ function setLoginState(card, errorNode, lock, visual, state, message = '') {
     errorNode.dataset.type = state === 'success' ? 'success' : state === 'error' ? 'error' : 'info';
   }
 
-  if (state !== 'success') {
-    visual.setState(state);
-  }
+  if (state !== 'success') visual.setState(state);
 }
 
 function delay(ms) {
