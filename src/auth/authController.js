@@ -1,6 +1,6 @@
 import { dbApi } from '../api/dbApi.js';
 import { getAuthSession, setAuthSession, clearAuthSession } from './session.js';
-import { initLoginParticleVisual } from './loginParticleVisual.js';
+import { initLoginParticleVisual } from './loginParticleVisualCycle.js';
 
 const APP_DISPLAY_NAME = 'Legal Dashboard';
 
