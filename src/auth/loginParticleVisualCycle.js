@@ -15,6 +15,7 @@ export function initLoginParticleVisual(root) {
   let destroyed = false;
   let ambientActive = false;
   let showingTitle = false;
+  let needsAmbientReset = false;
   let cycleVersion = 0;
   let pendingTimer = 0;
 
@@ -35,6 +36,7 @@ export function initLoginParticleVisual(root) {
     restoreCanvas();
     visual = initBaseLoginParticleVisual(root);
     showingTitle = false;
+    needsAmbientReset = false;
   };
 
   const wait = (duration, version) =>
@@ -135,11 +137,13 @@ export function initLoginParticleVisual(root) {
   return {
     setState(mode = 'idle', options = {}) {
       if (AMBIENT_MODES.has(mode)) {
+        if (needsAmbientReset) recreateVisual();
         startAmbientCycle();
         return Promise.resolve();
       }
 
       stopAmbientCycle({ resetVisual: true });
+      needsAmbientReset = true;
       return visual.setState(mode, options);
     },
     showSuccessText(label = getDisplayName()) {
