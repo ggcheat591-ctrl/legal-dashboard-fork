@@ -2,7 +2,8 @@ import { dbApi } from '../api/dbApi.js';
 import { getAuthSession, setAuthSession, clearAuthSession } from './session.js';
 import { initLoginParticleVisual } from './loginParticleVisualCycle.js';
 
-const APP_DISPLAY_NAME = 'Legal Dashboard';
+const APP_DISPLAY_NAME = 'ЮрСфера';
+const APP_SYSTEM_LABEL = 'Правовая система';
 
 export function initAuthGate(onAuthenticated) {
   const existing = getAuthSession();
@@ -22,7 +23,11 @@ function renderLoginScreen(onAuthenticated) {
   const root = document.querySelector('#app');
   root.innerHTML = `
     <main class="login-screen">
-      <section class="login-visual" aria-label="Интерактивная цифровая фигура">
+      <section
+        class="login-visual"
+        data-login-visual-label="${APP_DISPLAY_NAME}"
+        aria-label="Интерактивная цифровая фигура"
+      >
         <canvas
           class="login-visual-canvas"
           data-login-particle-canvas
@@ -35,9 +40,19 @@ function renderLoginScreen(onAuthenticated) {
       <section class="login-card" data-login-card data-state="idle" aria-labelledby="login-title">
         <div class="login-brand">
           <span class="login-brand-mark" aria-hidden="true"></span>
-          ${APP_DISPLAY_NAME}
+          ${APP_SYSTEM_LABEL}
         </div>
-        <div class="login-logo" data-login-lock aria-hidden="true">🔒</div>
+
+        <div class="login-logo" data-login-lock data-state="idle" aria-hidden="true">
+          <svg class="login-lock-icon" viewBox="0 0 64 64" focusable="false" aria-hidden="true">
+            <path class="login-lock-shield" d="M32 5.5 52 13.8v15.5c0 13.1-8.2 24.2-20 29.2-11.8-5-20-16.1-20-29.2V13.8L32 5.5Z" />
+            <path class="login-lock-shackle" d="M23.5 29v-5.2a8.5 8.5 0 0 1 17 0V29" />
+            <rect class="login-lock-body" x="20.5" y="27.5" width="23" height="19" rx="6.5" />
+            <circle class="login-lock-keyhole" cx="32" cy="36" r="2.8" />
+            <path class="login-lock-key-stem" d="M32 38.5v3.8" />
+          </svg>
+        </div>
+
         <h1 id="login-title">${APP_DISPLAY_NAME}</h1>
         <p>Введите пароль для входа в систему</p>
 
@@ -131,17 +146,11 @@ export function initAuthUi() {
   });
 }
 
-function showError(node, text) {
-  if (!node) return;
-  node.textContent = text;
-  node.hidden = false;
-}
-
 function setLoginState(card, errorNode, lock, visual, state, message = '') {
   if (card) card.dataset.state = state;
   if (lock) {
     lock.hidden = state === 'success';
-    lock.textContent = state === 'checking' ? '⋯' : '🔒';
+    lock.dataset.state = state;
   }
 
   if (errorNode) {
