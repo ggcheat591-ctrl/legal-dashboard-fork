@@ -5,9 +5,9 @@
 @import './layout.css';
 @import './sidebar.css';
 @import './topbar.css';
-@import './dashboard.css';
 @import './gridstack.css';
 @import './widgets.css';
+@import './dashboard.css';
 @import './pages.css';
 @import './tables.css';
 @import './forms.css';
