@@ -25,8 +25,8 @@ export function createWidget(id) {
 
   const meta = WIDGET_META[id] || {};
   const openButton = widget.action === 'notifications'
-    ? '<button class="btn small widget-open-btn" data-open-notifications type="button">Открыть</button>'
-    : `<button class="btn small widget-open-btn" data-view="${widget.view}" type="button">Открыть</button>`;
+    ? '<button class="widget-open-btn" data-open-notifications type="button">Открыть</button>'
+    : `<button class="widget-open-btn" data-view="${widget.view}" type="button">Открыть</button>`;
 
   return `
     <div class="widget-shell widget-shell-${id}" data-widget="${id}">
