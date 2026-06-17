@@ -1,0 +1,130 @@
+.login-brand {
+  color: rgba(245, 250, 255, .92);
+  letter-spacing: .08em;
+}
+
+.login-logo {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  color: var(--login-text);
+  background:
+    radial-gradient(circle at 35% 28%, rgba(255, 255, 255, .16), transparent 25%),
+    linear-gradient(145deg, rgba(67, 136, 255, .34), rgba(23, 62, 126, .32));
+  border-color: rgba(105, 174, 255, .35);
+  box-shadow:
+    0 18px 44px rgba(20, 82, 204, .24),
+    inset 0 1px 0 rgba(255, 255, 255, .18),
+    inset 0 -12px 22px rgba(0, 20, 58, .2);
+}
+
+.login-logo::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -10px;
+  border-radius: 26px;
+  background: radial-gradient(circle, rgba(67, 136, 255, .2), transparent 68%);
+  opacity: .75;
+  filter: blur(8px);
+}
+
+.login-logo::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(223, 240, 255, .11);
+  border-radius: 15px;
+  pointer-events: none;
+}
+
+.login-lock-icon {
+  width: 42px;
+  height: 42px;
+  overflow: visible;
+  filter: drop-shadow(0 7px 12px rgba(0, 15, 44, .3));
+}
+
+.login-lock-shield {
+  fill: rgba(8, 28, 56, .34);
+  stroke: rgba(116, 191, 255, .58);
+  stroke-width: 1.6;
+}
+
+.login-lock-shackle,
+.login-lock-key-stem {
+  fill: none;
+  stroke: #d9efff;
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.login-lock-body {
+  fill: #4b92ff;
+  stroke: rgba(226, 242, 255, .86);
+  stroke-width: 1.4;
+}
+
+.login-lock-keyhole {
+  fill: #071a33;
+}
+
+.login-card[data-state="checking"] .login-logo {
+  border-color: rgba(90, 161, 255, .62);
+  box-shadow:
+    0 18px 48px rgba(30, 102, 230, .3),
+    inset 0 1px 0 rgba(255, 255, 255, .2);
+}
+
+.login-card[data-state="checking"] .login-lock-icon {
+  animation: login-lock-breathe 1.15s ease-in-out infinite;
+}
+
+.login-card[data-state="checking"] .login-lock-shackle {
+  stroke-dasharray: 38;
+  animation: login-lock-scan 1.15s ease-in-out infinite;
+}
+
+.login-card[data-state="error"] .login-logo {
+  background:
+    radial-gradient(circle at 35% 28%, rgba(255, 255, 255, .14), transparent 25%),
+    linear-gradient(145deg, rgba(255, 113, 130, .45), rgba(104, 21, 38, .38));
+}
+
+.login-card[data-state="error"] .login-lock-shield {
+  stroke: rgba(255, 183, 192, .76);
+}
+
+.login-card[data-state="error"] .login-lock-body {
+  fill: #ff7182;
+}
+
+.login-card[data-state="error"] .login-lock-icon {
+  animation: login-lock-error .38s ease both;
+}
+
+@keyframes login-lock-breathe {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 7px 12px rgba(0, 15, 44, .3)); }
+  50% { transform: scale(1.045); filter: drop-shadow(0 9px 17px rgba(67, 136, 255, .42)); }
+}
+
+@keyframes login-lock-scan {
+  0% { stroke-dashoffset: 38; opacity: .55; }
+  45%, 70% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: -38; opacity: .55; }
+}
+
+@keyframes login-lock-error {
+  0%, 100% { transform: translateX(0); }
+  30% { transform: translateX(-4px) rotate(-2deg); }
+  65% { transform: translateX(4px) rotate(2deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-card[data-state="checking"] .login-lock-icon,
+  .login-card[data-state="checking"] .login-lock-shackle,
+  .login-card[data-state="error"] .login-lock-icon {
+    animation: none;
+  }
+}
