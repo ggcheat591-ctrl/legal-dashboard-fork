@@ -1,0 +1,191 @@
+name: Build tested Legal Dashboard release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/build-feature-release.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  verify-build-release:
+    runs-on: windows-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout working branch
+        uses: actions/checkout@v4
+        with:
+          ref: login-animation-timing
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install application dependencies
+        run: npm install
+
+      - name: Install map dependencies
+        run: npm --prefix external/your-map-source install
+
+      - name: Build web application
+        run: npm run build:app
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install chromium
+
+      - name: Start local server
+        shell: powershell
+        run: |
+          $process = Start-Process -FilePath "npx.cmd" -ArgumentList "vite","--config","scripts/vite-smoke.config.mjs" -RedirectStandardOutput "vite-output.log" -RedirectStandardError "vite-error.log" -PassThru
+          $process.Id | Out-File -FilePath "vite.pid" -Encoding ascii
+
+          $ready = $false
+          for ($attempt = 0; $attempt -lt 60; $attempt++) {
+            try {
+              $response = Invoke-WebRequest -Uri "http://127.0.0.1:5173" -UseBasicParsing -TimeoutSec 2
+              if ($response.StatusCode -eq 200) {
+                $ready = $true
+                break
+              }
+            } catch {
+              Start-Sleep -Seconds 1
+            }
+          }
+
+          if (-not $ready) {
+            Get-Content "vite-output.log" -ErrorAction SilentlyContinue
+            Get-Content "vite-error.log" -ErrorAction SilentlyContinue
+            throw "Vite server did not start within 60 seconds."
+          }
+
+      - name: Verify navigation, panels, dropdowns, dialogs and buttons
+        env:
+          SMOKE_BASE_URL: http://127.0.0.1:5173
+        run: node scripts/ui-smoke.mjs
+
+      - name: Upload UI test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-smoke-results-1.0.12
+          path: |
+            test-results/ui-smoke
+            vite-output.log
+            vite-error.log
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Stop local server
+        if: always()
+        shell: powershell
+        run: |
+          if (Test-Path "vite.pid") {
+            $serverPid = Get-Content "vite.pid" | Select-Object -First 1
+            if ($serverPid) {
+              Stop-Process -Id $serverPid -Force -ErrorAction SilentlyContinue
+            }
+          }
+
+      - name: Build installer and portable EXE
+        run: npm run dist:work
+
+      - name: Verify packaged application startup
+        shell: powershell
+        run: |
+          $exe = Get-ChildItem -Path "release\win-unpacked" -Filter "*.exe" -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -notmatch "Uninstall" } |
+            Select-Object -First 1
+
+          if (-not $exe) {
+            throw "Packaged EXE was not found in release\win-unpacked."
+          }
+
+          $process = Start-Process -FilePath $exe.FullName -ArgumentList "--disable-gpu","--no-sandbox" -PassThru
+          Start-Sleep -Seconds 12
+
+          if ($process.HasExited) {
+            throw "Packaged application exited during startup. Exit code: $($process.ExitCode)"
+          }
+
+          Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+
+      - name: Verify release directory
+        shell: powershell
+        run: |
+          $files = Get-ChildItem -Path "release" -Filter "*.exe" -File
+          if (-not $files -or $files.Count -lt 2) {
+            Get-ChildItem -Path "release" -Recurse | Select-Object FullName, Length
+            throw "Installer and portable EXE were not both created in release."
+          }
+          $files | Select-Object Name, Length | Format-Table -AutoSize
+
+      - name: Publish tested EXE files
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: v1.0.12-tested
+        run: |
+          set -e
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" release/*.exe --clobber
+          else
+            gh release create "$TAG" release/*.exe \
+              --target login-animation-timing \
+              --title "Legal Dashboard 1.012 — tested Windows build" \
+              --notes "Автоматическая Windows-сборка после проверки навигации, панелей, вкладок, выпадающих списков, диалогов и основных кнопок. Созданы установщик и portable EXE из папки release."
+          fi
+
+      - name: Upload release folder artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: legal-dashboard-release-1.0.12
+          path: release/*.exe
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Comment successful result on pull request
+        if: success()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > build-comment.md <<'EOF'
+          ✅ Windows-сборка 1.012 завершена.
+
+          Проверено автоматически:
+          - вход и переключатель видимости пароля;
+          - левое меню и переходы по всем разделам;
+          - сворачивание меню;
+          - переключение темы;
+          - панели заметок и уведомлений;
+          - вкладки, фильтры и диалог карточки общего перечня дел;
+          - четыре существующих виджета главной страницы;
+          - расположение и диалог кнопки «Добавить дату»;
+          - неизменный iframe карты `/map/index.html`;
+          - стартовый поток и вкладки раздела «Совещания»;
+          - запуск упакованного приложения.
+
+          В папке `release` созданы установщик и portable EXE.
+          Релиз: https://github.com/ggcheat591-ctrl/legal-dashboard-fork/releases/tag/v1.0.12-tested
+          EOF
+          gh pr comment 1 --body-file build-comment.md
+
+      - name: Comment failed result on pull request
+        if: failure()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr comment 1 --body "❌ Windows-сборка или автоматическая проверка интерфейса завершилась ошибкой. Логи: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
