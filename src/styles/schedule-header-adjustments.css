@@ -1,0 +1,23 @@
+.schedule-page-head {
+  width: 100%;
+}
+
+.schedule-title-row {
+  width: 100%;
+}
+
+.schedule-title-row .schedule-add-date-action {
+  margin-left: auto;
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: 14px;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .schedule-title-row .schedule-add-date-action {
+    width: 100%;
+    margin-left: 0;
+    justify-content: center;
+  }
+}

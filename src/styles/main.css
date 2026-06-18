@@ -1,10 +1,10 @@
 @import './auth.css';
+@import './auth-branding.css';
 @import './variables.css';
 @import './reset.css';
 @import './layout.css';
 @import './sidebar.css';
 @import './topbar.css';
-@import './dashboard.css';
 @import './gridstack.css';
 @import './widgets.css';
 @import './pages.css';
@@ -13,6 +13,7 @@
 @import './floating-edit-menu.css';
 @import './calendar.css';
 @import './schedule.css';
+@import './schedule-header-adjustments.css';
 @import './cases.css';
 @import './enforcement.css';
 @import './map.css';
@@ -22,3 +23,4 @@
 @import './utility-panels.css';
 @import './controlled-cases.css';
 @import './theme-overrides.css';
+@import './dashboard.css';

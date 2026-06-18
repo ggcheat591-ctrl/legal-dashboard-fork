@@ -1,0 +1,136 @@
+name: Verify UI and build Windows EXE
+
+on:
+  push:
+    branches:
+      - login-animation-timing
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-and-build:
+    runs-on: windows-latest
+    timeout-minutes: 75
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install application dependencies
+        run: npm install
+
+      - name: Install map dependencies
+        run: npm --prefix external/your-map-source install
+
+      - name: Build web application
+        run: npm run build:app
+
+      - name: Install Playwright for UI verification
+        run: |
+          npm install --no-save playwright
+          npx playwright install chromium
+
+      - name: Start local application server
+        shell: powershell
+        run: |
+          $process = Start-Process -FilePath "npx.cmd" -ArgumentList "vite","--config","scripts/vite-smoke.config.mjs" -RedirectStandardOutput "vite-output.log" -RedirectStandardError "vite-error.log" -PassThru
+          $process.Id | Out-File -FilePath "vite.pid" -Encoding ascii
+
+          $ready = $false
+          for ($attempt = 0; $attempt -lt 60; $attempt++) {
+            try {
+              $response = Invoke-WebRequest -Uri "http://127.0.0.1:5173" -UseBasicParsing -TimeoutSec 2
+              if ($response.StatusCode -eq 200) {
+                $ready = $true
+                break
+              }
+            } catch {
+              Start-Sleep -Seconds 1
+            }
+          }
+
+          if (-not $ready) {
+            Get-Content "vite-output.log" -ErrorAction SilentlyContinue
+            Get-Content "vite-error.log" -ErrorAction SilentlyContinue
+            throw "Vite server did not start within 60 seconds."
+          }
+
+      - name: Run browser UI smoke tests
+        env:
+          SMOKE_BASE_URL: http://127.0.0.1:5173
+        run: node scripts/ui-smoke.mjs
+
+      - name: Upload UI verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-smoke-results
+          path: |
+            test-results/ui-smoke
+            vite-output.log
+            vite-error.log
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Stop local application server
+        if: always()
+        shell: powershell
+        run: |
+          if (Test-Path "vite.pid") {
+            $serverPid = Get-Content "vite.pid" | Select-Object -First 1
+            if ($serverPid) {
+              Stop-Process -Id $serverPid -Force -ErrorAction SilentlyContinue
+            }
+          }
+
+      - name: Build Windows installer and portable EXE
+        run: npm run dist:work
+
+      - name: Verify packaged application starts
+        shell: powershell
+        run: |
+          $exe = Get-ChildItem -Path "release\win-unpacked" -Filter "*.exe" -ErrorAction SilentlyContinue |
+            Where-Object { $_.Name -notmatch "Uninstall" } |
+            Select-Object -First 1
+
+          if (-not $exe) {
+            throw "Packaged application EXE was not found in release\win-unpacked."
+          }
+
+          $process = Start-Process -FilePath $exe.FullName -ArgumentList "--disable-gpu","--no-sandbox" -PassThru
+          Start-Sleep -Seconds 12
+
+          if ($process.HasExited) {
+            throw "Packaged application exited during startup smoke test. Exit code: $($process.ExitCode)"
+          }
+
+          Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+
+      - name: Verify release EXE files
+        shell: powershell
+        run: |
+          $files = Get-ChildItem -Path "release" -Filter "*.exe" -File
+          if (-not $files -or $files.Count -lt 2) {
+            Get-ChildItem -Path "release" -Recurse | Select-Object FullName, Length
+            throw "Expected installer and portable EXE files in release."
+          }
+
+          New-Item -ItemType Directory -Path "artifact\release" -Force | Out-Null
+          Copy-Item -Path "release\*.exe" -Destination "artifact\release" -Force
+          $files | Select-Object Name, Length | Format-Table -AutoSize
+
+      - name: Upload Windows release
+        uses: actions/upload-artifact@v4
+        with:
+          name: legal-dashboard-windows-release-1.0.12
+          path: artifact
+          if-no-files-found: error
+          retention-days: 30
