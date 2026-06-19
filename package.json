@@ -32,7 +32,7 @@
   "main": "electron/main.cjs",
   "build": {
     "appId": "ru.legal.dashboard",
-    "productName": "Legal Dashboard",
+    "productName": "ЮрСфера",
     "directories": {
       "output": "release"
     },
@@ -82,7 +82,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Legal Dashboard"
+      "shortcutName": "ЮрСфера"
     }
   },
   "proxy:dev": "set MAP_PROXY_URL=http://192.168.227.254:3128&& npm run dev",
