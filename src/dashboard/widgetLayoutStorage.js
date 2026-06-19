@@ -3,9 +3,13 @@ import { allowedWidgetIds, widgetRegistry } from './widgetRegistry.js';
 
 const LAYOUT_KEY = 'legal_dashboard_layout_v1';
 const REQUIRED_WIDGET_IDS = ['calendarKanban', 'calendarTodayTasks'];
+const LEGACY_CASES_WIDGET_ID = 'cases';
+const CASES_STATS_WIDGET_ID = 'casesStats';
+const CASES_TABLE_WIDGET_ID = 'casesTable';
 
 export const defaultLayout = [
-  'cases',
+  CASES_STATS_WIDGET_ID,
+  CASES_TABLE_WIDGET_ID,
   'calendarKanban',
   'calendar',
   'calendarTodayTasks'
@@ -18,7 +22,8 @@ export function loadLayout() {
   const saved = readStorage(LAYOUT_KEY, null);
 
   if (Array.isArray(saved) && saved.length) {
-    const layout = normalizeLayout(saved);
+    const migrated = migrateLegacyCasesLayout(saved);
+    const layout = normalizeLayout(migrated);
 
     if (!layout.length) {
       writeStorage(LAYOUT_KEY, defaultLayout);
@@ -73,6 +78,43 @@ export function normalizeLayout(layout = []) {
   }
 
   return normalized;
+}
+
+function migrateLegacyCasesLayout(layout = []) {
+  const legacy = layout.find(item => item?.id === LEGACY_CASES_WIDGET_ID);
+  if (!legacy) return layout;
+
+  const migrated = layout.filter(item => item?.id !== LEGACY_CASES_WIDGET_ID);
+
+  if (!migrated.some(item => item?.id === CASES_STATS_WIDGET_ID)) {
+    const fallback = widgetRegistry[CASES_STATS_WIDGET_ID].defaultLayout;
+    migrated.push({
+      id: CASES_STATS_WIDGET_ID,
+      x: readNumber(legacy.x, fallback.x),
+      y: readNumber(legacy.y, fallback.y),
+      w: readNumber(legacy.w, fallback.w),
+      h: Math.max(3, readNumber(legacy.h, fallback.h))
+    });
+  }
+
+  if (!migrated.some(item => item?.id === CASES_TABLE_WIDGET_ID)) {
+    const fallback = widgetRegistry[CASES_TABLE_WIDGET_ID].defaultLayout;
+    const bottom = migrated.reduce((max, item) => {
+      const y = readNumber(item?.y, 0);
+      const h = readNumber(item?.h, 1);
+      return Math.max(max, y + h);
+    }, 0);
+
+    migrated.push({
+      id: CASES_TABLE_WIDGET_ID,
+      x: 0,
+      y: bottom,
+      w: fallback.w,
+      h: fallback.h
+    });
+  }
+
+  return migrated;
 }
 
 function normalizeLayoutMetrics(item, fallback) {
