@@ -10,39 +10,53 @@
   overflow: hidden;
 }
 
+.dashboard-modern .widget-shell-casesStats .widget-content {
+  container-type: size;
+}
+
 .dashboard-modern .cases-stats-widget {
   height: 100%;
   min-height: 0;
   display: grid;
-  align-items: start;
-  overflow: auto;
+  place-items: center;
+  overflow: hidden;
 }
 
 .dashboard-modern .cases-stats-grid {
-  min-width: 300px;
-  grid-template-columns: repeat(3, minmax(88px, 1fr));
-  align-items: start;
-  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: center;
+  gap: clamp(2px, 1.5cqw, 10px);
 }
 
 .dashboard-modern .cases-stats-grid > div {
+  width: min(100%, 100cqh);
+  min-width: 0;
+  min-height: 0;
   aspect-ratio: 1 / 1;
-  min-height: 88px;
+  justify-self: center;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 12px;
-  padding: 14px;
+  gap: clamp(2px, min(2cqw, 3cqh), 12px);
+  padding: clamp(3px, min(3cqw, 4cqh), 14px);
+  overflow: hidden;
 }
 
 .dashboard-modern .cases-stats-grid .stat-label {
-  line-height: 1.25;
+  overflow: hidden;
+  font-size: clamp(6px, min(2.4cqw, 3.5cqh), 9px);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
 }
 
 .dashboard-modern .cases-stats-grid b {
   margin-top: auto;
-  font-size: clamp(24px, 3vw, 34px);
+  overflow: hidden;
+  font-size: clamp(12px, min(8cqw, 12cqh), 34px);
   line-height: 1;
+  text-overflow: ellipsis;
 }
 
 .dashboard-modern .cases-table-widget {
@@ -161,16 +175,4 @@
   color: var(--dashboard-muted);
   text-align: center !important;
   white-space: normal !important;
-}
-
-@media (max-width: 720px) {
-  .dashboard-modern .cases-stats-grid {
-    min-width: 270px;
-    grid-template-columns: repeat(3, minmax(80px, 1fr));
-  }
-
-  .dashboard-modern .cases-stats-grid > div {
-    min-height: 80px;
-    padding: 11px;
-  }
 }
