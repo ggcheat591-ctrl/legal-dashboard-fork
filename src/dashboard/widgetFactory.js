@@ -1,8 +1,12 @@
 import { widgetRegistry } from './widgetRegistry.js';
 
 const WIDGET_META = {
-  cases: {
-    subtitle: 'Дела, контроль и обязательная явка',
+  casesStats: {
+    subtitle: 'Всего дел, явка и контроль',
+    icon: '<svg viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6z"></path><path d="M15 3v4h4"></path><path d="M9 11h6M9 15h6M9 19h4"></path></svg>',
+  },
+  casesTable: {
+    subtitle: 'Краткий перечень по основным реквизитам',
     icon: '<svg viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6z"></path><path d="M15 3v4h4"></path><path d="M9 11h6M9 15h6M9 19h4"></path></svg>',
   },
   calendarKanban: {
