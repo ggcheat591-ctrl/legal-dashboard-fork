@@ -1,0 +1,211 @@
+:root[data-theme="dark"] {
+  --bg: #06111a;
+  --panel: rgba(10, 28, 43, .92);
+  --line: rgba(157, 198, 228, .17);
+  --text: #eef5f9;
+  --muted: #8ea6b8;
+  --blue: #4388ff;
+  --blue-dark: #2455cf;
+  --green: #23c7a7;
+  --orange: #ffbe55;
+  --red: #ff7182;
+  --purple: #8f79e8;
+  --navy: #07131f;
+  --surface-soft: rgba(17, 39, 58, .86);
+  --surface-blue: rgba(25, 52, 73, .82);
+  --line-strong: rgba(157, 198, 228, .3);
+  --subtle: #6f8799;
+  --primary-soft: rgba(67, 136, 255, .13);
+  --cyan: #2bc7dc;
+  --shadow: 0 12px 36px rgba(0, 0, 0, .2);
+  --shadow-md: 0 24px 58px rgba(0, 0, 0, .28);
+  --shadow-lg: 0 32px 90px rgba(0, 0, 0, .38);
+  --app-bg: var(--bg);
+  --sidebar-bg: #07131f;
+  --header-bg: rgba(10, 28, 43, .94);
+  --card-bg: rgba(10, 28, 43, .92);
+  --elevated-bg: rgba(17, 39, 58, .9);
+  --input-bg: rgba(7, 21, 33, .88);
+  --modal-bg: rgba(10, 28, 43, .98);
+  --text-primary: var(--text);
+  --text-secondary: #a6b9c7;
+  --text-muted: #7890a2;
+  --text-placeholder: #60798c;
+  --text-disabled: #657d8f;
+  --border-color: var(--line);
+  --divider-color: rgba(157, 198, 228, .12);
+  --hover-bg: rgba(25, 52, 73, .9);
+  --active-bg: rgba(67, 136, 255, .18);
+  --selected-bg: rgba(67, 136, 255, .14);
+  --disabled-bg: rgba(20, 38, 52, .86);
+  --overlay-bg: rgba(3, 10, 18, .7);
+  --focus-ring: rgba(67, 136, 255, .2);
+  --icon-primary: #dbe8f1;
+  --icon-muted: #91a7b8;
+}
+
+:root[data-theme="dark"] body {
+  color: var(--text) !important;
+  background:
+    radial-gradient(circle at 7% 8%, rgba(43, 199, 220, .1), transparent 24%),
+    radial-gradient(circle at 93% 90%, rgba(67, 136, 255, .11), transparent 27%),
+    #06111a !important;
+}
+
+:root[data-theme="dark"] .app,
+:root[data-theme="dark"] .main,
+:root[data-theme="dark"] .content,
+:root[data-theme="dark"] .view {
+  color: var(--text) !important;
+  background-color: transparent !important;
+}
+
+:root[data-theme="dark"] .sidebar {
+  color: #eef5f9 !important;
+  background:
+    radial-gradient(circle at 20% 0, rgba(43, 199, 220, .11), transparent 28%),
+    linear-gradient(180deg, #0a1c2b 0%, #07131f 100%) !important;
+  border-color: rgba(157, 198, 228, .12) !important;
+  box-shadow: inset -1px 0 0 rgba(157, 198, 228, .08) !important;
+}
+
+:root[data-theme="dark"] .sidebar-bottom {
+  background: linear-gradient(180deg, rgba(7, 19, 31, 0), rgba(7, 19, 31, .98) 34%) !important;
+}
+
+:root[data-theme="dark"] .topbar,
+:root[data-theme="dark"] .topbar-modern {
+  color: var(--text) !important;
+  background:
+    radial-gradient(circle at 88% 16%, rgba(43, 199, 220, .1), transparent 28%),
+    linear-gradient(145deg, rgba(255, 255, 255, .035), transparent 45%),
+    rgba(10, 28, 43, .94) !important;
+  border-color: var(--line) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+:root[data-theme="dark"] .btn.primary,
+:root[data-theme="dark"] .record-create-plus,
+:root[data-theme="dark"] .topbar-notify-badge,
+:root[data-theme="dark"] .calendar-widget-plan-head strong {
+  color: #fff !important;
+  background: linear-gradient(135deg, #2f6fe8, #2455cf) !important;
+  border-color: rgba(131, 180, 255, .38) !important;
+  box-shadow: 0 14px 30px rgba(22, 78, 194, .24) !important;
+}
+
+:root[data-theme="dark"] input,
+:root[data-theme="dark"] select,
+:root[data-theme="dark"] textarea,
+:root[data-theme="dark"] .search-input,
+:root[data-theme="dark"] .date-picker {
+  color: var(--text) !important;
+  background: var(--input-bg) !important;
+  border-color: var(--line) !important;
+}
+
+:root[data-theme="dark"] input:focus,
+:root[data-theme="dark"] select:focus,
+:root[data-theme="dark"] textarea:focus,
+:root[data-theme="dark"] .search-input:focus,
+:root[data-theme="dark"] .date-picker:focus {
+  border-color: rgba(67, 136, 255, .68) !important;
+  box-shadow: 0 0 0 4px rgba(67, 136, 255, .1) !important;
+}
+
+:root[data-theme="dark"] .meetings-view {
+  background:
+    radial-gradient(circle at 7% 8%, rgba(43, 199, 220, .08), transparent 24%),
+    radial-gradient(circle at 93% 90%, rgba(67, 136, 255, .09), transparent 27%),
+    transparent !important;
+}
+
+:root[data-theme="dark"] .meetings-entry-card,
+:root[data-theme="dark"] .meetings-editor-card,
+:root[data-theme="dark"] .meetings-table-card,
+:root[data-theme="dark"] .meetings-inner-panel,
+:root[data-theme="dark"] .meetings-form-block,
+:root[data-theme="dark"] .meetings-type-grid button,
+:root[data-theme="dark"] .meetings-preloader-card {
+  color: var(--text) !important;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .035), transparent 46%),
+    var(--panel) !important;
+  border-color: var(--line) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+:root[data-theme="dark"] .meetings-main-head h2,
+:root[data-theme="dark"] .meetings-archive-head h3,
+:root[data-theme="dark"] .meetings-table-title h3,
+:root[data-theme="dark"] .meetings-editor-head h3,
+:root[data-theme="dark"] .meetings-block-head h4,
+:root[data-theme="dark"] .meetings-panel-head h4,
+:root[data-theme="dark"] .meetings-entry-card strong {
+  color: var(--text) !important;
+}
+
+:root[data-theme="dark"] .meetings-main-head p,
+:root[data-theme="dark"] .meetings-archive-head p,
+:root[data-theme="dark"] .meetings-table-title p,
+:root[data-theme="dark"] .meetings-editor-head p,
+:root[data-theme="dark"] .meetings-block-head p,
+:root[data-theme="dark"] .meetings-panel-head p,
+:root[data-theme="dark"] .meetings-entry-card span:last-child {
+  color: var(--muted) !important;
+}
+
+:root[data-theme="dark"] .meetings-entry-icon,
+:root[data-theme="dark"] .meetings-type-icon {
+  color: var(--blue) !important;
+  background: rgba(67, 136, 255, .12) !important;
+}
+
+:root[data-theme="dark"] .meetings-list-box,
+:root[data-theme="dark"] .meetings-people-panel,
+:root[data-theme="dark"] .meetings-person-row.person-header,
+:root[data-theme="dark"] .meetings-selected-summary div,
+:root[data-theme="dark"] .meetings-selected-list > div span,
+:root[data-theme="dark"] .meetings-archive-status span {
+  color: var(--text) !important;
+  background: var(--surface-soft) !important;
+  border-color: var(--line) !important;
+}
+
+:root[data-theme="dark"] .meetings-table th {
+  color: var(--muted) !important;
+  background: var(--surface-soft) !important;
+  border-color: var(--line) !important;
+}
+
+:root[data-theme="dark"] .meetings-table td {
+  color: var(--text) !important;
+  background: var(--panel) !important;
+  border-color: var(--line) !important;
+}
+
+:root[data-theme="dark"] .meetings-table tr[data-meetings-row].selected td,
+:root[data-theme="dark"] .meetings-table tr[data-meetings-row]:hover td {
+  background: var(--surface-blue) !important;
+}
+
+:root[data-theme="dark"] .meetings-editor-actions {
+  border-color: var(--line) !important;
+  background:
+    linear-gradient(180deg, rgba(6, 17, 26, .72), rgba(6, 17, 26, .96) 28%, #06111a 100%) !important;
+}
+
+:root[data-theme="dark"] .meetings-preloader {
+  background: rgba(3, 10, 18, .68) !important;
+}
+
+:root[data-theme="dark"] .meetings-section-menu {
+  background: rgba(10, 28, 43, .98);
+}
+
+:root[data-theme="dark"] .meetings-section-option:hover,
+:root[data-theme="dark"] .meetings-section-option.selected {
+  color: var(--text);
+  border-color: rgba(67, 136, 255, .32);
+  background: rgba(67, 136, 255, .11);
+}
