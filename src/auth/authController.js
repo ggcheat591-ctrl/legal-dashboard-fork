@@ -2,7 +2,8 @@ import { dbApi } from '../api/dbApi.js';
 import { getAuthSession, setAuthSession, clearAuthSession } from './session.js';
 import { initLoginParticleVisual } from './loginParticleVisual.js';
 
-const APP_DISPLAY_NAME = 'Legal Dashboard';
+const APP_DISPLAY_NAME = 'ЮрСфера';
+const LOGIN_BRAND_LABEL = 'Правовая система';
 
 export function initAuthGate(onAuthenticated) {
   const existing = getAuthSession();
@@ -35,7 +36,7 @@ function renderLoginScreen(onAuthenticated) {
       <section class="login-card" data-login-card data-state="idle" aria-labelledby="login-title">
         <div class="login-brand">
           <span class="login-brand-mark" aria-hidden="true"></span>
-          ${APP_DISPLAY_NAME}
+          ${LOGIN_BRAND_LABEL}
         </div>
         <div class="login-logo" data-login-lock aria-hidden="true">🔒</div>
         <h1 id="login-title">${APP_DISPLAY_NAME}</h1>
