@@ -1,0 +1,348 @@
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+:root[data-theme="dark"] body,
+:root[data-theme="dark"] #app,
+:root[data-theme="dark"] .app,
+:root[data-theme="dark"] .main,
+:root[data-theme="dark"] .content,
+:root[data-theme="dark"] .view {
+  color: var(--text) !important;
+}
+
+:root[data-theme="dark"] .view {
+  background:
+    radial-gradient(circle at 8% 5%, rgba(43, 199, 220, .055), transparent 26%),
+    radial-gradient(circle at 94% 92%, rgba(67, 136, 255, .065), transparent 29%),
+    transparent !important;
+}
+
+/* Единая поверхность блоков и окон в гамме раздела «Совещания». */
+:root[data-theme="dark"] :is(
+  .panel,
+  .case-card,
+  .widget-shell,
+  .widget-body,
+  .calendar-main-card,
+  .calendar-side-card,
+  .calendar-week-card,
+  .calendar-month-panel,
+  .calendar-mode-card,
+  .calendar-task-card,
+  .calendar-week-task,
+  .calendar-unified-list-item,
+  .calendar-mini-widget,
+  .calendar-widget-kanban-column,
+  .calendar-widget-kanban-task,
+  .calendar-today-only-task,
+  .schedule-card,
+  .schedule-panel,
+  .enforcement-card,
+  .enforcement-panel,
+  .controlled-case-card,
+  .emergency-card,
+  .registry-card,
+  .utility-panel,
+  .map-panel,
+  .map-shell,
+  .detail-item,
+  .owner-card,
+  .quick-tip,
+  .modal,
+  dialog
+) {
+  color: var(--text) !important;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .026), transparent 46%),
+    var(--panel) !important;
+  border-color: var(--line) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+/* Подхватываем нестандартные карточки, панели и окна разных модулей. */
+:root[data-theme="dark"] :is(
+  [class$="-card"],
+  [class*="-card "],
+  [class$="-panel"],
+  [class*="-panel "],
+  [class$="-dialog"],
+  [class*="-dialog "],
+  [class$="-modal"],
+  [class*="-modal "],
+  [class$="-popover"],
+  [class*="-popover "],
+  [class$="-dropdown"],
+  [class*="-dropdown "]
+) {
+  border-color: var(--line) !important;
+}
+
+:root[data-theme="dark"] :is(
+  [class$="-dialog"],
+  [class*="-dialog "],
+  [class$="-modal"],
+  [class*="-modal "],
+  [class$="-popover"],
+  [class*="-popover "],
+  [class$="-dropdown"],
+  [class*="-dropdown "]
+) {
+  color: var(--text) !important;
+  background: var(--modal-bg) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* Внутренние секции, панели инструментов и области списков. */
+:root[data-theme="dark"] :is(
+  .table-wrap,
+  .calendar-toolbar,
+  .calendar-week-tools,
+  .calendar-dialog-body,
+  .calendar-detail-body,
+  .calendar-move-body,
+  .calendar-case-link-body,
+  .calendar-conflict-body,
+  .calendar-dependent-body,
+  .calendar-dialog-actions,
+  .modal-body,
+  .modal-footer,
+  .widget-head,
+  .widget-dragbar,
+  .control-page-row,
+  [class$="-toolbar"],
+  [class*="-toolbar "],
+  [class$="-body"],
+  [class*="-body "],
+  [class$="-content"],
+  [class*="-content "]
+) {
+  color: var(--text) !important;
+  border-color: var(--line) !important;
+}
+
+:root[data-theme="dark"] :is(
+  .calendar-toolbar,
+  .calendar-week-tools,
+  .widget-dragbar,
+  .calendar-dialog-body,
+  .calendar-detail-body,
+  .calendar-move-body,
+  .calendar-case-link-body,
+  .calendar-conflict-body,
+  .calendar-dependent-body,
+  .calendar-dialog-actions,
+  .modal-body,
+  .modal-footer
+) {
+  background: var(--surface-soft) !important;
+}
+
+/* Поля ввода во всех разделах. */
+:root[data-theme="dark"] :is(
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea,
+  .search-input,
+  .date-picker
+) {
+  color: var(--text) !important;
+  background: rgba(6, 20, 31, .9) !important;
+  border-color: rgba(157, 198, 228, .18) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025) !important;
+  caret-color: var(--blue) !important;
+}
+
+:root[data-theme="dark"] :is(
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea,
+  .search-input,
+  .date-picker
+):hover {
+  border-color: rgba(157, 198, 228, .28) !important;
+}
+
+:root[data-theme="dark"] :is(
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea,
+  .search-input,
+  .date-picker
+):focus {
+  color: var(--text) !important;
+  background: rgba(7, 23, 36, .98) !important;
+  border-color: rgba(67, 136, 255, .72) !important;
+  outline-color: rgba(67, 136, 255, .72) !important;
+  box-shadow: 0 0 0 4px rgba(67, 136, 255, .11) !important;
+}
+
+:root[data-theme="dark"] input::placeholder,
+:root[data-theme="dark"] textarea::placeholder {
+  color: #617b8e !important;
+}
+
+:root[data-theme="dark"] :is(input, select, textarea, button):disabled {
+  color: var(--text-disabled) !important;
+  background: var(--disabled-bg) !important;
+  border-color: rgba(157, 198, 228, .1) !important;
+  opacity: .78;
+}
+
+/* Обычные кнопки становятся частью тёмной системы, основные цвета не меняются. */
+:root[data-theme="dark"] .btn:not(.primary):not(.danger),
+:root[data-theme="dark"] :is(
+  .topbar-note-btn,
+  .topbar-notify-btn,
+  .topbar-theme-toggle,
+  .profile-action-btn,
+  .calendar-other-toggle,
+  .calendar-week-date,
+  .meetings-inline-back,
+  .meetings-mini-toggle
+) {
+  color: var(--text) !important;
+  background: rgba(17, 39, 58, .9) !important;
+  border-color: var(--line) !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="dark"] .btn:not(.primary):not(.danger):hover,
+:root[data-theme="dark"] :is(
+  .topbar-note-btn,
+  .topbar-notify-btn,
+  .topbar-theme-toggle,
+  .profile-action-btn,
+  .calendar-other-toggle,
+  .calendar-week-date,
+  .meetings-inline-back,
+  .meetings-mini-toggle
+):hover {
+  color: #fff !important;
+  background: rgba(25, 52, 73, .96) !important;
+  border-color: rgba(157, 198, 228, .3) !important;
+  box-shadow: 0 0 0 3px rgba(67, 136, 255, .09) !important;
+}
+
+/* Таблицы и списки. */
+:root[data-theme="dark"] table {
+  color: var(--text) !important;
+  border-color: var(--line) !important;
+}
+
+:root[data-theme="dark"] th {
+  color: var(--muted) !important;
+  background: rgba(17, 39, 58, .94) !important;
+  border-color: var(--line) !important;
+}
+
+:root[data-theme="dark"] td {
+  color: var(--text) !important;
+  background: rgba(10, 28, 43, .82) !important;
+  border-color: var(--line) !important;
+}
+
+:root[data-theme="dark"] tbody tr:hover td,
+:root[data-theme="dark"] tr.selected td,
+:root[data-theme="dark"] [aria-selected="true"] {
+  background: rgba(25, 52, 73, .9) !important;
+}
+
+:root[data-theme="dark"] :is(
+  .case-preview-row,
+  .control-row,
+  .calendar-day-cell,
+  .calendar-week-day,
+  .calendar-week-day-body,
+  .calendar-case-link-choice,
+  .empty-cell,
+  [class$="-row"],
+  [class*="-row "]
+) {
+  border-color: var(--line) !important;
+}
+
+/* Заголовки и вторичный текст. */
+:root[data-theme="dark"] :is(
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .page-head h2,
+  .topbar-title-text h1,
+  .widget-head h3
+) {
+  color: var(--text) !important;
+}
+
+:root[data-theme="dark"] :is(
+  .page-head p,
+  .topbar p,
+  .topbar-profile-text small,
+  .muted,
+  small,
+  .empty-cell,
+  .field-hint,
+  .form-hint
+) {
+  color: var(--muted) !important;
+}
+
+/* Меню, вкладки и выбранные элементы. */
+:root[data-theme="dark"] :is(
+  .panel-tabs button,
+  .event-type-row button,
+  .calendar-event-scope span,
+  .calendar-task-types label,
+  [role="tab"]
+) {
+  color: var(--text-secondary) !important;
+  background: rgba(17, 39, 58, .86) !important;
+  border-color: var(--line) !important;
+}
+
+:root[data-theme="dark"] :is(
+  .panel-tabs button.active,
+  .event-type-row button.active,
+  .calendar-event-scope input:checked + span,
+  [role="tab"][aria-selected="true"]
+) {
+  color: #dceaff !important;
+  background: rgba(67, 136, 255, .16) !important;
+  border-color: rgba(67, 136, 255, .42) !important;
+}
+
+/* Затемнение фона модальных окон. */
+:root[data-theme="dark"] dialog::backdrop,
+:root[data-theme="dark"] .modal-backdrop,
+:root[data-theme="dark"] [class$="-dialog"]::backdrop,
+:root[data-theme="dark"] [class*="-dialog "]::backdrop {
+  background: rgba(2, 8, 14, .74) !important;
+  backdrop-filter: blur(6px);
+}
+
+/* Системные полосы прокрутки в той же палитре. */
+:root[data-theme="dark"] * {
+  scrollbar-color: rgba(91, 126, 151, .72) rgba(7, 20, 31, .52);
+}
+
+:root[data-theme="dark"] *::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+:root[data-theme="dark"] *::-webkit-scrollbar-track {
+  background: rgba(7, 20, 31, .52);
+}
+
+:root[data-theme="dark"] *::-webkit-scrollbar-thumb {
+  border: 3px solid rgba(7, 20, 31, .52);
+  border-radius: 999px;
+  background: rgba(91, 126, 151, .72);
+}
+
+:root[data-theme="dark"] *::-webkit-scrollbar-thumb:hover {
+  background: rgba(112, 153, 181, .85);
+}
