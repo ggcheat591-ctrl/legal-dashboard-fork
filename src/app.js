@@ -9,6 +9,7 @@ import { initSchedulePage } from './modules/schedule/scheduleController.js';
 import { initEmergencyFundPage } from './modules/emergencyFund/emergencyFundController.js';
 import { initMunicipalRegistryPage } from './modules/municipalRegistry/municipalRegistryController.js';
 import { initMeetingsPage } from './modules/meetings/meetingsController.js';
+import { initMeetingsWorkflowUi } from './modules/meetings/meetingsWorkflowUi.js';
 import { initMapFullscreenButton } from './modules/map/mapFullscreen.js';
 import { initUtilityPanels } from './modules/utility/utilityPanelsController.js';
 import { initAuthGate, initAuthUi } from './auth/authController.js';
@@ -32,6 +33,7 @@ export function initApp() {
     initEmergencyFundPage();
     initMunicipalRegistryPage();
     initMeetingsPage();
+    initMeetingsWorkflowUi();
     initMapFullscreenButton();
     initUtilityPanels();
     initCaseNumberAutoYear();
