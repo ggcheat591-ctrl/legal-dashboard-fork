@@ -1,0 +1,380 @@
+/*
+ * Точечные исправления контраста и расположения элементов в тёмной теме.
+ * Файл намеренно подключается последним и не затрагивает карту.
+ */
+
+/* Светлые поисковые строки только в перечисленных рабочих разделах. */
+:root[data-theme="dark"] :is(
+  #cases,
+  #controlledCases,
+  #enforcement,
+  #schedule,
+  #emergencyFund,
+  #municipalRegistry,
+  #reports
+) .search-field-wrap .search-input {
+  color: #18334a !important;
+  background: linear-gradient(180deg, #eef6fb 0%, #dceaf3 100%) !important;
+  border-color: #a6bdcc !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .82),
+    0 8px 22px rgba(0, 0, 0, .13) !important;
+  caret-color: #2455cf !important;
+}
+
+:root[data-theme="dark"] :is(
+  #cases,
+  #controlledCases,
+  #enforcement,
+  #schedule,
+  #emergencyFund,
+  #municipalRegistry,
+  #reports
+) .search-field-wrap .search-input::placeholder {
+  color: #567185 !important;
+  opacity: 1 !important;
+}
+
+:root[data-theme="dark"] :is(
+  #cases,
+  #controlledCases,
+  #enforcement,
+  #schedule,
+  #emergencyFund,
+  #municipalRegistry,
+  #reports
+) .search-field-wrap .search-input:hover {
+  background: linear-gradient(180deg, #f6fbfe 0%, #e3eff6 100%) !important;
+  border-color: #8eabba !important;
+}
+
+:root[data-theme="dark"] :is(
+  #cases,
+  #controlledCases,
+  #enforcement,
+  #schedule,
+  #emergencyFund,
+  #municipalRegistry,
+  #reports
+) .search-field-wrap .search-input:focus {
+  color: #102b42 !important;
+  background: #f8fcff !important;
+  border-color: #4388ff !important;
+  box-shadow:
+    0 0 0 4px rgba(67, 136, 255, .20),
+    0 10px 26px rgba(0, 0, 0, .14) !important;
+}
+
+:root[data-theme="dark"] :is(
+  #cases,
+  #controlledCases,
+  #enforcement,
+  #schedule,
+  #emergencyFund,
+  #municipalRegistry,
+  #reports
+) .search-field-icon {
+  color: #315d78 !important;
+  opacity: .92 !important;
+}
+
+/* Вторичные действия в шапках визуально равны основной кнопке создания. */
+:root[data-theme="dark"] :is(
+  #cases [data-general-refresh],
+  #cases [data-general-archive-toggle],
+  #controlledCases [data-controlled-refresh],
+  #controlledCases [data-controlled-full-table],
+  #controlledCases [data-controlled-archive-toggle],
+  #enforcement [data-enforcement-refresh],
+  #enforcement [data-enforcement-export],
+  #enforcement [data-enforcement-archive-toggle],
+  #calendar [data-calendar-refresh],
+  #schedule [data-schedule-date-new],
+  #emergencyFund [data-emergency-upload],
+  #emergencyFund [data-emergency-reports-open],
+  #emergencyFund [data-emergency-archive-open],
+  #municipalRegistry [data-registry-archive-open],
+  #reports [data-reports-refresh],
+  #reports .reports-refresh-button,
+  #reports .report-refresh-button
+) {
+  color: #fff !important;
+  background: linear-gradient(135deg, #2f6fe8 0%, #2455cf 100%) !important;
+  border-color: rgba(131, 180, 255, .44) !important;
+  box-shadow: 0 12px 28px rgba(22, 78, 194, .28) !important;
+}
+
+:root[data-theme="dark"] :is(
+  #cases [data-general-refresh],
+  #cases [data-general-archive-toggle],
+  #controlledCases [data-controlled-refresh],
+  #controlledCases [data-controlled-full-table],
+  #controlledCases [data-controlled-archive-toggle],
+  #enforcement [data-enforcement-refresh],
+  #enforcement [data-enforcement-export],
+  #enforcement [data-enforcement-archive-toggle],
+  #calendar [data-calendar-refresh],
+  #schedule [data-schedule-date-new],
+  #emergencyFund [data-emergency-upload],
+  #emergencyFund [data-emergency-reports-open],
+  #emergencyFund [data-emergency-archive-open],
+  #municipalRegistry [data-registry-archive-open],
+  #reports [data-reports-refresh],
+  #reports .reports-refresh-button,
+  #reports .report-refresh-button
+):hover {
+  color: #fff !important;
+  background: linear-gradient(135deg, #3b7af2 0%, #2b60da 100%) !important;
+  border-color: rgba(166, 202, 255, .62) !important;
+  box-shadow: 0 15px 34px rgba(22, 78, 194, .36) !important;
+  transform: translateY(-1px);
+}
+
+/* Общий перечень дел: подпись вида отображения не теряется на фоне. */
+:root[data-theme="dark"] #cases .general-case-viewbar-caption > span {
+  color: #dcecff !important;
+  font-weight: 800 !important;
+}
+
+:root[data-theme="dark"] #cases .general-case-viewbar-caption > small {
+  color: #a8c2d5 !important;
+}
+
+/* Белые маркеры с нейтральной обводкой вместо тёмных квадратов. */
+:root[data-theme="dark"] :is(
+  #cases .case-form-flags input[type="checkbox"],
+  #cases .check-row input[type="checkbox"],
+  #emergencyFund .review-ready-check input[type="checkbox"],
+  #meetings input[type="checkbox"]
+) {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  flex: 0 0 20px !important;
+  border: 1.5px solid #94a3b8 !important;
+  border-radius: 5px !important;
+  background: #fff !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, .16) !important;
+  cursor: pointer;
+}
+
+:root[data-theme="dark"] :is(
+  #cases .case-form-flags input[type="checkbox"],
+  #cases .check-row input[type="checkbox"],
+  #emergencyFund .review-ready-check input[type="checkbox"],
+  #meetings input[type="checkbox"]
+):checked {
+  border-color: #2f6fe8 !important;
+  background-color: #2f6fe8 !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='m4.5 10.5 3.3 3.3 7.7-8' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  background-size: 16px 16px !important;
+}
+
+:root[data-theme="dark"] :is(
+  #cases .case-form-flags input[type="checkbox"],
+  #cases .check-row input[type="checkbox"],
+  #emergencyFund .review-ready-check input[type="checkbox"],
+  #meetings input[type="checkbox"]
+):focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 4px rgba(67, 136, 255, .24) !important;
+}
+
+/* Исполнительные производства: редактор открывается модальным окном по центру. */
+.enforcement-editor-card.is-open {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: min(1180px, calc(100vw - 48px)) !important;
+  max-height: calc(100vh - 48px) !important;
+  overflow: auto !important;
+  border-radius: 28px !important;
+  transform: translate(-50%, -50%) !important;
+  box-shadow: 0 28px 100px rgba(0, 0, 0, .42) !important;
+  animation: enforcementEditorCenterIn .24s cubic-bezier(.2, .78, .25, 1) !important;
+}
+
+@keyframes enforcementEditorCenterIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 24px)) scale(.985);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Календарь: кнопка обновления и читаемые элементы формы события. */
+:root[data-theme="dark"] #calendar .calendar-refresh-icon {
+  color: #fff !important;
+}
+
+:root[data-theme="dark"] #calendar .calendar-dialog-head [data-calendar-dialog-title] {
+  color: #f4f8ff !important;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .18);
+}
+
+:root[data-theme="dark"] #calendar .calendar-task-types input[type="radio"] {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  flex: 0 0 20px !important;
+  border: 1.5px solid #94a3b8 !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, .16) !important;
+}
+
+:root[data-theme="dark"] #calendar .calendar-task-types input[type="radio"]:checked {
+  border-color: #2f6fe8 !important;
+  background: radial-gradient(circle, #2f6fe8 0 42%, #fff 45% 100%) !important;
+}
+
+#calendar .calendar-privacy-hint {
+  color: #29465c !important;
+  background: #dcebf4 !important;
+  border: 1px solid #a9bfcd !important;
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+/* График судебных заседаний: заголовок модального окна контрастнее. */
+:root[data-theme="dark"] #schedule .schedule-date-dialog-head h3 {
+  color: #f3f8ff !important;
+}
+
+/* Аварийный фонд: акцент редактора одинаково синий в обеих темах. */
+#emergencyFund .emergency-editor-card::before {
+  background: linear-gradient(180deg, #2f6fe8 0%, #2455cf 100%) !important;
+}
+
+/* Реестр: единый знак обновления, как в аварийном фонде. */
+#municipalRegistry .registry-refresh-icon {
+  font-size: 0 !important;
+}
+
+#municipalRegistry .registry-refresh-icon::before {
+  content: "↻";
+  font-size: 25px;
+  line-height: 1;
+}
+
+/* Совещания: читаемая стартовая область и более спокойные заголовки. */
+:root[data-theme="dark"] #meetings .meetings-main-head h2 {
+  color: #f1f7fb !important;
+}
+
+:root[data-theme="dark"] #meetings .meetings-main-head p {
+  color: #aec5d5 !important;
+}
+
+#meetings :is(
+  .meetings-entry-card strong,
+  .meetings-editor-head h3,
+  .meetings-archive-head h3,
+  .meetings-table-title h3,
+  .meetings-block-head h4,
+  .meetings-panel-head h4,
+  .meetings-section-context strong,
+  .meetings-section-option-copy b
+) {
+  color: #24486d !important;
+  font-weight: 700 !important;
+}
+
+:root[data-theme="dark"] #meetings :is(
+  .meetings-entry-card strong,
+  .meetings-editor-head h3,
+  .meetings-archive-head h3,
+  .meetings-table-title h3,
+  .meetings-block-head h4,
+  .meetings-panel-head h4,
+  .meetings-section-context strong,
+  .meetings-section-option-copy b
+) {
+  color: #c9dff0 !important;
+  font-weight: 650 !important;
+}
+
+/* Светлая полоса прокрутки списка выбранных участников. */
+#meetings :is(
+  .meetings-selected-list,
+  .meetings-selected-people,
+  .meetings-list-box,
+  [data-meetings-selected-list],
+  [data-meetings-selected-people]
+) {
+  scrollbar-color: #91afc2 #dce9f1 !important;
+  scrollbar-width: thin;
+}
+
+#meetings :is(
+  .meetings-selected-list,
+  .meetings-selected-people,
+  .meetings-list-box,
+  [data-meetings-selected-list],
+  [data-meetings-selected-people]
+)::-webkit-scrollbar-track {
+  background: #dce9f1 !important;
+  border-radius: 999px;
+}
+
+#meetings :is(
+  .meetings-selected-list,
+  .meetings-selected-people,
+  .meetings-list-box,
+  [data-meetings-selected-list],
+  [data-meetings-selected-people]
+)::-webkit-scrollbar-thumb {
+  border: 2px solid #dce9f1 !important;
+  border-radius: 999px;
+  background: #91afc2 !important;
+}
+
+/* Экран отчётов: обновление рядом с заголовком и только в виде стрелки.
+   Селекторы поддерживают обе встречавшиеся схемы разметки раздела. */
+#reports :is(.reports-title-row, .report-title-row) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+#reports :is(
+  [data-reports-refresh],
+  .reports-refresh-button,
+  .report-refresh-button
+) {
+  width: 46px !important;
+  min-width: 46px !important;
+  height: 46px !important;
+  padding: 0 !important;
+  border-radius: 14px !important;
+  font-size: 0 !important;
+}
+
+#reports :is(
+  [data-reports-refresh],
+  .reports-refresh-button,
+  .report-refresh-button
+)::before {
+  content: "↻";
+  font-size: 25px;
+  line-height: 1;
+}
+
+@media (max-width: 880px) {
+  .enforcement-editor-card.is-open {
+    width: calc(100vw - 20px) !important;
+    max-height: calc(100vh - 20px) !important;
+    border-radius: 22px !important;
+  }
+}
